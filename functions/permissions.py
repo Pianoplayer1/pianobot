@@ -13,3 +13,8 @@ def permissions(user, channel, guild):
         test = None
 
     return [perms[perm] for perm in range(len(perms)) if test & pow(2, perm) > 0]
+
+def check_permissions(user, channel, check_perms):
+    user_perms = permissions(user, channel, channel.guild)
+
+    return all(perm in user_perms for perm in check_perms)
