@@ -36,7 +36,7 @@ class Permissions(commands.Cog):
                         await ctx.send(f'**{role.name}**:\n{perms}')
         else:
             await ctx.send('\n'.join(permissions(member, channel, guild)))
-            await ctx.send(guid.roles)
+            await ctx.send(guild.roles)
 
 def setup(client):
     client.add_cog(Permissions(client))
