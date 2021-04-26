@@ -7,18 +7,16 @@ async def territory(client):
     async with aiohttp.ClientSession() as session, session.get('https://api.wynncraft.com/public_api.php?action=territoryList') as response:
         terrs = await response.json()
         terrs = terrs['territories']
-        tmissing = []
 
         for terr in list(db_terrs.keys()):
-            if terrs[terr]['guild'] != 'Eden':
-                tmissing.append(terr)
-                if db_terrs[terr] == 'Eden':
-                    ping_terr = terr
+            if terrs[terr]['guild'] != 'Eden' and db_terrs[terr] == 'Eden':
+                ping_terr = terr
             if db_terrs[terr] != terrs[terr]['guild']:  
                 query("UPDATE territories SET guild = %s WHERE name = %s", (terrs[terr]['guild'], terr))
                 print(f'{terr}: {db_terrs[terr]} -> {terrs[terr]["guild"]}')
 
         if 'ping_terr' in locals():
+            tmissing = query("SELECT name FROM territories WHERE guild != 'Eden'")
             msg = f'{terrs[ping_terr]["guild"]} has taken control of {ping_terr}!```All missing territories ({len(tmissing)}):\n'
             for terr in tmissing:
                 msg += f'\n- {terr} ({terrs[terr]["guild"]})'

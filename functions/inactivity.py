@@ -10,7 +10,7 @@ async def fetch(session, member):
             if memberStats['data'][0]['meta']['location']['online'] == True:
                 times[member['name']] = [0, 'Online']
             else:
-                diff = datetime.strptime(str(datetime.utcnow()), '%Y-%m-%d %H:%M:%S.%f') - datetime.strptime(memberStats['data'][0]['meta']['lastJoin'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                diff = datetime.utcnow() - datetime.strptime(memberStats['data'][0]['meta']['lastJoin'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 days = diff.days + (diff.seconds / 86400)
                 value = days
                 if value < 1:
@@ -38,7 +38,9 @@ async def check_activity(guild, reverse):
         guildStats = await response.json()
         await asyncio.gather(*[fetch(session, member) for member in guildStats['members']])
 
-    data = []
-    for key, value in sorted(times.items(), key=lambda item: item[1][0], reverse=reverse):
-        data.append([key, ranks[key], times[key][1]])
-    return data
+    return [
+        [key, ranks[key], times[key][1]]
+        for key, value in sorted(
+            times.items(), key=lambda item: item[1][0], reverse=reverse
+        )
+    ]
