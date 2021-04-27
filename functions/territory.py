@@ -19,6 +19,7 @@ async def territory(client):
             tmissing = query("SELECT name FROM territories WHERE guild != 'Eden'")
             msg = f'{terrs[ping_terr]["guild"]} has taken control of {ping_terr}!```All missing territories ({len(tmissing)}):\n'
             for terr in tmissing:
+                terr = terr[0]
                 msg += f'\n- {terr} ({terrs[terr]["guild"]})'
             msg += '```'
 
