@@ -2,7 +2,7 @@ from discord.ext import commands
 from functions.db import query
 from functions.table import table
 from functions.pages import paginator
-from functions.permissions import permissions
+from functions.permissions import check_permissions
 import aiohttp
 
 class Territories(commands.Cog):
@@ -20,14 +20,11 @@ class Territories(commands.Cog):
     async def territories(self, ctx, action, *, territories = None):
         tlist = query("SELECT * FROM territories")
         tlist = dict(tlist)
-        if territories:
-            territories = territories.split(', ')
-        else:
-            territories = []
+        territories = territories.split(', ') if territories else []
         if action.lower() == 'list':
             await paginator(self.client, ctx, table({f'Territory' : len(max(list(tlist.keys()), key=len)) + 8, 'Guild' : len(max(list(tlist.keys()), key=len)) + 3}, list(tlist.items()), 10, 20, True))
         elif action.lower() == 'add':
-            if not 'manage_roles' in permissions(ctx.author, ctx.channel, ctx.guild):
+            if not check_permissions(ctx.author, ctx.channel, ['manage_roles']):
                 await ctx.send('You don\'t have the required permissions to perform this action!')
                 return
             tlist = list(tlist.keys())
@@ -48,17 +45,17 @@ class Territories(commands.Cog):
                     else:
                         failed.append(territory)
                 message = ''
-                if len(success) > 0:
+                if success:
                     message += f'Successfully added {len(success)} {"territories" if len(success) > 1 else "territory"} to the list!\n\n'
-                if len(failed) > 0: 
+                if failed: 
                     message += f'Following {"territories" if len(failed) > 1 else "territory"} could not be added:\n'
                     for fail in failed:
                         message += f'-`{fail}`\n'
                 if len(territories) == 0:
                     message = 'You have to specifiy at least one territory to add!'
                 await ctx.send(message)
-        elif action.lower() == 'del' or action.lower() == 'delete':
-            if not 'manage_roles' in permissions(ctx.author, ctx.channel, ctx.guild):
+        elif action.lower() in ['del', 'delete']:
+            if not check_permissions(ctx.author, ctx.channel):
                 await ctx.send('You don\'t have the required permissions to perform this action!')
                 return
             tlist = list(tlist.keys())
@@ -73,9 +70,9 @@ class Territories(commands.Cog):
                 else:
                     failed.append(territory)
             message = ''
-            if len(success) > 0:
+            if success:
                 message += f'Successfully removed {len(success)} {"territories" if len(success) > 1 else "territory"} from the list!\n\n'
-            if len(failed) > 0:
+            if failed:
                 message += f'Following {"territories" if len(failed) > 1 else "territory"} could not be removed:\n'
                 for fail in failed:
                     message += f'-`{fail}`\n'

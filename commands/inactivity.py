@@ -1,7 +1,7 @@
 from discord.ext import commands
 from functions.inactivity import check_activity
 from functions.pages import paginator
-from functions.permissions import permissions
+from functions.permissions import check_permissions
 from functions.table import table
 import aiohttp
 
@@ -42,7 +42,7 @@ class Inactivity(commands.Cog):
                     return m.author == ctx.author and m.channel == ctx.channel
 
                 msg = await self.client.wait_for('message', check=check)
-                if ctx.guild and 'manage_messages' in permissions(self.client.user, ctx.channel, ctx.guild):
+                if ctx.guild and check_permissions(self.client.user, ctx.channel, ['manage_messages']):
                     await msg.delete()
                 
                 try:

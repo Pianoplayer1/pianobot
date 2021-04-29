@@ -15,8 +15,8 @@ class Nickname(commands.Cog):
     @commands.guild_only()
     async def nickname(self, ctx, user, nick, guild = None):
         guild = ctx.guild if not guild else self.client.get_guild(guild)
-        if not check_permissions(ctx.author, ctx.channel, ['manage_nicknames']) or 'manage_nicknames' not in permissions(self.client.user, guild.channels[0], guild):
-            await ctx.send('You don\'t have the required permissions to edit nicknames!')
+        if check_permissions(self.client.user, ctx.channel, ['manage_nicknames']):
+            await ctx.send('I don\'t have the required permissions to edit nicknames!')
             return
         member = guild.get_member(int(user))
         if member:

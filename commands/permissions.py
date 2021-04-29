@@ -1,7 +1,7 @@
+import discord
+import typing
 from discord.ext import commands
 from functions.permissions import permissions
-import asyncio
-from math import ceil
 
 class Permissions(commands.Cog):
 
@@ -14,29 +14,24 @@ class Permissions(commands.Cog):
                         help = 'View permissions.',
                         hidden = True  )
     @commands.guild_only()
-    async def permissions(self, ctx, channel = None, member = None, all_roles = None):
-        try:
-            channel = self.client.get_channel(int(channel))
-        except TypeError:
+    async def permissions(self, ctx, target : typing.Union[discord.Member, discord.Role] = None, channel : typing.Union[discord.TextChannel, discord.VoiceChannel] = None, *, args = ''):
+        if channel is None:
             channel = ctx.channel
-        guild = channel.guild
-        try:
-            member = guild.get_role(int(member)) or guild.get_member(int(member))
-        except TypeError:
-            member = ctx.author
-        if all_roles:
-            await ctx.send([chann.name for chann in guild.channels if 'view_channel' in permissions(self.client.user, chann, guild)])
-            if id:
-                for role in guild.roles:
-                    perms = permissions(role, channel, guild)
-                    if len(perms) > 0:
-                        perms = '\n'.join(perms)
-                        if role.name[0] == '>':
-                            role.name = '\\' + role.name
-                        await ctx.send(f'**{role.name}**:\n{perms}')
+        if target is None:
+            target = ctx.author
+        
+        if 'all' in args:
+            for role in channel.guild.roles:
+                perms = permissions(role, channel)
+                if len(perms) > 0:
+                    perms = '\n'.join(perms)
+                    if role.name[0] == '>':
+                        role.name = '\\' + role.name
+                    await ctx.send(f'**{role.name}**:\n{perms}')
         else:
-            await ctx.send('\n'.join(permissions(member, channel, guild)))
-            await ctx.send(guild.roles)
+            perms = permissions(target, channel)
+            message = '\n'.join(perms) if len(perms) > 0 else 'No permissions'
+            await ctx.send(f'Permissions for {target.mention} in {channel.mention}:\n{message}')
 
 def setup(client):
     client.add_cog(Permissions(client))
