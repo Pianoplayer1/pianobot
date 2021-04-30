@@ -20,6 +20,7 @@ for filename in listdir('./events'):
     if filename.endswith('.py'):
         client.load_extension(f'events.{filename[:-3]}')
 
+db.connect()
 client.run(getenv('TOKEN'))
 
 db.disconnect()

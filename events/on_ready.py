@@ -1,5 +1,4 @@
 from discord.ext import commands, tasks
-from functions.db import connect
 from functions.territory import territory
 from functions.worlds import worlds
 
@@ -10,7 +9,6 @@ class On_ready(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        connect()
         print('Booted up')
         self.loop.start()
 

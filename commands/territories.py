@@ -55,7 +55,7 @@ class Territories(commands.Cog):
                     message = 'You have to specifiy at least one territory to add!'
                 await ctx.send(message)
         elif action.lower() in ['del', 'delete']:
-            if not check_permissions(ctx.author, ctx.channel):
+            if not check_permissions(ctx.author, ctx.channel, ['manage_roles']):
                 await ctx.send('You don\'t have the required permissions to perform this action!')
                 return
             tlist = list(tlist.keys())
