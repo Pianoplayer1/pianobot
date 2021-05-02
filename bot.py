@@ -9,7 +9,7 @@ class Pianobot(commands.Bot):
         intents.members = True
         super().__init__(command_prefix = self.get_prefixes, help_command = None, intents = intents)
 
-        self.load_extension_folder('commands/test')
+        self.load_extension_folder('commands')
         self.load_extension_folder('events')
 
     async def get_prefixes(self, client, message):
