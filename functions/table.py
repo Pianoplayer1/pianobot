@@ -1,6 +1,6 @@
 from math import ceil
 
-def table(columns, rawData, seperator = 0, pageLen = 0, enum = False):
+def table(columns, rawData, seperator = 0, pageLen = 0, enum = False, label = ''):
     if enum:
         columns[list(columns.keys())[0]] -= 5
     message = []
@@ -39,7 +39,7 @@ def table(columns, rawData, seperator = 0, pageLen = 0, enum = False):
                     message[page] += ' ' * (list(columns.values())[i]) + '|'
                     
         if pageNum > 1:
-            message[page] += f'\n\nPage {page + 1} / {pageNum}'
+            message[page] += f'\n\nPage {page + 1} / {pageNum} {label}'
         message[page] += '```'
             
     return message
