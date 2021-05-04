@@ -23,7 +23,7 @@ class Members(commands.Cog):
                  'consul'       : eden.get_role(727551690248683571),
                  'emperor'      : eden.get_role(682677588933869577)}
         guild_members = [member for member in eden.members if roles['guild_member'] in member.roles]
-        wrong_amount = [member for member in guild_members if sum(role in member.roles for role in roles.items()) > 2]
+        wrong_amount = [member for member in guild_members if sum(role in member.roles for role in roles.values()) > 2]
 
         await ctx.send(', '.join(w.name for w in wrong_amount))
 
