@@ -16,7 +16,8 @@ class Members(commands.Cog):
 
         links = dict(query('SELECT uuid, discord FROM members'))
         async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
-            ingame_members = await response.json()['members']
+            ingame_members = await response.json()
+            ingame_members = ingame_members['members']
         for member in ingame_members:
             try:
                 if links[member['uuid']] == 0:
