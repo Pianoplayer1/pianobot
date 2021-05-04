@@ -11,7 +11,17 @@ class Members(commands.Cog):
                         brief = 'Outputs members of the Eden Discord server.',
                         help = 'This command outputs members of the Eden Discord server.',
                         usage = ''  )
-    async def members(self, ctx):
+    async def members(self, ctx, *, args = none):
+        command, name, id = args.split()
+        if command.lower() == 'link':
+            async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
+                json_response = await response.json()
+            uuid = json_response['id']
+            if uuid:
+                query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0', (name, uuid, id))
+            else:
+                print(f'Couldn\'t find uuid of {name}')
+            return
         output = {'Missing link':[],'Wrong amount of roles':[],'No guild member role':[],'Not in the guild':[],'Wrong role':[]}
 
         links = dict(query('SELECT discord, uuid FROM members'))
@@ -32,21 +42,22 @@ class Members(commands.Cog):
         for member in eden.members:
             if roles['guild_member'] in member.roles:
                 if sum(role in member.roles for role in roles.values()) > 2:
-                    output['Wrong amount of roles'].append(member.nick)
+                    output['Wrong amount of roles'].append(member.nick or member.name)
                 try:
                     uuid = links[member.id]
                     try:
                         ingame_member = ingame_members[uuid]
                         if roles[ingame_member['rank'].lower()] in member.roles:
-                            a=1
+                            if member.nick not in ingame_member['name']:
+                                output['Wrong nickname'].append(member.nick or member.name)
                         else:
-                            output['Wrong role'].append(member.nick)
+                            output['Wrong role'].append(member.nick or member.name)
                     except KeyError:
-                        output['Not in the guild'].append(member.nick)
+                        output['Not in the guild'].append(member.nick or member.name)
                 except KeyError:
-                    output['Missing link'].append(member.nick)
+                    output['Missing link'].append(member.nick or member.name)
             elif any(role in member.roles for role in roles.values()):
-                output['No guild member role'].append(member.nick)
+                output['No guild member role'].append(member.nick or member.name)
 
         await ctx.send(output)
 
