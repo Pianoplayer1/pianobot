@@ -11,7 +11,7 @@ class Members(commands.Cog):
                         brief = 'Outputs members of the Eden Discord server.',
                         help = 'This command outputs members of the Eden Discord server.',
                         usage = ''  )
-    async def members(self, ctx, *, args = none):
+    async def members(self, ctx, *, args = None):
         command, name, id = args.split()
         if command.lower() == 'link':
             async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
