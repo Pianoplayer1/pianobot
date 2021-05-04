@@ -35,7 +35,7 @@ class Members(commands.Cog):
                  'consul'       : eden.get_role(727551690248683571),
                  'emperor'      : eden.get_role(682677588933869577)}
         discord_members = [member for member in eden.members if roles['guild_member'] in member.roles]
-        output['Wrong amount of roles'] = [member.nickname for member in discord_members if sum(role in member.roles for role in roles.values()) > 2]
+        output['Wrong amount of roles'] = [member.nick for member in discord_members if sum(role in member.roles for role in roles.values()) > 2]
 
         await ctx.send(output)
 
