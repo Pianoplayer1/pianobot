@@ -15,7 +15,7 @@ class Members(commands.Cog):
         output = {'Missing link' : [], 'Wrong amount of roles' : []}
 
         links = dict(query('SELECT uuid, discord FROM members'))
-        with self.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
+        with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
             ingame_members = response.json()['members']
         for member in ingame_members:
             try:
