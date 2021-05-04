@@ -12,16 +12,18 @@ class On_command_error(commands.Cog):
         if hasattr(ctx.command, 'on_error'):
             return
         cog = ctx.cog
-        if cog:
-            if cog._get_overridden_method(cog.cog_command_error) is not None:
-                return
+        if cog and cog._get_overridden_method(cog.cog_command_error) is not None:
+            return
         if ctx.guild:
             prefix = query('SELECT * FROM servers WHERE id = %s', ctx.guild.id)
             prefix = prefix[0][1]
         else:
             prefix = '-'
         if isinstance(error, commands.CommandNotFound):
-            await ctx.send(f'I don\'t know this command. Use `{prefix}help` to get a list of things I can do.')
+            try:
+                await ctx.send(f'I don\'t know this command. Use `{prefix}help` to get a list of things I can do.')
+            except discord.Forbidden:
+                print(f'\'{ctx.message.content}\' could not be processed in #{ctx.channel.name} in {ctx.guild.name}')
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(f'You are missing the required \'{error.param}\' argument after this command. Refer to `{prefix}help {ctx.command}` for detailed information.')
         elif isinstance(error, commands.NoPrivateMessage):
@@ -31,9 +33,7 @@ class On_command_error(commands.Cog):
                 pass
         elif isinstance(error, commands.MissingPermissions):
             if ctx.guild:
-                perms = ''
-                for perm in error.missing_perms:
-                    perms += f'\n- `{perm}`'
+                perms = ''.join(f'\n- `{perm}`' for perm in error.missing_perms)
                 await ctx.send(f'You do not have the required permissions to run this command!\nFollowing permissions are needed:\n{perms}')
             else:
                 await ctx.send(f'`{prefix}{ctx.command}` cannot be used in private messages.')
