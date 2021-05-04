@@ -17,10 +17,11 @@ class Members(commands.Cog):
             if command.lower() == 'link':
                 async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
                     json_response = await response.json()
+                    print(json_response)
                 uuid = json_response['id']
                 if uuid:
                     uuid = uuid[0:7]+'-'+uuid[8:11]+'-'+uuid[12:15]+'-'+uuid[16:19]+'-'+uuid[20:31]
-                    query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0', (name, uuid, id))
+                    query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0)', (name, uuid, id))
                 else:
                     print(f'Couldn\'t find uuid of {name}')
                 return
