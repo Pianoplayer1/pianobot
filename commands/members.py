@@ -41,6 +41,7 @@ class Members(commands.Cog):
                  'chief'        : eden.get_role(682675116865224773),
                  'consul'       : eden.get_role(727551690248683571),
                  'owner'        : eden.get_role(682677588933869577)}
+        high_roles = [roles['owner'], roles['consul'], roles['chief'], roles['strategist']]
 
         for member in eden.members:
             if roles['guild_member'] in member.roles:
@@ -51,10 +52,11 @@ class Members(commands.Cog):
                     try:
                         ingame_member = ingame_members[uuid]
                         if roles[ingame_member['rank'].lower()] in member.roles:
-                            if ingame_member['name'] not in (member.nick or member.name):
+                            if ingame_member['name'] not in (member.nick or member.name) and all(role not in member.roles for role in [high_roles]):
                                 output['Wrong nickname'].append(member.nick or member.name)
                         else:
-                            output['Wrong role'].append(member.nick or member.name)
+                            if roles['consul'] not in member.roles:
+                                output['Wrong role'].append(member.nick or member.name)
                     except KeyError:
                         output['Not in the guild'].append(member.nick or member.name)
                 except KeyError:
