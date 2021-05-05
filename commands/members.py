@@ -61,7 +61,8 @@ class Members(commands.Cog):
         high_roles = [roles['owner'], roles['consul'], roles['chief'], roles['strategist']]
 
         for member in eden.members:
-            discord_name = member.mention or member.name
+            discord_name = member.nick or member.name
+            message_name = member.mention
             if roles['guild_member'] in member.roles:
                 dormant = dormant_role in member.roles
                 try:
@@ -69,33 +70,33 @@ class Members(commands.Cog):
                     if uuid == '0':
                         raise KeyError
                 except KeyError:
-                    output['Missing link between Discord and MC account'].append(discord_name)
+                    output['Missing link between Discord and MC account'].append(message_name)
                     continue
                 try:
                     ingame_name = ingame_members[uuid]['name']
                     ingame_rank = ingame_members[uuid]['rank'].lower()
                 except KeyError:
                     if not dormant:
-                        output['Not in the ingame guild'].append(discord_name)
+                        output['Not in the ingame guild'].append(message_name)
                     continue
                 temp_roles = member.roles
                 temp_roles.reverse()
                 highest_role = next(role for role in temp_roles if role in roles.values())
 
                 if dormant:
-                    output['Dormant, but still in the guild - can be kicked if needed'].append(discord_name)
+                    output['Dormant, but still in the guild - can be kicked if needed'].append(message_name)
 
                 if sum(role in member.roles for role in roles.values()) != 2:
-                    output['Wrong amount of Discord roles'].append(discord_name)
+                    output['Wrong amount of Discord roles'].append(message_name)
 
                 if highest_role not in [roles[ingame_rank], roles['consul']]:
-                    output['Highest Discord role not matching ingame role'].append(discord_name)
+                    output['Highest Discord role not matching ingame role'].append(message_name)
 
                 if discord_name != symbols[highest_role] + ingame_members[uuid]['name'] and highest_role not in high_roles:
-                    output['Discord nickname not matching ingame name or rank symbol'].append(discord_name)
+                    output['Discord nickname not matching ingame name or rank symbol'].append(message_name)
 
             elif any(role in member.roles for role in roles.values()) and 'administrator' not in permissions(member, eden.channels[0]):
-                output['No guild member role in Discord'].append(discord_name)
+                output['No guild member role in Discord'].append(message_name)
 
         msgs = '.'
         msg = ('\n'.join(f'\n**{category[0]}:**\n' + '\n'.join(category[1]) for category in output.items() if len(category[1]) > 0))
