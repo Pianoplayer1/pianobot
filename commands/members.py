@@ -39,7 +39,12 @@ class Members(commands.Cog):
         links = dict(query('SELECT discord, uuid FROM members'))
         async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
             json_response = await response.json()
-        ingame_members = {member['uuid'] : {'name': member['name'], 'rank': member['rank']} for member in json_response['members']}
+        ingame_members = {}
+        for member in json_response['members']:
+            if member['uuid'] not in links.values():
+                output['Missing link between MC and Discord account'].append(member['name'])
+                continue
+            ingame_members[member['uuid']] = {'name': member['name'], 'rank': member['rank']}
 
         eden = self.client.get_guild(682671629213368351)
         roles = {   'guild_member' : eden.get_role(682675039631310915),
@@ -60,8 +65,10 @@ class Members(commands.Cog):
                 dormant = dormant_role in member.roles
                 try:
                     uuid = links[member.id]
+                    if int(uuid) == 0:
+                        raise KeyError
                 except KeyError:
-                    output['Missing link between MC and Discord account'].append(discord_name)
+                    output['Missing link between Discord and MC account'].append(discord_name)
                     continue
                 try:
                     ingame_name = ingame_members[uuid]['name']
