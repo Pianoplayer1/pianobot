@@ -63,7 +63,10 @@ class Members(commands.Cog):
                     output['Missing link'].append(member.nick or member.name)
             elif any(role in member.roles for role in roles.values()):
                 output['No guild member role'].append(member.nick or member.name)
-
+        message = ''
+        for category in output.items():
+            message.append(f'\n**{category[0]}**\n')
+            message.append('\n'.join(category[1]))
         await ctx.send(output)
 
 def setup(client):
