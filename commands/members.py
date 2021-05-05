@@ -98,13 +98,7 @@ class Members(commands.Cog):
             elif any(role in member.roles for role in roles.values()) and 'administrator' not in permissions(member, eden.channels[0]):
                 output['No guild member role in Discord'].append(message_name)
 
-        msgs = '.'
-        msg = ('\n'.join(f'\n**{category[0]}:**\n' + '\n'.join(category[1]) for category in output.items() if len(category[1]) > 0))
-        if len(msg) > 2000:
-            msgs = msg[1999:]
-            msg = msg[:1999]
-        await ctx.send(msg)
-        await ctx.send(msgs)
+        await ctx.send('\n'.join(f'\n**{category[0]}:**\n' + '\n'.join(category[1]) for category in output.items() if len(category[1]) > 0))
 
 def setup(client):
     client.add_cog(Members(client))
