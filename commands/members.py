@@ -29,6 +29,7 @@ class Members(commands.Cog):
 
 
         output = {  'Dormant, but still in the guild - can be kicked if needed' : [],
+                    'Missing link between Discord and MC account' : [],
                     'Missing link between MC and Discord account' : [],
                     'Wrong amount of Discord roles' : [],
                     'No guild member role in Discord' : [],
