@@ -24,7 +24,7 @@ class Members(commands.Cog):
                 else:
                     print(f'Couldn\'t find uuid of {name}')
                 return
-        output = {'Missing link':[],'Wrong amount of roles':[],'No guild member role':[],'Not in the guild':[],'Wrong role':[]}
+        output = {'Missing link':[],'Wrong amount of roles':[],'No guild member role':[],'Not in the guild':[],'Wrong role':[],'Wrong nickname':[]}
 
         links = dict(query('SELECT discord, uuid FROM members'))
         async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:

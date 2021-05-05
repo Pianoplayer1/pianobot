@@ -32,7 +32,7 @@ class Pianobot(commands.Bot):
 
     def shutdown(self):
         print('Shutting down...')
-        self.session.close
+        self.session.close()
         db.disconnect()
         print('Bot exited')
 
