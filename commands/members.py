@@ -89,10 +89,13 @@ class Members(commands.Cog):
                 if sum(role in member.roles for role in roles.values()) != 2:
                     output['Wrong amount of Discord roles'].append(message_name)
 
+                if highest_role in high_roles:
+                    continue
+
                 if highest_role not in [roles[ingame_rank], roles['consul']]:
                     output['Highest Discord role not matching ingame role'].append(message_name)
 
-                if discord_name != symbols[highest_role] + ingame_members[uuid]['name'] and highest_role not in high_roles:
+                if discord_name != symbols[highest_role] + ingame_members[uuid]['name']:
                     output['Discord nickname not matching ingame name or rank symbol'].append(message_name)
 
             elif any(role in member.roles for role in roles.values()) and 'administrator' not in permissions(member, eden.channels[0]):
