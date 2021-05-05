@@ -52,10 +52,10 @@ class Members(commands.Cog):
                     uuid = links[member.id]
                     try:
                         ingame_member = ingame_members[uuid]
-                        if any(role in member.roles for role in [roles[ingame_member['rank'].lower()], roles['consul']]):
+                        if roles[ingame_member['rank'].lower()] in member.roles:
                             if ingame_member['name'] not in (member.nick or member.name) and all(role not in member.roles for role in [high_roles]):
                                 output['Wrong nickname'].append(member.nick or member.name)
-                        else:
+                        elif roles['consul'] not in member.roles:
                             output['Wrong role'].append(member.nick or member.name)
                     except KeyError:
                         output['Not in the guild'].append(member.nick or member.name)
