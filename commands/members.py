@@ -72,7 +72,7 @@ class Members(commands.Cog):
                     continue
                 temp_roles = member.roles
                 temp_roles.reverse()
-                highest_role = next(role for role in temp_roles if role in roles)
+                highest_role = next(role for role in temp_roles if role in roles.values())
 
                 if dormant:
                     output['Dormant, but still in the guild - can be kicked if needed'].append(discord_name)
