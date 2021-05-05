@@ -1,6 +1,6 @@
 from discord.ext import commands
 from functions.db import query
-from functions.permissions import check_permissions
+from functions.permissions import permissions, check_permissions
 
 class Members(commands.Cog):
 
@@ -61,7 +61,7 @@ class Members(commands.Cog):
                         output['Not in the guild'].append(member.nick or member.name)
                 except KeyError:
                     output['Missing link'].append(member.nick or member.name)
-            elif any(role in member.roles for role in roles.values()) and not check_permissions(member, ctx.channel, ['administrator']):
+            elif any(role in member.roles for role in roles.values()) and 'administrator' not in permissions(member, eden.channels[0]):
                 output['No guild member role'].append(member.nick or member.name)
         message = ''
         for category in output.items():
