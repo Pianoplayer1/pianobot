@@ -65,7 +65,7 @@ class Members(commands.Cog):
                 dormant = dormant_role in member.roles
                 try:
                     uuid = links[member.id]
-                    if int(uuid) == 0:
+                    if uuid == '0':
                         raise KeyError
                 except KeyError:
                     output['Missing link between Discord and MC account'].append(discord_name)
