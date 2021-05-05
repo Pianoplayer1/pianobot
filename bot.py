@@ -1,4 +1,4 @@
-import aiohttp, discord
+import aiohttp, asyncio, discord
 from discord.ext import commands
 from functions import db
 from os import listdir, getenv
@@ -12,7 +12,7 @@ class Pianobot(commands.Bot):
         self.load_extension_folder('commands')
         self.load_extension_folder('events')
 
-        self.session = aiohttp.ClientSession()
+        asyncio.run(http_session_start())
         db.connect()
 
     async def get_prefixes(self, client, message):
@@ -30,9 +30,14 @@ class Pianobot(commands.Bot):
             except Exception as e:
                 print(f'Could not load ./{path}/{extension}')
 
+    async def http_session_start(self):
+        self.session = await aiohttp.ClientSession()
+    async def http_session_close(self):
+        await self.session.close()
+
     def shutdown(self):
         print('Shutting down...')
-        self.session.close()
+        asyncio.run(http_session_close())
         db.disconnect()
         print('Bot exited')
 

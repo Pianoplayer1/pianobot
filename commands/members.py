@@ -1,6 +1,6 @@
 from discord.ext import commands
 from functions.db import query
-from functions.db import check_permissions
+from functions.permissions import check_permissions
 
 class Members(commands.Cog):
 
