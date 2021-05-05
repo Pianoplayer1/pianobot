@@ -18,6 +18,7 @@ class Members(commands.Cog):
                 async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
                     json_response = await response.json()
                 uuid = json_response['id']
+                name = json_response['name']
                 if uuid:
                     uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
                     query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0)', (name, uuid, id))
@@ -49,9 +50,8 @@ class Members(commands.Cog):
                     uuid = links[member.id]
                     try:
                         ingame_member = ingame_members[uuid]
-                        print(ingame_member)
                         if roles[ingame_member['rank'].lower()] in member.roles:
-                            if member.nick not in ingame_member['name']:
+                            if ingame_member['name'] not in member.nick:
                                 output['Wrong nickname'].append(member.nick or member.name)
                         else:
                             output['Wrong role'].append(member.nick or member.name)
