@@ -58,12 +58,11 @@ class Members(commands.Cog):
                     except KeyError:
                         output['Not in the guild'].append(member.nick or member.name)
                 except KeyError:
-                    if len(output['Missing link']) < 30:
-                        output['Missing link'].append({member.nick or member.name:member.id})
+                    output['Missing link'].append(member.nick or member.name)
             elif any(role in member.roles for role in roles.values()):
                 output['No guild member role'].append(member.nick or member.name)
 
-        await ctx.send(output['Missing link'])
+        await ctx.send(output)
 
 def setup(client):
     client.add_cog(Members(client))
