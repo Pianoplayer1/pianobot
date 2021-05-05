@@ -67,7 +67,7 @@ class Members(commands.Cog):
         for category in output.items():
             message.append(f'\n**{category[0]}**\n')
             message.append('\n'.join(category[1]))
-        await ctx.send(output)
+        await ctx.send(message)
 
 def setup(client):
     client.add_cog(Members(client))
