@@ -51,7 +51,7 @@ class Members(commands.Cog):
                     try:
                         ingame_member = ingame_members[uuid]
                         if roles[ingame_member['rank'].lower()] in member.roles:
-                            if ingame_member['name'] not in member.nick:
+                            if ingame_member['name'] not in (member.nick or member.name):
                                 output['Wrong nickname'].append(member.nick or member.name)
                         else:
                             output['Wrong role'].append(member.nick or member.name)
