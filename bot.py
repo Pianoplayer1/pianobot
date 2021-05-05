@@ -12,7 +12,7 @@ class Pianobot(commands.Bot):
         self.load_extension_folder('commands')
         self.load_extension_folder('events')
 
-        asyncio.run(http_session_start())
+        asyncio.get_event_loop().run_until_complete(self.http_session_start())
         db.connect()
 
     async def get_prefixes(self, client, message):
@@ -31,13 +31,13 @@ class Pianobot(commands.Bot):
                 print(f'Could not load ./{path}/{extension}')
 
     async def http_session_start(self):
-        self.session = await aiohttp.ClientSession()
+        self.session = aiohttp.ClientSession()
     async def http_session_close(self):
         await self.session.close()
 
     def shutdown(self):
         print('Shutting down...')
-        asyncio.run(http_session_close())
+        asyncio.get_event_loop().run_until_complete(self.http_session_close())
         db.disconnect()
         print('Bot exited')
 
