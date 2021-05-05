@@ -62,7 +62,7 @@ class Members(commands.Cog):
             elif any(role in member.roles for role in roles.values()):
                 output['No guild member role'].append(member.nick or member.name)
 
-        await ctx.send(output)
+        await ctx.send(output['Missing link'])
 
 def setup(client):
     client.add_cog(Members(client))
