@@ -65,8 +65,9 @@ class Members(commands.Cog):
                 output['No guild member role'].append(member.nick or member.name)
         message = ''
         for category in output.items():
-            message += f'\n\n**{category[0]}:**\n'
-            message += '\n'.join(category[1])
+            if len(category[1]) > 0:
+                message += f'\n\n**{category[0]}:**\n'
+                message += '\n'.join(category[1])
         await ctx.send(message)
 
 def setup(client):
