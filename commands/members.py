@@ -1,5 +1,6 @@
 from discord.ext import commands
 from functions.db import query
+from functions.db import check_permissions
 
 class Members(commands.Cog):
 
@@ -12,7 +13,7 @@ class Members(commands.Cog):
                         help = 'This command outputs members of the Eden Discord server.',
                         usage = ''  )
     async def members(self, ctx, *, args = None):
-        if args is not None:
+        if args is not None and check_permissions(ctx.author, ctx.channel, ['manage_roles']):
             command, name, id = args.split()
             if command.lower() == 'link':
                 async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
@@ -45,23 +46,22 @@ class Members(commands.Cog):
 
         for member in eden.members:
             if roles['guild_member'] in member.roles:
-                if sum(role in member.roles for role in roles.values()) > 2:
+                if sum(role in member.roles for role in roles.values()) != 2:
                     output['Wrong amount of roles'].append(member.nick or member.name)
                 try:
                     uuid = links[member.id]
                     try:
                         ingame_member = ingame_members[uuid]
-                        if roles[ingame_member['rank'].lower()] in member.roles:
+                        if any(role in member.roles for role in [roles[ingame_member['rank'].lower()], roles['consul']]):
                             if ingame_member['name'] not in (member.nick or member.name) and all(role not in member.roles for role in [high_roles]):
                                 output['Wrong nickname'].append(member.nick or member.name)
                         else:
-                            if roles['consul'] not in member.roles:
-                                output['Wrong role'].append(member.nick or member.name)
+                            output['Wrong role'].append(member.nick or member.name)
                     except KeyError:
                         output['Not in the guild'].append(member.nick or member.name)
                 except KeyError:
                     output['Missing link'].append(member.nick or member.name)
-            elif any(role in member.roles for role in roles.values()):
+            elif any(role in member.roles for role in roles.values()) and not check_permissions(member, ctx.channel, ['administrator']):
                 output['No guild member role'].append(member.nick or member.name)
         message = ''
         for category in output.items():
