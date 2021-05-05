@@ -61,7 +61,7 @@ class Members(commands.Cog):
         high_roles = [roles['owner'], roles['consul'], roles['chief'], roles['strategist']]
 
         for member in eden.members:
-            discord_name = member.nick or member.name
+            discord_name = member.mention or member.name
             if roles['guild_member'] in member.roles:
                 dormant = dormant_role in member.roles
                 try:
