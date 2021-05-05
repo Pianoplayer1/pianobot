@@ -28,7 +28,7 @@ class Members(commands.Cog):
                 return
 
 
-        output = {  'Dormant, but still in the guild - can be kicked if needed'
+        output = {  'Dormant, but still in the guild'
                     'Missing link between MC and Discord account' : [],
                     'Wrong amount of Discord roles' : [],
                     'No guild member role in Discord' : [],
@@ -75,7 +75,7 @@ class Members(commands.Cog):
                 highest_role = next(role for role in temp_roles if role in roles.values())
 
                 if dormant:
-                    output['Dormant, but still in the guild - can be kicked if needed'].append(discord_name)
+                    output['Dormant, but still in the guild'].append(discord_name)
 
                 if sum(role in member.roles for role in roles.values()) != 2:
                     output['Wrong amount of Discord roles'].append(discord_name)
