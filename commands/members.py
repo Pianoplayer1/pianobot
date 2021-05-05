@@ -58,7 +58,7 @@ class Members(commands.Cog):
                     except KeyError:
                         output['Not in the guild'].append(member.nick or member.name)
                 except KeyError:
-                    output['Missing link'].append(member.nick or member.name)
+                    output['Missing link'].append({member.nick or member.name:member.id})
             elif any(role in member.roles for role in roles.values()):
                 output['No guild member role'].append(member.nick or member.name)
 
