@@ -96,7 +96,7 @@ class Members(commands.Cog):
                     output['Highest Discord role not matching ingame role'].append(message_name)
 
                 if discord_name != symbols[highest_role] + ingame_members[uuid]['name']:
-                    output['Discord nickname not matching ingame name or rank symbol'].append(message_name)
+                    output['Discord nickname not matching ingame name or rank symbol'].append(f'{message_name} --> {symbols[highest_role] + ingame_members[uuid]["name"]}')
 
             elif any(role in member.roles for role in roles.values()) and 'administrator' not in permissions(member, eden.channels[0]):
                 output['No guild member role in Discord'].append(message_name)
