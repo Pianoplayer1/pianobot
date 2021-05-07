@@ -43,7 +43,7 @@ class Members(commands.Cog):
         ingame_members = {}
         for member in json_response['members']:
             if member['uuid'] not in links.values():
-                output['Missing link between MC and Discord account'].append(member['name'])
+                output['Missing link between MC and Discord account'].append(member['name'].replace("_", "\_"))
                 continue
             ingame_members[member['uuid']] = {'name': member['name'], 'rank': member['rank']}
 
@@ -96,7 +96,7 @@ class Members(commands.Cog):
                     output['Highest Discord role not matching ingame role'].append(message_name)
 
                 if discord_name != symbols[highest_role] + ingame_members[uuid]['name']:
-                    output['Discord nickname not matching ingame name or rank symbol'].append(f'{message_name} --> {symbols[highest_role] + ingame_members[uuid]["name"]}')
+                    output['Discord nickname not matching ingame name or rank symbol'].append(f'{message_name} --> {symbols[highest_role] + ingame_members[uuid]["name"].replace("_", "\_")}')
 
             elif any(role in member.roles for role in roles.values()) and 'administrator' not in permissions(member, eden.channels[0]):
                 output['No guild member role in Discord'].append(message_name)
