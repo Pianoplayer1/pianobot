@@ -29,24 +29,14 @@ class Members(commands.Cog):
 
 
         output = {  'Dormant, but still in the guild - can be kicked if needed' : [],
-                    'Missing link between Discord and MC account' : [],
-                    'Missing link between MC and Discord account' : [],
+                    'Not linked to a minecraft account' : [],
+                    'Unknown Discord account' : [],
                     'Wrong amount of Discord roles' : [],
                     'No guild member role in Discord' : [],
                     'Not in the ingame guild' : [],
                     'Highest Discord role not matching ingame role' : [],
                     'Discord nickname not matching ingame name or rank symbol' : []  }
-
-        links = dict(query('SELECT discord, uuid FROM members'))
-        async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
-            json_response = await response.json()
-        ingame_members = {}
-        for member in json_response['members']:
-            if member['uuid'] not in links.values():
-                output['Missing link between MC and Discord account'].append(member['name'].replace("_", "\_"))
-                continue
-            ingame_members[member['uuid']] = {'name': member['name'], 'rank': member['rank']}
-
+        
         eden = self.client.get_guild(682671629213368351)
         roles = {   'guild_member' : eden.get_role(682675039631310915),
                     'recruit'      : eden.get_role(703591550424317963),
@@ -60,9 +50,21 @@ class Members(commands.Cog):
         symbols = {roles['recruit'] : '', roles['recruiter'] : '◉ ', roles['captain'] : '♞ ', roles['strategist'] : '♝ ', roles['chief'] : '♜ ', roles['consul'] : '♕ ', roles['owner'] : '♔ '}
         high_roles = [roles['owner'], roles['consul'], roles['chief'], roles['strategist']]
 
+        links = dict(query('SELECT discord, uuid FROM members'))
+        async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
+            json_response = await response.json()
+        ingame_members = {}
+        for member in json_response['members']:
+            if member['uuid'] not in links.values():
+                output['Unknown Discord account'].append(member['name'].replace("_", "\_"))
+            else:
+                ingame_members[member['uuid']] = {'name': member['name'], 'rank': member['rank']}
+
         for member in eden.members:
             discord_name = member.nick or member.name
             message_name = member.mention
+            if any(role in high_roles for role in roles['guild_member']):
+                message_name = discord_name
             if roles['guild_member'] in member.roles:
                 dormant = dormant_role in member.roles
                 try:
@@ -70,7 +72,7 @@ class Members(commands.Cog):
                     if uuid == '0':
                         raise KeyError
                 except KeyError:
-                    output['Missing link between Discord and MC account'].append(message_name)
+                    output['Not linked to a minecraft account'].append(message_name)
                     continue
                 try:
                     ingame_name = ingame_members[uuid]['name']
@@ -92,8 +94,8 @@ class Members(commands.Cog):
                 if highest_role in high_roles:
                     continue
 
-                if highest_role not in [roles[ingame_rank], roles['consul']]:
-                    output['Highest Discord role not matching ingame role'].append(message_name)
+                if highest_role != roles[ingame_rank]:
+                    output['Highest Discord role not matching ingame role'].append(message_name + ' --> ' + roles[ingame_rank])
 
                 if discord_name != symbols[highest_role] + ingame_members[uuid]['name']:
                     output['Discord nickname not matching ingame name or rank symbol'].append(message_name + ' --> ' + symbols[highest_role] + ingame_members[uuid]['name'].replace('_', '\_'))
