@@ -64,7 +64,7 @@ class Members(commands.Cog):
 
         for member in eden.members:
             discord_name = member.nick or member.name
-            message_name = member.mention if any(role in high_roles for role in member.roles) else discord_name
+            message_name = member.mention if any(role in senate_roles for role in member.roles) else discord_name
             if roles['guild_member'] in member.roles:
                 is_dormant = dormant_role in member.roles
                 try:
