@@ -95,7 +95,7 @@ class Members(commands.Cog):
                     continue
 
                 if highest_role != roles[ingame_rank]:
-                    output['Highest Discord role not matching ingame role'].append(message_name + ' --> ' + ingame_rank)
+                    output['Highest Discord role not matching ingame role'].append(message_name + ' (' + ingame_rank + ' ingame )')
 
                 if discord_name != symbols[highest_role] + ingame_members[uuid]['name']:
                     output['Discord nickname not matching ingame name or rank symbol'].append(message_name + ' --> ' + symbols[highest_role] + ingame_members[uuid]['name'].replace('_', '\_'))
