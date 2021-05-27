@@ -69,6 +69,7 @@ class Members(commands.Cog):
                 dormant = dormant_role in member.roles
                 try:
                     uuid = links[member.id]
+                    links.pop(member.id)
                     if uuid == '0':
                         raise KeyError
                 except KeyError:
@@ -104,6 +105,11 @@ class Members(commands.Cog):
                 output['No guild member role in Discord'].append(message_name)
 
         await ctx.send('\n'.join(f'\n**{category[0]}:**\n' + '\n'.join(category[1]) for category in output.items() if len(category[1]) > 0))
+
+        for discord, uuid in links:
+            if uuid not in ingame_members.keys():
+                query('DELETE FROM members WHERE uuid = %s', uuid)
+                print('Deleted', uuid)
 
 def setup(client):
     client.add_cog(Members(client))
