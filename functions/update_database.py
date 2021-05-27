@@ -51,10 +51,10 @@ async def guilds():
         for guild in leaderboard['data']:
             try:
                 if any(guild[prop] != db_lb[guild['prefix']][prop] for prop in properties):
-                    query("UPDATE guilds SET level=%s, xp=%s, territories=%s, warcount=%s, members=%s WHERE tag=%s", (guild['level'], guild['xp'], guild['warCount'], guild['membersCount'], guild['prefix']))
+                    query("UPDATE guilds SET level=%s, xp=%s, territories=%s, warcount=%s, members=%s WHERE tag=%s", (guild['level'], guild['xp'], guild['territories'], guild['warCount'], guild['membersCount'], guild['prefix']))
             except KeyError:
                 epoch = (datetime.strptime(guild['created'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
-                query("INSERT INTO guilds VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", (guild['name'], guild['prefix'], guild['level'], guild['xp'], guild['warCount'], guild['membersCount'], guild['prefix'], epoch))
+                query("INSERT INTO guilds VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", (guild['name'], guild['prefix'], guild['level'], guild['xp'], guild['territories'], guild['warCount'], guild['membersCount'], epoch))
 
 async def worlds():
     db_servers = query("SELECT * FROM worlds")
