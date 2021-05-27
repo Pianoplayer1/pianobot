@@ -1,6 +1,5 @@
 from discord.ext import commands, tasks
-from functions.territory import territory
-from functions.worlds import worlds
+from functions.update_database import territory, guilds, worlds
 
 class On_ready(commands.Cog):
 
@@ -15,6 +14,7 @@ class On_ready(commands.Cog):
     @tasks.loop(seconds=10)
     async def loop(self):
         await territory(self.client)
+        #await guilds()
         await worlds()
 
 def setup(client):

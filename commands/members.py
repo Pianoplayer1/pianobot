@@ -69,18 +69,19 @@ class Members(commands.Cog):
                 is_dormant = dormant_role in member.roles
                 try:
                     uuid = links[member.id]
-                    links.pop(member.id)
+                    if not is_dormant:
+                        links.pop(member.id)
                     if uuid == '0':
                         raise KeyError
                 except KeyError:
-                    output['Not linked to a minecraft account'].append(message_name)
+                    if not is_dormant:
+                        output['Not linked to a minecraft account'].append(message_name)
                     continue
                 try:
                     ingame_name = ingame_members[uuid]['name']
                     ingame_rank = ingame_members[uuid]['rank'].lower()
                 except KeyError:
-                    if not is_dormant:
-                        output['Not in the ingame guild'].append(message_name)
+                    output['Not in the ingame guild'].append(message_name)
                     continue
                 temp_roles = member.roles
                 temp_roles.reverse()
