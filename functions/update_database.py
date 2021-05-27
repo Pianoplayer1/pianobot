@@ -49,6 +49,8 @@ async def guilds():
         leaderboard = await response.json()
         properties = ['level', 'xp', 'territories', 'warCount', 'membersCount']
         for guild in leaderboard['data']:
+            if 'warCount' not in guild:
+                guild['warCount'] = 0
             try:
                 if any(guild[prop] != db_lb[guild['prefix']][prop] for prop in properties):
                     query("UPDATE guilds SET level=%s, xp=%s, territories=%s, warcount=%s, members=%s WHERE tag=%s", (guild['level'], guild['xp'], guild['territories'], guild['warCount'], guild['membersCount'], guild['prefix']))
