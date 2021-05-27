@@ -54,7 +54,7 @@ async def guilds():
                     query("UPDATE guilds SET level=%s, xp=%s, territories=%s, warcount=%s, members=%s WHERE tag=%s", (guild['level'], guild['xp'], guild['warcount'], guild['membersCount'], guild['prefix']))
             except KeyError:
                 epoch = (datetime.strptime(guild['created'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
-                query("INSERT INTO guilds VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", (guild['name'], guild['tag'], guild['level'], guild['xp'], guild['warcount'], guild['membersCount'], guild['prefix'], epoch))
+                query("INSERT INTO guilds VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", (guild['name'], guild['prefix'], guild['level'], guild['xp'], guild['warcount'], guild['membersCount'], guild['prefix'], epoch))
 
 async def worlds():
     db_servers = query("SELECT * FROM worlds")
