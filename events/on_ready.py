@@ -9,13 +9,17 @@ class On_ready(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print('Booted up')
-        self.loop.start()
+        self.loop_10s.start()
+        self.loop_1m.start()
 
     @tasks.loop(seconds=10)
-    async def loop(self):
+    async def loop_10s(self):
         await territory(self.client)
-        await guilds()
         await worlds()
+
+    @tasks.loop(seconds=60)
+    async def loop_1m(self):
+        await guilds()
 
 def setup(client):
     client.add_cog(On_ready(client))

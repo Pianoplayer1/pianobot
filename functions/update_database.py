@@ -39,12 +39,22 @@ async def guilds():
     async with aiohttp.ClientSession() as session, session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
         eden = await response.json()
         for member in eden['members']:
-            if member['uuid'] in db_members:
+            if member['uuid'] not in db_members:
                 epoch = (datetime.strptime(member['joined'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
-                query("UPDATE members SET name=%s, rank=%s, joined=%s, xp=%s WHERE uuid=%s", (member['name'], member['rank'].capitalize(), epoch, member['contributed'], member['uuid']))
-            else:
-                epoch = (datetime.strptime(member['joined'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
-                query("INSERT INTO members VALUES (%s, %s, 0, %s, %s, 0, 0, %s)", (member['uuid'], member['name'], member['rank'].capitalize(), epoch, member['contributed']))
+                query("INSERT INTO members(uuid, joined) VALUES (%s, %s)", (member['uuid'], epoch))
+            query("UPDATE members SET name=%s, rank=%s, xp=%s WHERE uuid=%s", (member['name'], member['rank'].capitalize(), member['contributed'], member['uuid']))
+
+    db_lb = {a : {'level' : b,'xp' : c,'territories' : d,'warcount' : e,'membersCount' : f} for _,a,b,c,d,e,f,_ in query("SELECT * FROM guilds")}
+    async with aiohttp.ClientSession() as session, session.get('https://api.wynncraft.com/public_api.php?action=statsLeaderboard&type=guild&timeframe=alltime') as response:
+        leaderboard = await response.json()
+        properties = ['level', 'xp', 'territories', 'warcount', 'membersCount']
+        for guild in leaderboard['data']:
+            try:
+                if any(guild[prop] != db_lb[guild['prefix']][prop] for prop in properties):
+                    query("UPDATE guilds SET level=%s, xp=%s, territories=%s, warcount=%s, members=%s WHERE tag=%s", (guild['level'], guild['xp'], guild['warcount'], guild['membersCount'], guild['prefix']))
+            except KeyError:
+                epoch = (datetime.strptime(guild['created'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
+                query("INSERT INTO guilds VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", (guild['name'], guild['tag'], guild['level'], guild['xp'], guild['warcount'], guild['membersCount'], guild['prefix'], epoch))
 
 async def worlds():
     db_servers = query("SELECT * FROM worlds")
