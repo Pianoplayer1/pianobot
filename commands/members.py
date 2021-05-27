@@ -109,7 +109,7 @@ class Members(commands.Cog):
 
         for uuid in links.keys():
             if uuid not in ingame_members.keys():
-                query('DELETE FROM members WHERE uuid = %s', links[uuid])
+                query('DELETE FROM members WHERE discord = %s', links[uuid])
                 print('Deleted', uuid, links[uuid])
 
 def setup(client):
