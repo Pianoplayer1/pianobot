@@ -107,7 +107,7 @@ class Members(commands.Cog):
 
         await ctx.send('\n'.join(f'\n**{category[0]}:**\n' + '\n'.join(category[1]) for category in output.items() if len(category[1]) > 0))
 
-        for discord, uuid in links:
+        for discord, uuid in links.values():
             if uuid not in ingame_members.keys():
                 query('DELETE FROM members WHERE uuid = %s', uuid)
                 print('Deleted', uuid)
