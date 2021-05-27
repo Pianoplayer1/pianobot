@@ -1,4 +1,5 @@
 from functions.db import query
+from datetime import datetime
 import aiohttp, time
 
 async def territory(client):
@@ -39,9 +40,11 @@ async def guilds():
         eden = await response.json()
         for member in eden['members']:
             if member['uuid'] in db_members:
-                query("UPDATE members SET name=%s, rank=%s, joined=%s, ")
+                epoch = (datetime.strptime(member['joined'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
+                query("UPDATE members SET name=%s, rank=%s, joined=%s, xp=%s WHERE uuid=%s", member['name'], member['rank'].capitalize(), epoch, member['contributed'], member['uuid'])
             else:
-                query("INSERT INTO ")
+                epoch = (datetime.strptime(member['joined'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
+                query("INSERT INTO members VALUES (%s, %s, 0, %s, %s, 0, 0, %s)", member['uuid'], member['name'], member['rank'].capitalize(), epoch, member['contributed'])
 
 async def worlds():
     db_servers = query("SELECT * FROM worlds")

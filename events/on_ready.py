@@ -14,7 +14,7 @@ class On_ready(commands.Cog):
     @tasks.loop(seconds=10)
     async def loop(self):
         await territory(self.client)
-        #await guilds()
+        await guilds()
         await worlds()
 
 def setup(client):
