@@ -1,6 +1,7 @@
 from functions.db import query
-from datetime import datetime
-import aiohttp, time
+from datetime import datetime, timedelta, tzinfo
+import aiohttp, time, asyncio
+guilds = {}
 
 async def territory(client):
     servers = query("SELECT * FROM servers")
@@ -57,6 +58,36 @@ async def guilds():
             except KeyError:
                 epoch = (datetime.strptime(guild['created'], "%Y-%m-%dT%H:%M:%S.%fZ") - datetime(1970, 1, 1)).total_seconds()
                 query("INSERT INTO guilds VALUES(%s, %s, %s, %s, %s, %s, %s, %s)", (guild['name'], guild['prefix'], guild['level'], guild['xp'], guild['territories'], guild['warCount'], guild['membersCount'], epoch))
+
+async def guild_activity():
+    global guilds
+
+    async with aiohttp.ClientSession() as session:
+        serverList = await session.get('https://api.wynncraft.com/public_api.php?action=onlinePlayers')
+        serverList = await serverList.json()
+        guilds = {guild: None for guild in ['ShadowFall', 'Avicia', 'IceBlue Team', 'Guardian of Wynn', 'The Mage Legacy', 'Emorians', 'Paladins United', 'Lux Nova', 'HackForums', 'The Aquarium', 'The Simple Ones', 'Empire of Sindria', 'Titans Valor', 'The Dark Phoenix', 'Nethers Ascent', 'Sins of Seedia', 'WrathOfTheFallen', 'busted moments', 'Nefarious Ravens', 'Aequitas', 'Eden', 'KongoBoys', 'Nerfuria']}
+        await asyncio.gather(*[fetch(serverList, session, guild) for guild in guilds])
+
+        time = datetime.utcnow()
+        if time.day == 31:
+            return
+        roundTo = 60 * 5                                            # Round to 5 minute steps as this function runs every 5 minutes
+        seconds = (time.replace(tzinfo=None) - time.min).seconds
+        rounded_time = (seconds+roundTo/2) // roundTo * roundTo
+        rounded_time = str(time + timedelta(0,rounded_time-seconds,-time.microsecond))
+
+        sql = f'INSERT INTO guildActivity(`time`, `{"`, `".join(guilds.keys())}`) VALUES (%s{", %s" * len(guilds)})'
+        variables = (rounded_time, *guilds.values())
+
+        query(sql, variables)
+
+async def fetch(serverList, session, guild):
+    global guilds
+    async with session.get(f'https://api.wynncraft.com/public_api.php?action=guildStats&command={guild}') as response:
+        response = await response.json()
+        count = sum( any(player['name'] in server for server in serverList.values()) for player in response['members'])
+
+        guilds[guild] = count
 
 async def worlds():
     db_servers = query("SELECT * FROM worlds")
