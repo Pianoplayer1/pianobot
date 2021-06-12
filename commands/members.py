@@ -23,7 +23,7 @@ class Members(commands.Cog):
                     name = json_response['name']
                     if uuid:
                         uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
-                        query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0)', (name, uuid, id))
+                        query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0)', (uuid, name, id))
                     else:
                         await ctx.send(f'Couldn\'t find uuid of {name}')
             finally:
