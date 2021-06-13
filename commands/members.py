@@ -57,7 +57,8 @@ class Members(commands.Cog):
             json_response = await response.json()
         ingame_members = {}
         for member in json_response['members']:
-            if member['uuid'] not in links.values() or dict(uuid, discord for discord, uuid in link)[member['uuid'] == 0:
+            links_reverse = {uuid, discord for discord, uuid in links.items()}
+            if member['uuid'] not in links.values() or dict_reverse[member['uuid'] == 0:
                 output['Unknown Discord account'].append(member['name'].replace('_', '\_'))
             else:
                 ingame_members[member['uuid']] = {'name': member['name'], 'rank': member['rank']}
