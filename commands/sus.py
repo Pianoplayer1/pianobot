@@ -15,7 +15,7 @@ class Sus(commands.Cog):
         # Ashcon API
         try:
             async with self.client.session.get('https://api.ashcon.app/mojang/v2/user/' + player) as response:
-                ashcon_response = response.json()
+                ashcon_response = await response.json()
                 self.uuid = ashcon_response['uuid']
         except KeyError:
             await ctx.send('Not a minecraft username!')
