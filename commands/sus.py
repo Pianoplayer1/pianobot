@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
-import requests, math, asyncio
+import math, asyncio
 
 class Sus(commands.Cog):
 
@@ -14,8 +14,9 @@ class Sus(commands.Cog):
 
         # Ashcon API
         try:
-            ashcon_response = requests.get('https://api.ashcon.app/mojang/v2/user/' + player).json()
-            self.uuid = ashcon_response['uuid']
+            async with self.client.session.get('https://api.ashcon.app/mojang/v2/user/' + player) as response:
+                ashcon_response = response.json()
+                self.uuid = ashcon_response['uuid']
         except KeyError:
             await ctx.send('Not a minecraft username!')
             return
