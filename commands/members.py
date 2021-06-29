@@ -23,7 +23,7 @@ class Members(commands.Cog):
                     name = json_response['name']
                     if uuid:
                         uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
-                        query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0)', (name, uuid, id))
+                        query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0)', (uuid, name, id))
                     else:
                         await ctx.send(f'Couldn\'t find uuid of {name}')
             finally:
@@ -53,11 +53,12 @@ class Members(commands.Cog):
         senate_roles = [roles['owner'], roles['consul'], roles['chief'], roles['strategist']]
 
         links = dict(query('SELECT discord, uuid FROM members'))
+        links_r = dict(query('SELECT uuid, discord FROM members'))
         async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
             json_response = await response.json()
         ingame_members = {}
         for member in json_response['members']:
-            if member['uuid'] not in links.values():
+            if member['uuid'] not in links.values() or links_r[member['uuid']] == 0:
                 output['Unknown Discord account'].append(member['name'].replace('_', '\_'))
             else:
                 ingame_members[member['uuid']] = {'name': member['name'], 'rank': member['rank']}
