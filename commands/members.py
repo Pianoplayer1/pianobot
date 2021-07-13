@@ -13,6 +13,8 @@ class Members(commands.Cog):
                         help = 'This command outputs members of the Eden Discord server.',
                         usage = ''  )
     async def members(self, ctx, *, args = None):
+        links = dict(query('SELECT discord, uuid FROM members'))
+
         if args is not None and check_permissions(ctx.author, ctx.channel, ['manage_roles']):
             try:
                 command, name, id = args.split()
@@ -23,7 +25,10 @@ class Members(commands.Cog):
                     name = json_response['name']
                     if uuid:
                         uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
-                        query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0)', (uuid, name, id))
+                        if uuid not in links.values():
+                            query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, id))
+                        else:
+                            query('UPDATE members SET discord=%s WHERE uuid=%s;', (id, uuid))
                     else:
                         await ctx.send(f'Couldn\'t find uuid of {name}')
             finally:
@@ -52,7 +57,6 @@ class Members(commands.Cog):
         rank_symbols = {roles['recruit'] : '', roles['recruiter'] : '◉ ', roles['captain'] : '♞ ', roles['strategist'] : '♝ ', roles['chief'] : '♜ ', roles['consul'] : '♕ ', roles['owner'] : '♔ '}
         senate_roles = [roles['owner'], roles['consul'], roles['chief'], roles['strategist']]
 
-        links = dict(query('SELECT discord, uuid FROM members'))
         links_r = dict(query('SELECT uuid, discord FROM members'))
         async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
             json_response = await response.json()
