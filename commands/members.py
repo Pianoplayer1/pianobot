@@ -29,14 +29,10 @@ class Members(commands.Cog):
                     return
 
                 uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
-                print(uuid)
-                print(links.values())
-                if uuid not in links.values():
-                    query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
-                    print('hi')
-                else:
+                if uuid in links.values():
                     query('UPDATE members SET discord=%s WHERE uuid=%s;', (discord_id, uuid))
-                    print('ho')
+                else:
+                    query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
                     
             
             return
@@ -119,10 +115,10 @@ class Members(commands.Cog):
 
         await ctx.send('\n'.join(f'\n**{category[0]}:**\n' + '\n'.join(category[1]) for category in output.items() if len(category[1]) > 0))
 
-        #for discord, uuid in links.items():
-        #    if uuid not in ingame_members.keys():
-        #        query('DELETE FROM members WHERE discord = %s', discord)
-        #        print('Deleted', uuid, discord)
+        for discord, uuid in links.items():
+            if uuid not in ingame_members.keys():
+                query('DELETE FROM members WHERE discord = %s', discord)
+                print('Deleted', uuid, discord)
 
 def setup(client):
     client.add_cog(Members(client))
