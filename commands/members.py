@@ -33,6 +33,8 @@ class Members(commands.Cog):
                             print('ho')
                     else:
                         await ctx.send(f'Couldn\'t find uuid of {name}')
+            except Exception as e:
+                print(e)
             finally:
                 return
 
