@@ -27,8 +27,10 @@ class Members(commands.Cog):
                         uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
                         if uuid not in links.values():
                             query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, id))
+                            print('hi')
                         else:
                             query('UPDATE members SET discord=%s WHERE uuid=%s;', (id, uuid))
+                            print('ho')
                     else:
                         await ctx.send(f'Couldn\'t find uuid of {name}')
             finally:
