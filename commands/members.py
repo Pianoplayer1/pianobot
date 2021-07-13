@@ -16,27 +16,22 @@ class Members(commands.Cog):
         links = dict(query('SELECT discord, uuid FROM members'))
 
         if args is not None and check_permissions(ctx.author, ctx.channel, ['manage_roles']):
-            try:
-                command, name, discord_id = args.split()
-                if command.lower() == 'link':
-                    async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
-                        json_response = await response.json()
-                    uuid = json_response['id']
-                    name = json_response['name']
-                    if uuid:
-                        uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
-                        if uuid not in links.values():
-                            query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
-                            print('hi')
-                        else:
-                            query('UPDATE members SET discord=%s WHERE uuid=%s;', (discord_id, uuid))
-                            print('ho')
+            command, name, discord_id = args.split()
+            if command.lower() == 'link':
+                async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
+                    json_response = await response.json()
+                uuid = json_response['id']
+                name = json_response['name']
+                if uuid:
+                    uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
+                    if uuid not in links.values():
+                        query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
+                        print('hi')
                     else:
-                        await ctx.send(f'Couldn\'t find uuid of {name}')
-            except Exception as e:
-                print(e)
-            finally:
-                return
+                        query('UPDATE members SET discord=%s WHERE uuid=%s;', (discord_id, uuid))
+                        print('ho')
+                else:
+                    await ctx.send(f'Couldn\'t find uuid of {name}')
 
 
         output = {  'Dormant, but still in the guild - can be kicked if needed' : [],
