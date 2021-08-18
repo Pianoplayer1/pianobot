@@ -96,10 +96,11 @@ class Sus(commands.Cog):
         params = {'key': 'd9a6b029-99ea-4620-ba52-6df35c61486b', 'uuid': self.uuid}
         async with self.client.session.get('https://api.hypixel.net/player', params = params) as response:
             hypixel_response = await response.json()
-            if 'player' in hypixel_response.keys():
-                self.first_hypixel_login = datetime.utcfromtimestamp(hypixel_response['player']['firstLogin'] / 1000)
-            else:
+            if hypixel_response['player'] is None:
                 self.first_hypixel_login = None
+            else:
+                self.first_hypixel_login = datetime.utcfromtimestamp(hypixel_response['player']['firstLogin'] / 1000)
+                
 
 def setup(client):
     client.add_cog(Sus(client))
