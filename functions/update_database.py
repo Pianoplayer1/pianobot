@@ -82,7 +82,11 @@ async def guild_activity():
         try:
             query(sql, variables)
         except Exception:
+<<<<<<< HEAD
             print('Duplicate in guild activity times, skipping.')
+=======
+            print('Duplicate guild activity time')
+>>>>>>> 6911977a68c7b0170db3463002348b628a9d4405
 
 async def fetch(serverList, session, guild):
     global guilds

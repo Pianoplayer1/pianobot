@@ -21,7 +21,8 @@ class On_command_error(commands.Cog):
             prefix = '-'
         if isinstance(error, commands.CommandNotFound):
             try:
-                await ctx.send(f'I don\'t know this command. Use `{prefix}help` to get a list of things I can do.')
+                #await ctx.send(f'I don\'t know this command. Use `{prefix}help` to get a list of things I can do.')
+                pass
             except discord.Forbidden:
                 print(f'\'{ctx.message.content}\' could not be processed in #{ctx.channel.name} in {ctx.guild.name}')
         elif isinstance(error, commands.MissingRequiredArgument):
