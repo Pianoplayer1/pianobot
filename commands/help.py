@@ -13,7 +13,7 @@ class Help(commands.Cog):
         if ctx.guild:
             prefix = query('SELECT * FROM servers WHERE id = %s', ctx.guild.id)
             prefix = prefix[0][1]
-            help_text = help_text = f'This bot tags a specified role whenever an Eden territory is taken by another guild.\nTo set up the bot, type \'{prefix}channel\' in the channel where the bot should display the messages.\n\n' + help_text
+            help_text = help_text = f'Utility bot for various different Wynncraft related things.\n\n' + help_text
         else:
             prefix = '-'
         if command:
