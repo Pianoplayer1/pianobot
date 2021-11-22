@@ -79,7 +79,10 @@ async def guild_activity():
         sql = f'INSERT INTO guildActivity(`time`, `{"`, `".join(guilds.keys())}`) VALUES (%s{", %s" * len(guilds)})'
         variables = (rounded_time, *guilds.values())
 
-        query(sql, variables)
+        try:
+            query(sql, variables)
+        except Exception:
+            print('Duplicate guild activity time')
 
 async def fetch(serverList, session, guild):
     global guilds
