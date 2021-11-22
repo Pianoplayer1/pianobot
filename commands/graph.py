@@ -22,16 +22,15 @@ class Graph(commands.Cog):
         except Exception:
             await ctx.send('Interval must be a number!')
             return
-        print(interval)
         
-        guilds = ['ShadowFall', 'Avicia', 'IceBlue Team', 'Guardian of Wynn', 'The Mage Legacy', 'Emorians', 'Paladins United', 'Lux Nova', 'HackForums', 'The Aquarium', 'The Simple Ones', 'Empire of Sindria', 'Titans Valor', 'The Dark Phoenix', 'Nethers Ascent', 'Sins of Seedia', 'WrathOfTheFallen', 'busted moments', 'Nefarious Ravens', 'Aequitas', 'Eden', 'KongoBoys', 'Nerfuria']
-        guild = [g for g in guilds if g.lower() == guild.lower()]
-        if len(guild) != 1:
+        guild_list = ['ShadowFall', 'Avicia', 'IceBlue Team', 'Guardian of Wynn', 'The Mage Legacy', 'Emorians', 'Paladins United', 'Lux Nova', 'HackForums', 'The Aquarium', 'The Simple Ones', 'Empire of Sindria', 'Titans Valor', 'The Dark Phoenix', 'Nethers Ascent', 'Sins of Seedia', 'WrathOfTheFallen', 'busted moments', 'Nefarious Ravens', 'Aequitas', 'Eden', 'KongoBoys', 'Nerfuria']
+        guilds = [g for g in guild_list if g.lower() == guild.lower()]
+        if len(guilds) != 1:
             await ctx.send(guild + 'is not a valid guild!')
             return
-        guild = guild[0]
+        guild = guilds[0]
 
-        res = query(f"SELECT time, {guild} FROM `guildActivity` WHERE `time` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);")
+        res = query(f"SELECT time, `{guild}` FROM `guildActivity` WHERE `time` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);")
         data = {time : amount for time, amount in res}
         
         plot, axes = pyplot.subplots()
