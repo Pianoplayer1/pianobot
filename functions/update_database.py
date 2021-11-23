@@ -92,7 +92,7 @@ async def fetch(serverList, session, guild):
         try:
             count = sum( any(player['name'] in server for server in serverList.values()) for player in response['members'])
         except KeyError:
-            print('error when fetching ' + guild '\'s activity!')
+            print('error when fetching ' + guild + '\'s activity!')
 
         guilds[guild] = count
 
