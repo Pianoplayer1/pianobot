@@ -88,7 +88,11 @@ async def fetch(serverList, session, guild):
     global guilds
     async with session.get(f'https://api.wynncraft.com/public_api.php?action=guildStats&command={guild}') as response:
         response = await response.json()
-        count = sum( any(player['name'] in server for server in serverList.values()) for player in response['members'])
+        count = 0
+        try:
+            count = sum( any(player['name'] in server for server in serverList.values()) for player in response['members'])
+        except KeyError:
+            print('error when fetching ' + guild '\'s activity!')
 
         guilds[guild] = count
 
