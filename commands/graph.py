@@ -26,7 +26,7 @@ class Graph(commands.Cog):
         guild_list = ['ShadowFall', 'Avicia', 'IceBlue Team', 'Guardian of Wynn', 'The Mage Legacy', 'Emorians', 'Paladins United', 'Lux Nova', 'HackForums', 'The Aquarium', 'The Simple Ones', 'Empire of Sindria', 'Titans Valor', 'The Dark Phoenix', 'Nethers Ascent', 'Sins of Seedia', 'WrathOfTheFallen', 'busted moments', 'Nefarious Ravens', 'Aequitas', 'Eden', 'KongoBoys', 'Nerfuria', 'TheNoLifes']
         guilds = [g for g in guild_list if g.lower() == guild.lower()]
         if len(guilds) != 1:
-            await ctx.send(guild + 'is not a valid guild!')
+            await ctx.send(f'`{guild}` is not a tracked guild!')
             return
         guild = guilds[0]
 
