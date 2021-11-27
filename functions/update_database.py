@@ -65,7 +65,7 @@ async def guild_activity():
     async with aiohttp.ClientSession() as session:
         serverList = await session.get('https://api.wynncraft.com/public_api.php?action=onlinePlayers')
         serverList = await serverList.json()
-        guilds = {guild: None for guild in ['ShadowFall', 'Avicia', 'IceBlue Team', 'Guardian of Wynn', 'The Mage Legacy', 'Emorians', 'Paladins United', 'Lux Nova', 'HackForums', 'The Aquarium', 'The Simple Ones', 'Empire of Sindria', 'Titans Valor', 'The Dark Phoenix', 'Nethers Ascent', 'Sins of Seedia', 'WrathOfTheFallen', 'busted moments', 'Nefarious Ravens', 'Aequitas', 'Eden', 'KongoBoys', 'Nerfuria']}
+        guilds = {guild: None for guild in ['ShadowFall', 'Avicia', 'IceBlue Team', 'Guardian of Wynn', 'The Mage Legacy', 'Emorians', 'Paladins United', 'Lux Nova', 'HackForums', 'The Aquarium', 'The Simple Ones', 'Empire of Sindria', 'Titans Valor', 'The Dark Phoenix', 'Nethers Ascent', 'Sins of Seedia', 'WrathOfTheFallen', 'busted moments', 'Nefarious Ravens', 'Aequitas', 'Eden', 'KongoBoys', 'Nerfuria', 'TheNoLifes']}
         await asyncio.gather(*[fetch(serverList, session, guild) for guild in guilds])
 
         time = datetime.utcnow()
