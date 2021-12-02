@@ -23,8 +23,8 @@ class Graph(commands.Cog):
             await ctx.send('Interval must be a number!')
             return
         
-        guild_list = ['Achte Shadow', 'Aequitas', 'Atlas Inc', 'Avicia', 'Blacklisted', 'Breadskate', 'Crystal Iris', 'Cyphrus Code', 'Eden', 'Emorians', 'Empire of Sindria', 'FlameKnights', 'Forever Twilight', 'ForsakenLaws', 'Fuzzy Spiders', 'Gabameno', 'Germany', 'Gopniks', 'Guardian of Wynn', 'HackForums', 'IceBlue Team', 'Idiot Co', 'Jasmine Dragon', 'Jeus', 'Kingdom Foxes', 'KongoBoys', 'Last Order', 'LittleBunny Land', 'Lux Nova', 'Nefarious Ravens', 'Nerfuria', 'Opus Maximus', 'Paladins United', 'Profession Heaven', 'Question Mark Syndicate', 'SICA Team', 'ShadowFall', 'Sins of Seedia', 'Skuc Nation', 'Syndicate of Nyx', 'TVietNam', 'Tartarus Wrath', 'The Aquarium', 'The Broken Gasmask', 'The Dark Phoenix', 'The Mage Legacy', 'The Simple Ones', 'TheNoLifes', 'Titans Valor', 'TruthSworD', 'Wheres The Finish', 'WynnFairyTail', 'busted moments']
-        guilds = [g for g in guild_list if g.lower() == guild.lower()]
+        guild_list = {'Cyphrus Code': 'CYX', 'ShadowFall': 'Shy', 'Question Mark Syndicate': 'QMS', 'Gabameno': 'GBE', 'Wheres The Finish': 'WFN', 'Breadskate': 'BSE', 'Jasmine Dragon': 'LEAF', 'Eden': 'EDN', 'Avicia': 'AVO', 'Atlas Inc': 'AIn', 'Nerfuria': 'Nia', 'LittleBunny Land': 'LBL', 'The Broken Gasmask': 'TBGM', 'Opus Maximus': 'OpM', 'Tartarus Wrath': 'Fate', 'WynnFairyTail': 'WFT', 'Syndicate of Nyx': 'SYNN', 'Emorians': 'ERN', 'ForsakenLaws': 'FKL', 'Skuc Nation': 'skuc', 'The Simple Ones': 'ILQ', 'Lux Nova': 'LXA', 'Forever Twilight': 'FXX', 'Guardian of Wynn': 'GsW', 'Idiot Co': 'ICo', 'Crystal Iris': 'Cona', 'Last Order': 'IPS', 'Kingdom Foxes': 'Fox', 'Jeus': 'Jeus', 'The Aquarium': 'TAq', 'Germany': 'DEU', 'Titans Valor': 'ANO', 'Empire of Sindria': 'ESI', 'FlameKnights': 'FLK', 'Nefarious Ravens': 'NFR', 'KongoBoys': 'DUDE', 'Blacklisted': 'BLA', 'TVietNam': 'VNP', 'Gopniks': 'GKS', 'Profession Heaven': 'PROF', 'TruthSworD': 'Tsd', 'IceBlue Team': 'IBT', 'busted moments': 'fuy', 'HackForums': 'Hax', 'Sins of Seedia': 'SDU', 'Fuzzy Spiders': 'cxz', 'The Mage Legacy': 'Mag', 'The Dark Phoenix': 'TNI', 'Aequitas': 'Aeq', 'TheNoLifes': 'TNL', 'Paladins United': 'PUN', 'Achte Shadow': 'ASh', 'SICA Team': 'FEU'}
+        guilds = [k for k, v in guild_list.items() if k.lower() == guild.lower() or v.lower() == guild.lower()]
         if len(guilds) != 1:
             await ctx.send(f'`{guild}` is not a tracked guild!')
             return
@@ -38,7 +38,7 @@ class Graph(commands.Cog):
         axes.xaxis.set_major_formatter(dates.DateFormatter('%b %d, %H:%M'))
         axes.xaxis.set_label_position('top')
         plot.autofmt_xdate()
-        pyplot.xlabel('Online Player Activity')
+        pyplot.xlabel(f'Online Player Activity of {guild} [{guild_list[guild]}]')
         pyplot.ylabel('Player Count')
 
         plot.savefig('graph.png')
