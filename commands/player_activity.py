@@ -19,10 +19,11 @@ class PlayerActivity(commands.Cog):
         data = {time : amount for time, amount in res}
         
         plot, axes = pyplot.subplots()
-        axes.plot(data.keys(), data.values())
-        axes.xaxis.set_major_formatter(dates.DateFormatter('%b %d, %H:%M'))
+        times = [str(key) for key in data.keys()]
+        axes.bar(data.keys(), data.values())
+        axes.xaxis.set_major_locator(dates.DayLocator(interval=1))  
+        axes.xaxis.set_major_formatter(dates.DateFormatter('%a'))
         axes.xaxis.set_label_position('top')
-        plot.autofmt_xdate()
         pyplot.xlabel(f'Player Activity of {player}')
         pyplot.ylabel('Minutes')
 
