@@ -1,5 +1,5 @@
 from discord.ext import commands, tasks
-from functions.update_database import territory, guilds, worlds, guild_activity
+from functions.update_database import territory, members, worlds, guild_activity, player_activity
 
 class On_ready(commands.Cog):
 
@@ -20,7 +20,8 @@ class On_ready(commands.Cog):
 
     @tasks.loop(seconds=60)
     async def loop_1m(self):
-        await guilds()
+        await members()
+        await player_activity()
     
     @tasks.loop(seconds=300)
     async def loop_5m(self):

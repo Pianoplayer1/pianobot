@@ -1,5 +1,5 @@
 from functions.db import query
-from datetime import datetime, timedelta, tzinfo
+from datetime import datetime, timedelta
 import aiohttp, time, asyncio
 guilds = {}
 
@@ -35,7 +35,7 @@ async def territory(client):
                 except:
                     print(f'Couldn\'t send message to server {server[0]}')
 
-async def guilds():
+async def members():
     db_members = dict(query("SELECT uuid, name FROM members"))
     async with aiohttp.ClientSession() as session, session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
         eden = await response.json()
@@ -110,3 +110,14 @@ async def worlds():
 
         for server in servers:
             query("INSERT INTO worlds VALUES (%s, %s)", (server, time.time()))
+
+async def player_activity():
+    async with aiohttp.ClientSession() as session, session.get('https://api.wynncraft.com/public_api.php?action=onlinePlayers') as response:
+        response = await response.json()
+        day = datetime.strftime(datetime.utcnow(), '%Y-%m-%d')
+        players = []
+        for server in response.values():
+            if type(server) == list:
+                players.extend(server)
+        values = ', '.join(['(\'' + day + '_' + name.lower() + '\', \'' + str(datetime.utcnow()) + '\', 1)' for name in players])
+        query(f"INSERT INTO playerActivity VALUES {values} ON DUPLICATE KEY UPDATE count = count + 1")

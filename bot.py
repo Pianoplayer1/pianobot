@@ -7,7 +7,7 @@ class Pianobot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
-        super().__init__(command_prefix = self.get_prefixes, help_command = None, intents = intents)
+        super().__init__(command_prefix = self.get_prefixes, help_command = None, intents = intents, case_insensitive=True)
 
         self.load_extension_folder('commands')
         self.load_extension_folder('events')
