@@ -1,5 +1,5 @@
 from discord.ext import commands
-from functions.permissions import permissions, check_permissions
+from ..utils.permissions import permissions, check_permissions
 
 class Nickname(commands.Cog):
 

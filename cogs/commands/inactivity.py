@@ -1,9 +1,9 @@
 import aiohttp, asyncio
 from datetime import datetime
 from discord.ext import commands
-from functions.pages import paginator
-from functions.permissions import check_permissions
-from functions.table import table
+from ..utils.pages import paginator
+from ..utils.permissions import check_permissions
+from ..utils.table import table
 
 class Inactivity(commands.Cog):
 

@@ -1,5 +1,5 @@
 from discord.ext import commands
-from functions.db import query
+from ..utils.db import query
 import discord
 
 class Help(commands.Cog):

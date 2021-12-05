@@ -1,7 +1,7 @@
 import discord
 import typing
 from discord.ext import commands
-from functions.permissions import permissions
+from ..utils.permissions import permissions
 
 class Permissions(commands.Cog):
 

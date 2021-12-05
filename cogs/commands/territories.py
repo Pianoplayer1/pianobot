@@ -1,8 +1,8 @@
 from discord.ext import commands
-from functions.db import query
-from functions.table import table
-from functions.pages import paginator
-from functions.permissions import check_permissions
+from ..utils.db import query
+from ..utils.table import table
+from ..utils.pages import paginator
+from ..utils.permissions import check_permissions
 import aiohttp
 
 class Territories(commands.Cog):

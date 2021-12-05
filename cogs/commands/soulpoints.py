@@ -1,6 +1,6 @@
 from discord.ext import commands
-from functions.db import query
-from functions.table import table
+from ..utils.db import query
+from ..utils.table import table
 from math import floor
 import time
 

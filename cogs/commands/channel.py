@@ -1,6 +1,6 @@
 from discord.ext import commands
-from functions.db import query
-from functions.permissions import check_permissions
+from ..utils.db import query
+from ..utils.permissions import check_permissions
 
 class Channel(commands.Cog):
 

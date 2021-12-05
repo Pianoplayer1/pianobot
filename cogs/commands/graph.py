@@ -1,7 +1,7 @@
 from datetime import datetime
 from discord.ext import commands
 import discord
-from functions.db import query
+from ..utils.db import query
 from matplotlib import pyplot, dates
 
 class Graph(commands.Cog):
