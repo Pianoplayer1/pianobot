@@ -1,5 +1,4 @@
 from discord.ext import commands
-from ..utils.db import query
 from ..utils.table import table
 from ..utils.pages import paginator
 from ..utils.permissions import check_permissions
@@ -18,7 +17,7 @@ class Territories(commands.Cog):
                         hidden = True  )
     @commands.guild_only()
     async def territories(self, ctx, action, *, territories = None):
-        tlist = query("SELECT * FROM territories")
+        tlist = self.client.query("SELECT * FROM territories")
         tlist = dict(tlist)
         territories = territories.split(', ') if territories else []
         if action.lower() == 'list':
@@ -38,7 +37,7 @@ class Territories(commands.Cog):
                     if territory.lower() in lower_terrs:
                         territory = all_terrs[lower_terrs.index(territory.lower())]
                         if territory not in tlist:
-                            query("INSERT INTO territories VALUES (%s,'None')", territory)
+                            self.client.query("INSERT INTO territories VALUES (%s,'None')", territory)
                             success.append(territory)
                         else:
                             failed.append(territory)
@@ -65,7 +64,7 @@ class Territories(commands.Cog):
             for territory in territories:
                 if territory.lower() in lower_tlist:
                     territory = tlist[lower_tlist.index(territory.lower())]
-                    query("DELETE FROM territories WHERE name = %s", territory)
+                    self.client.query("DELETE FROM territories WHERE name = %s", territory)
                     success.append(territory)
                 else:
                     failed.append(territory)

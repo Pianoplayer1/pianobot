@@ -1,5 +1,4 @@
 from discord.ext import commands
-from ..utils.db import query
 from ..utils.permissions import check_permissions
 
 class Cooldown(commands.Cog):
@@ -13,7 +12,7 @@ class Cooldown(commands.Cog):
         if not check_permissions(ctx.author, ctx.channel, ['manage_roles']):
             await ctx.send('You don\'t have the required permissions to perform this action!')
             return
-        query("UPDATE servers SET ping = %s WHERE id = %s;", (new*60, ctx.guild.id))
+        self.client.query("UPDATE servers SET ping = %s WHERE id = %s;", (new*60, ctx.guild.id))
         if new == 0:
             await ctx.send(f'Territory ping toggled off')
         else:

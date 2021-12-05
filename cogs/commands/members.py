@@ -1,5 +1,4 @@
 from discord.ext import commands
-from ..utils.db import query
 from ..utils.permissions import permissions, check_permissions
 
 class Members(commands.Cog):
@@ -13,8 +12,8 @@ class Members(commands.Cog):
                         help = 'This command outputs members of the Eden Discord server.',
                         usage = ''  )
     async def members(self, ctx, *, args = None):
-        links = dict(query('SELECT discord, uuid FROM members'))
-        links_r = dict(query('SELECT uuid, discord FROM members'))
+        links = dict(self.client.query('SELECT discord, uuid FROM members'))
+        links_r = dict(self.client.query('SELECT uuid, discord FROM members'))
 
         if args is not None and check_permissions(ctx.author, ctx.channel, ['manage_roles']):
             command, name, discord_id = args.split()
@@ -30,9 +29,9 @@ class Members(commands.Cog):
 
                 uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
                 if uuid in links.values():
-                    query('UPDATE members SET discord=%s WHERE uuid=%s;', (discord_id, uuid))
+                    self.client.query('UPDATE members SET discord=%s WHERE uuid=%s;', (discord_id, uuid))
                 else:
-                    query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
+                    self.client.query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
                     
             
             return
@@ -117,7 +116,7 @@ class Members(commands.Cog):
 
         for discord, uuid in links.items():
             if uuid not in ingame_members.keys():
-                query('DELETE FROM members WHERE discord = %s', discord)
+                self.client.query('DELETE FROM members WHERE discord = %s', discord)
                 print('Deleted', uuid, discord)
 
 def setup(client):

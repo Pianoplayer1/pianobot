@@ -1,7 +1,6 @@
 from datetime import datetime
 from discord.ext import commands
 import discord
-from ..utils.db import query
 from matplotlib import pyplot, dates
 
 class Graph(commands.Cog):
@@ -30,7 +29,7 @@ class Graph(commands.Cog):
             return
         guild = guilds[0]
 
-        res = query(f"SELECT time, `{guild}` FROM `guildActivity` WHERE `time` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);")
+        res = self.client.query(f"SELECT time, `{guild}` FROM `guildActivity` WHERE `time` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);")
         data = {time : amount for time, amount in res}
         
         plot, axes = pyplot.subplots()

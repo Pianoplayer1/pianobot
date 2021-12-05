@@ -1,5 +1,4 @@
 from discord.ext import commands
-from ..utils.db import query
 from ..utils.permissions import check_permissions
 
 class Channel(commands.Cog):
@@ -13,7 +12,7 @@ class Channel(commands.Cog):
         if not check_permissions(ctx.author, ctx.channel, ['manage_roles']):
             await ctx.send('You don\'t have the required permissions to perform this action!')
             return
-        query("UPDATE servers SET channel = %s WHERE id = %s;", (ctx.channel.id, ctx.guild.id))
+        self.client.query("UPDATE servers SET channel = %s WHERE id = %s;", (ctx.channel.id, ctx.guild.id))
         await ctx.send(f'Channel changed to #{ctx.channel.name}')
 
 def setup(client):

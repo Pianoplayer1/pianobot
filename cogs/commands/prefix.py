@@ -1,5 +1,4 @@
 from discord.ext import commands
-from ..utils.db import query
 from ..utils.permissions import check_permissions
 
 class Prefix(commands.Cog):
@@ -13,7 +12,7 @@ class Prefix(commands.Cog):
         if not check_permissions(ctx.author, ctx.channel, ['manage_guild']):
             await ctx.send('You don\'t have the required permissions to perform this action!')
             return
-        query("UPDATE servers SET prefix = %s WHERE id = %s;", (new, ctx.guild.id))
+        self.client.query("UPDATE servers SET prefix = %s WHERE id = %s;", (new, ctx.guild.id))
         await ctx.send(f'Prefix changed to \'{new}\'')
 
 def setup(client):

@@ -1,5 +1,4 @@
 from discord.ext import commands
-from ..utils.db import query
 import discord
 
 class Help(commands.Cog):
@@ -11,7 +10,7 @@ class Help(commands.Cog):
     async def help(self, ctx, command = None):
         help_text = 'List of commands:\n```'
         if ctx.guild:
-            prefix = query('SELECT * FROM servers WHERE id = %s', ctx.guild.id)
+            prefix = self.client.query('SELECT * FROM servers WHERE id = %s', ctx.guild.id)
             prefix = prefix[0][1]
             help_text = help_text = f'Utility bot for various different Wynncraft related things.\n\n' + help_text
         else:

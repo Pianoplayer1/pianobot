@@ -1,5 +1,4 @@
 from discord.ext import commands
-from ..utils.db import query
 from ..utils.table import table
 from math import floor
 import time
@@ -13,7 +12,7 @@ class Soulpoints(commands.Cog):
     async def soulpoints(self, ctx):
         data = [[server, f'{floor(20 - ((time.time() - uptime) / 60) % 20):02}:{floor((1200 - (time.time() - uptime) % 1200) % 60):02} minutes',
                  f'{floor((time.time() - uptime) / 3600):02}:{floor((time.time() - uptime) % 3600 / 60):02} hours']
-                for server, uptime in sorted(query("SELECT * FROM worlds"), key = lambda item: (time.time() - item[1]) % 1200, reverse = True)]
+                for server, uptime in sorted(self.client.query("SELECT * FROM worlds"), key = lambda item: (time.time() - item[1]) % 1200, reverse = True)]
 
         columns = {"Server" : 10, "Next Soul Point" : 18, "Uptime" : 18}
         await ctx.send(table(columns, data[:20])[0])

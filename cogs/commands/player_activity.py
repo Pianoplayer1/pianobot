@@ -1,6 +1,5 @@
 from discord.ext import commands
 import discord
-from ..utils.db import query
 from matplotlib import pyplot, dates
 
 class PlayerActivity(commands.Cog):
@@ -14,7 +13,7 @@ class PlayerActivity(commands.Cog):
                         help = 'This command returns a bar graph with the number of minutes a given player has been online in the last days.',
                         usage = '<player> [days]'  )
     async def graph(self, ctx : commands.Context, player : str, interval : int = 14):
-        res = query(f"SELECT `date`, `count` FROM `playerActivity` WHERE `name` = CONCAT(`date`, '_{player}') AND `date` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);")
+        res = self.client.query(f"SELECT `date`, `count` FROM `playerActivity` WHERE `name` = CONCAT(`date`, '_{player}') AND `date` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);")
 
         data = {time : amount for time, amount in res}
         
