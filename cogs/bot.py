@@ -20,7 +20,7 @@ class Pianobot(commands.Bot):
         if message.guild is None:
             prefixes.append('-')
         else:
-            prefixes.extend([prefix for row in db.query("SELECT prefix FROM servers WHERE id = %s", message.guild.id) for prefix in row])
+            prefixes.extend([prefix for row in self.query("SELECT prefix FROM servers WHERE id = %s", message.guild.id) for prefix in row])
         return prefixes
 
     def load_extension_folder(self, path : str):
