@@ -21,7 +21,7 @@ class OnReady(Cog):
 
     @loop(seconds=60)
     async def loop_1m(self):
-        await members.run(self.bot)
+        #await members.run(self.bot)
         await player_activity.run(self.bot)
     
     @loop(seconds=300)
