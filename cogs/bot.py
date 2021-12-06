@@ -16,7 +16,7 @@ class Pianobot(commands.Bot):
         self.con = db.connect()
 
     async def _get_prefixes(self, _, message : discord.Message):
-        prefixes = [f'<@!{self.user.id}> ', f'<@{self.user.id}> ']
+        prefixes = [f'<@!{self.user.id}> ', f'<@{self.user.id}> ', f'<@!{self.user.id}>', f'<@{self.user.id}>']
         if message.guild is None:
             prefixes.append('-')
         else:
@@ -42,6 +42,5 @@ class Pianobot(commands.Bot):
     def shutdown(self):
         print('Shutting down...')
         asyncio.new_event_loop().run_until_complete(self._http_session_close())
-        asyncio.get_event_loop().close()
         db.disconnect(self.con)
         print('Bot exited')

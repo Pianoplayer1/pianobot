@@ -14,4 +14,4 @@ async def run(bot : Pianobot) -> None:
                 bot.query('DELETE FROM `worlds` WHERE `world` = %s;', server[0])
 
         for server in servers:
-            bot.query('INSERT INTO `worlds` (`world`, `time`) VALUES (%s, %s)', (server, time()))
+            bot.query('INSERT INTO `worlds` (`world`, `time`) VALUES (%s, %s);', (server, time()))

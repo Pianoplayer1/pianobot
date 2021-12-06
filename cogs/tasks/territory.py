@@ -1,34 +1,33 @@
-import time
+from time import time
 from ..bot import Pianobot
 
 async def run(bot : Pianobot):
-    servers = bot.query("SELECT * FROM servers")
-    db_terrs = dict(bot.query("SELECT * FROM territories"))
+    db_terrs = bot.query('SELECT `name`, `guild` FROM `territories`;')
+    notify = None
     async with bot.session.get('https://api.wynncraft.com/public_api.php?action=territoryList') as response:
-        terrs = await response.json()
-        terrs = terrs['territories']
+        terrs = (await response.json())['territories']
 
-        for terr in list(db_terrs.keys()):
-            if terrs[terr]['guild'] != 'Eden' and db_terrs[terr] == 'Eden':
-                ping_terr = terr
-            if db_terrs[terr] != terrs[terr]['guild']:  
-                bot.query("UPDATE territories SET guild = %s WHERE name = %s", (terrs[terr]['guild'], terr))
-                print(f'{terr}: {db_terrs[terr]} -> {terrs[terr]["guild"]}')
+        for terr, guild in db_terrs:
+            if terrs[terr]['guild'] != guild:  
+                bot.query('UPDATE `territories` SET `guild` = %s WHERE `name` = %s;', (terrs[terr]['guild'], terr))
+                print(f'{terr}: {guild} -> {terrs[terr]["guild"]}')
+                if terrs[terr]['guild'] != 'Eden' and guild == 'Eden':
+                    notify = terr
 
-        if 'ping_terr' in locals():
-            tmissing = bot.query("SELECT name FROM territories WHERE guild != 'Eden'")
-            msg = f'{terrs[ping_terr]["guild"]} has taken control of {ping_terr}!```All missing territories ({len(tmissing)}):\n'
-            for terr in tmissing:
-                terr = terr[0]
-                msg += f'\n- {terr} ({terrs[terr]["guild"]})'
-            msg += '```'
+        if notify is None: return
 
-            for server in servers:
-                msgTemp = msg
-                if server[3] != 0 and time.time() >= (server[4] + server[5]) and server[5] != 0:
-                    msgTemp = f'<@&{server[3]}>\n' + msg
-                    bot.query("UPDATE servers SET time = %s WHERE id = %s", (time.time(), server[0]))
-                try:
-                    await bot.get_channel(server[2]).send(msgTemp)
-                except:
-                    print(f'Couldn\'t send message to server {server[0]}')
+        missing_terrs = [terr for entry in bot.query('SELECT `name` FROM `territories` WHERE `guild` != %s;', 'Eden') for terr in entry]
+        terrs_msg = '\n'.join([f'- {terr} ({terrs[terr]["guild"]})' for terr in missing_terrs][:10])
+        if len(missing_terrs) > 10:
+            terrs_msg += f'\n- ... ({len(missing_terrs) - 10} more)'
+        msg = f'{terrs[notify]["guild"]} has taken control of {notify}!```All missing territories ({len(missing_terrs)}):\n\n{terrs_msg}```'
+
+        for channel, role, last_ping, cooldown in bot.query('SELECT `channel`, `role`, `time`, `ping` FROM `servers`;'):
+            temp_msg = msg
+            if role != 0 and cooldown != 0 and time() >= (last_ping + cooldown):
+                temp_msg = f'<@&{role}>\n{msg}'
+                bot.query('UPDATE `servers` SET `time` = %s WHERE `channel` = %s;', (time(), channel))
+            try:
+                await bot.get_channel(channel).send(temp_msg)
+            except AttributeError:
+                print(f'Channel {channel} not found')

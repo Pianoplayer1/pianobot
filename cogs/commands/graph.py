@@ -12,6 +12,9 @@ class Graph(commands.Cog):
                         help = 'This command returns a line graph with the number of members online in the last days.',
                         usage = '<guild> -[days]')
     async def graph(self, ctx : commands.Context, *, guild : str):
+        await ctx.send('This feature is currently not supported because of database issues. Please message @Pianoplayer1#5215 for further details!')
+        return
+
         interval = 7
         try:
             if '-' in guild:
