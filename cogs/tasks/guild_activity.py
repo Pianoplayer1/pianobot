@@ -1,7 +1,6 @@
 import asyncio
 from ..bot import Pianobot
 from datetime import datetime, timedelta
-from pymysql.err import IntegrityError
 
 async def run(bot : Pianobot) -> None:
     async with bot.session.get('https://api.wynncraft.com/public_api.php?action=onlinePlayers') as response:
@@ -27,7 +26,7 @@ async def run(bot : Pianobot) -> None:
 
         try:
             bot.query(sql, values)
-        except IntegrityError:
+        except:
             print('Duplicate guild activity time')
 
 async def fetch(player_list, session, guild):
