@@ -1,17 +1,16 @@
 from os import getenv
 import psycopg2
-from psycopg2 import connection
 
-def connect() -> connection:
+def connect():
     con = psycopg2.connect(host = getenv('PG_HOST'), user = getenv('PG_USER'), password = getenv('PG_PASS'), database = getenv('PG_DB'))
     print('Connected to database')
     return con
 
-def disconnect(con : connection):
+def disconnect(con):
     con.close()
     print('Disconnected from database')
 
-def query(con : connection, sql : str, vals : tuple) -> tuple:
+def query(con, sql : str, vals : tuple) -> tuple:
     sql = sql.replace('`', '"')
     cursor = con.cursor()
     cursor.execute(sql, vals)
