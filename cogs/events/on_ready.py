@@ -9,7 +9,7 @@ class OnReady(Cog):
     
     @Cog.listener()
     async def on_ready(self):
-        print('Booted up')
+        print('Bot booted up')
         self.loop_10s.start()
         self.loop_1m.start()
         self.loop_5m.start()
