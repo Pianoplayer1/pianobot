@@ -10,7 +10,6 @@ async def run(bot : Pianobot):
         for terr, guild in db_terrs:
             if terrs[terr]['guild'] != guild:  
                 bot.query('UPDATE `territories` SET `guild` = %s WHERE `name` = %s;', (terrs[terr]['guild'], terr))
-                print(f'{terr}: {guild} -> {terrs[terr]["guild"]}')
                 if terrs[terr]['guild'] != 'Eden' and guild == 'Eden':
                     notify = terr
 
