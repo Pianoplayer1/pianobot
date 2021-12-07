@@ -1,17 +1,17 @@
 from os import getenv
-import pymysql
-from pymysql.connections import Connection
+import psycopg2
 
-def connect() -> Connection:
-    con = pymysql.connect(host = getenv('HOST'), user = getenv('USER'), password = getenv('PASSWORD'), database = getenv('DATABASE'))
+def connect() -> psycopg2.connection:
+    con = psycopg2.connect(host = getenv('PG_HOST'), user = getenv('PG_USER'), password = getenv('PG_PASS'), database = getenv('PG_DB'))
     print('Connected to database')
     return con
 
-def disconnect(con : Connection):
+def disconnect(con : psycopg2.connection):
     con.close()
     print('Disconnected from database')
 
-def query(con : Connection, sql : str, vals : tuple) -> tuple:
+def query(con : psycopg2.connection, sql : str, vals : tuple) -> tuple:
+    sql = sql.replace('`', '"')
     cursor = con.cursor()
     cursor.execute(sql, vals)
     con.commit()
