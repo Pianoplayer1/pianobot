@@ -1,24 +1,24 @@
+from ..bot import Pianobot
 from discord.ext import commands
-from ..utils.permissions import permissions, check_permissions
+from ..utils.permissions import check_permissions
 
 class Members(commands.Cog):
+    def __init__(self, bot : Pianobot):
+        self.bot = bot
 
-    def __init__(self, client):
-        self.client = client
-    
     @commands.command(  name = 'members',
                         aliases = [],
                         brief = 'Outputs members of the Eden Discord server.',
                         help = 'This command outputs members of the Eden Discord server.',
-                        usage = ''  )
-    async def members(self, ctx, *, args = None):
-        links = dict(self.client.query('SELECT discord, uuid FROM members'))
-        links_r = dict(self.client.query('SELECT uuid, discord FROM members'))
+                        usage = '')
+    async def members(self, ctx : commands.Context, *, args : str = None):
+        links = dict(self.bot.query('SELECT `discord`, `uuid` FROM `members`;'))
+        links_r = dict(self.bot.query('SELECT `uuid`, `discord` FROM `members`;'))
 
-        if args is not None and check_permissions(ctx.author, ctx.channel, ['manage_roles']):
+        if args and check_permissions(ctx.author, ctx.channel, 'manage_roles'):
             command, name, discord_id = args.split()
             if command.lower() == 'link':
-                async with self.client.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
+                async with self.bot.session.get(f'https://api.mojang.com/users/profiles/minecraft/{name}') as response:
                     json_response = await response.json()
                 try:
                     uuid = json_response['id']
@@ -27,13 +27,11 @@ class Members(commands.Cog):
                     await ctx.send(f'Couldn\'t find uuid of {name}')
                     return
 
-                uuid = uuid[0:8]+'-'+uuid[8:12]+'-'+uuid[12:16]+'-'+uuid[16:20]+'-'+uuid[20:32]
+                uuid = uuid[0:8] + '-' + uuid[8:12] + '-' + uuid[12:16] + '-' + uuid[16:20] + '-' + uuid[20:32]
                 if uuid in links.values():
-                    self.client.query('UPDATE members SET discord=%s WHERE uuid=%s;', (discord_id, uuid))
+                    self.bot.query('UPDATE members SET discord=%s WHERE uuid=%s;', (discord_id, uuid))
                 else:
-                    self.client.query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
-                    
-            
+                    self.bot.query('INSERT INTO members VALUES(%s, %s, %s, 0, 0, 0, 0, 0);', (uuid, name, discord_id))
             return
 
 
@@ -45,8 +43,8 @@ class Members(commands.Cog):
                     'Not in the ingame guild' : [],
                     'Highest Discord role not matching ingame role' : [],
                     'Discord nickname not matching ingame name or rank symbol' : []  }
-        
-        eden = self.client.get_guild(682671629213368351)
+
+        eden = self.bot.get_guild(682671629213368351)
         roles = {   'guild_member' : eden.get_role(682675039631310915),
                     'recruit'      : eden.get_role(703591550424317963),
                     'recruiter'    : eden.get_role(703591538508300299),
@@ -59,7 +57,7 @@ class Members(commands.Cog):
         rank_symbols = {roles['recruit'] : '', roles['recruiter'] : '◉ ', roles['captain'] : '♞ ', roles['strategist'] : '♝ ', roles['chief'] : '♜ ', roles['consul'] : '♕ ', roles['owner'] : '♔ '}
         senate_roles = [roles['owner'], roles['consul'], roles['chief'], roles['strategist']]
 
-        async with self.client.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
+        async with self.bot.session.get('https://api.wynncraft.com/public_api.php?action=guildStats&command=Eden') as response:
             json_response = await response.json()
         ingame_members = {}
         for member in json_response['members']:
@@ -109,15 +107,15 @@ class Members(commands.Cog):
                 if discord_name != correct_name:
                     output['Discord nickname not matching ingame name or rank symbol'].append(message_name + ' --> ' + correct_name.replace('_', '\_'))
 
-            elif any(role in member.roles for role in roles.values()) and 'administrator' not in permissions(member, eden.channels[0]):
+            elif any(role in member.roles for role in roles.values()) and not check_permissions(member, eden.channels[0], 'administrator'):
                 output['No guild member role in Discord'].append(message_name)
 
         await ctx.send('\n'.join(f'\n**{category[0]}:**\n' + '\n'.join(category[1]) for category in output.items() if len(category[1]) > 0))
 
         for discord, uuid in links.items():
             if uuid not in ingame_members.keys():
-                self.client.query('DELETE FROM members WHERE discord = %s', discord)
+                self.bot.query('DELETE FROM `members` WHERE `discord` = %s;', discord)
                 print('Deleted', uuid, discord)
 
-def setup(client):
-    client.add_cog(Members(client))
+def setup(bot : Pianobot):
+    bot.add_cog(Members(bot))

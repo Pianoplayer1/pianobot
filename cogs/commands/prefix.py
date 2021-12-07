@@ -17,7 +17,7 @@ class Prefix(commands.Cog):
         if len(new) > 3:
             await ctx.send('A prefix cannot be longer than 3 characters!')
             return
-        if not check_permissions(ctx.author, ctx.channel, ['manage_guild']):
+        if not check_permissions(ctx.author, ctx.channel, 'manage_guild'):
             await ctx.send('You don\'t have the required permissions to perform this action!')
             return
         self.bot.query('UPDATE `servers` SET `prefix` = %s WHERE `id` = %s;', (new, ctx.guild.id))

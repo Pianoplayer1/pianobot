@@ -14,13 +14,13 @@ class OnCommandError(commands.Cog):
         if cog and cog._get_overridden_method(cog.cog_command_error) is not None:
             return
         if ctx.guild:
-            prefix = self.bot.query('SELECT * FROM `servers` WHERE `id` = %s', ctx.guild.id)
+            prefix = self.bot.query('SELECT * FROM `servers` WHERE `id` = %s;', ctx.guild.id)
             prefix = prefix[0][1]
         else:
             prefix = '-'
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f'You are missing the required \'{error.param}\' argument after this command. Refer to `{prefix}help {ctx.command}` for detailed information.')
+            await ctx.send(f'You are missing the required `{error.param.name}` argument after this command. Refer to `{prefix}help {ctx.command}` for detailed information.')
         elif isinstance(error, commands.NoPrivateMessage):
             try:
                 await ctx.author.send(f'`{prefix}{ctx.command}` cannot be used in private messages.')
@@ -33,8 +33,8 @@ class OnCommandError(commands.Cog):
             else:
                 await ctx.send(f'`{prefix}{ctx.command}` cannot be used in private messages.')
         else: 
-            print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-            traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+            print(f'Ignoring exception in command {ctx.command}:', file = sys.stderr)
+            traceback.print_exception(type(error), error, error.__traceback__, file = sys.stderr)
 
 def setup(bot : Pianobot):
     bot.add_cog(OnCommandError(bot))
