@@ -21,7 +21,7 @@ async def run(bot : Pianobot) -> None:
 
         columns = '`, `'.join(guilds.keys())
         placeholders = '%s' + ', %s' * len(guilds)
-        sql = f'INSERT INTO guildActivity(`time`, `{columns}`) VALUES ({placeholders})'
+        sql = f'INSERT INTO "guildActivity"(`time`, `{columns}`) VALUES ({placeholders});'
         values = (rounded_time, *guilds.values())
 
         try:

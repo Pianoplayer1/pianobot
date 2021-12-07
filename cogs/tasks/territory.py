@@ -2,7 +2,7 @@ from time import time
 from ..bot import Pianobot
 
 async def run(bot : Pianobot):
-    db_terrs = bot.query('SELECT `name`, `guild` FROM `territories`;')
+    db_terrs = bot.query('SELECT "name", "guild" FROM "territories";')
     notify = None
     async with bot.session.get('https://api.wynncraft.com/public_api.php?action=territoryList') as response:
         terrs = (await response.json())['territories']

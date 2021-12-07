@@ -9,4 +9,4 @@ async def run(bot : Pianobot) -> None:
 		date = datetime.strftime(datetime.utcnow(), '%Y-%m-%d')
 		values = ', '.join([f'(\'{date}_{name.lower()}\', \'{datetime.utcnow()}\', 1)' for name in players])
 		
-		bot.query(f"INSERT INTO `playerActivity` VALUES {values} ON DUPLICATE KEY UPDATE `count` = `count` + 1")
+		bot.query(f"INSERT INTO `playerActivity` VALUES {values} ON CONFLICT (name) DO UPDATE SET `count` = `playerActivity`.`count` + 1")

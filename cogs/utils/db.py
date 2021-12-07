@@ -15,6 +15,9 @@ def query(con, sql : str, vals : tuple) -> tuple:
     cursor = con.cursor()
     cursor.execute(sql, vals)
     con.commit()
-    rows = cursor.fetchall()
+    try:
+        rows = cursor.fetchall()
+    except psycopg2.ProgrammingError:
+        rows = ()
     cursor.close()
     return rows
