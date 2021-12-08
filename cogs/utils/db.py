@@ -12,6 +12,7 @@ def disconnect(con):
     print('Disconnected from database')
 
 def query(con, sql : str, vals : tuple) -> tuple:
+    if type(vals) != tuple: vals = (vals,)
     sql = sql.replace('`', '"')
     cursor = con.cursor()
     cursor.execute(sql, vals)
