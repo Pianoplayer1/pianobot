@@ -28,7 +28,7 @@ class Graph(commands.Cog):
             return
         guild = matches[0]
 
-        res = self.bot.query(f'SELECT `time`, `{guild}` FROM `guildActivity` WHERE `time` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);')
+        res = self.bot.query(f'SELECT `time`, `{guild}` FROM `guildActivity` WHERE `time` > (CURRENT_TIMESTAMP - \'{interval} day\'::interval);')
         data = {time: amount for time, amount in res}
         
         plot, axes = pyplot.subplots()

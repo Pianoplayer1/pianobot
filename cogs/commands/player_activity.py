@@ -13,7 +13,7 @@ class PlayerActivity(commands.Cog):
                         help = 'This command returns a bar graph with the number of minutes a given player has been online in the last days.',
                         usage = '<player> [days]')
     async def graph(self, ctx : commands.Context, player : str, interval : int = 14):
-        res = self.bot.query(f'SELECT `date`, `count` FROM `playerActivity` WHERE `name` = CONCAT(`date`, "_{player}") AND `date` > DATE_SUB(CURRENT_TIMESTAMP, INTERVAL {interval} DAY);')
+        res = self.bot.query(f'SELECT `date`, `count` FROM `playerActivity` WHERE `name` = CONCAT(`date`, \'_{player}\') AND `date` > (CURRENT_TIMESTAMP - \'{interval} day\'::interval);')
         data = {time: amount for time, amount in res}
 
         plot, axes = pyplot.subplots()
