@@ -2,7 +2,7 @@ from typing import Union
 from discord import Member, User
 from discord.channel import TextChannel
 
-def check_permissions(member : Union[Member, User], channel : TextChannel, *permissions : tuple[str]):
+def check_permissions(member : Union[Member, User], channel : TextChannel, *permissions : tuple):
     if isinstance(member, User):
         member = channel.guild.get_member(member.id)
         if member is None:
