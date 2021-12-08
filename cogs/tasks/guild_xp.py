@@ -10,7 +10,7 @@ async def run(bot : Pianobot) -> None:
         
         to_add = set(current_xp.keys())
         to_add.difference_update(columns)
-        add_string = ', '.join([f'ADD COLUMN "{name}" VARCHAR NOT NULL' for name in to_add])
+        add_string = ', '.join([f'ADD COLUMN "{name}" BIGINT NOT NULL' for name in to_add])
         to_remove = set(columns)
         to_remove.difference_update(current_xp.keys())
         remove_string = ', '.join([f'DROP COLUMN IF EXISTS "{name}"' for name in to_remove])
