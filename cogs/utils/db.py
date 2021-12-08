@@ -1,8 +1,9 @@
 from os import getenv
-import psycopg2
+import psycopg2, traceback
 
 def connect():
     con = psycopg2.connect(host = getenv('PG_HOST'), user = getenv('PG_USER'), password = getenv('PG_PASS'), database = getenv('PG_DB'))
+    con.autocommit = True
     print('Connected to database')
     return con
 
