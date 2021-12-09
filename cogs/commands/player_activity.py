@@ -11,7 +11,14 @@ class PlayerActivity(commands.Cog):
                         brief = 'Outputs the activity of a given player in a given interval.',
                         help = 'This command returns a bar graph with the number of minutes a given player has been online in the last days.',
                         usage = '<player> [days]')
-    async def graph(self, ctx : commands.Context, player : str, interval : int = 14):
+    async def graph(self, ctx : commands.Context, player : str, interval : str = '14'):
+        if interval.startswith('-'):
+            interval = interval[1:]
+        try:
+            interval = int(interval)
+        except ValueError:
+            await ctx.send('Please provide a valid interval!')
+            return
         await ctx.send(f'https://wynnstats.dieterblancke.xyz/api/charts/onlinetime/{player}/{interval}')
 
 def setup(bot : Pianobot):
