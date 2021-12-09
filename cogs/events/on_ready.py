@@ -1,7 +1,7 @@
 from ..bot import Pianobot
 from discord.ext.commands import Cog
 from discord.ext.tasks import loop
-from ..tasks import guild_activity, guild_leaderboard, members, player_activity, territory, worlds, guild_xp
+from ..tasks import guild_activity, guild_leaderboard, members, territory, worlds, guild_xp
 
 class OnReady(Cog):
     def __init__(self, bot : Pianobot):
@@ -23,7 +23,6 @@ class OnReady(Cog):
     async def loop_1m(self):
         #await members.run(self.bot)
         await guild_leaderboard.run(self.bot)
-        await player_activity.run(self.bot)
     
     @loop(seconds=300)
     async def loop_5m(self):
