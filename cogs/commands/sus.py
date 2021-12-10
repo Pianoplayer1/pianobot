@@ -49,7 +49,7 @@ class Sus(commands.Cog):
         for player_class in player_data['classes']:
             wynncraft_quests.update(player_class['quests']['list'])
             wynncraft_level += player_class['level']
-        wynncraft_level_score = min(round(wynncraft_level / 10, 2), 100)
+        wynncraft_level_score = min(wynncraft_level / 10, 100)
         wynncraft_quests_score = min(int(len(wynncraft_quests) / 2), 100)
 
 
@@ -57,7 +57,7 @@ class Sus(commands.Cog):
         async with self.bot.session.get('https://api.hypixel.net/player', params = {'key': 'd9a6b029-99ea-4620-ba52-6df35c61486b', 'uuid': uuid}) as response:
             response = await response.json()
             first_hypixel_login = None
-            if response['player']:
+            if response['player'] and response['player']['firstLogin']:
                 first_hypixel_login = datetime.utcfromtimestamp(response['player']['firstLogin'] / 1000)
 
 
@@ -78,7 +78,7 @@ class Sus(commands.Cog):
 
         embed = Embed(title = 'Suspiciousness of ' + player + ': ' + str(total_score) + '%', description = 'The rating is based on following components:', color = color)
         for i, field in enumerate(embed_fields):
-            embed.add_field(name = field, value = f'{categories[i]}\n{100 - scores[i]}% sus', inline = True)
+            embed.add_field(name = field, value = f'{categories[i]}\n{round(100 - scores[i], 2)}% sus', inline = True)
         await ctx.send(embed = embed)
 
 

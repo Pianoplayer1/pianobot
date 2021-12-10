@@ -32,6 +32,8 @@ class OnCommandError(commands.Cog):
                 await ctx.send(f'You do not have the required permissions to run this command!\nFollowing permissions are needed:\n{perms}')
             else:
                 await ctx.send(f'`{prefix}{ctx.command}` cannot be used in private messages.')
+        elif isinstance(error, commands.CommandNotFound):
+            pass
         else: 
             print(f'Ignoring exception in command {ctx.command}:', file = sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file = sys.stderr)
