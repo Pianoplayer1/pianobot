@@ -42,6 +42,9 @@ class Pianobot(commands.Bot):
     
     def shutdown(self):
         print('Shutting down...')
-        asyncio.new_event_loop().run_until_complete(self._http_session_close())
+        temp_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(temp_loop)
+        temp_loop.run_until_complete(self._http_session_close())
+        temp_loop.close()
         db.disconnect(self.con)
         print('Bot exited')
