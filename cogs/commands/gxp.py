@@ -39,8 +39,8 @@ class GuildXP(commands.Cog):
         table_cols = {f'Eden Members': 36, f'Gained Guild XP': 30}
         ascending_data = [[name, self.format(xp)] for name, xp in sorted(differences.items(), key = lambda item: item[1])]
         descending_data = [[name, self.format(xp)] for name, xp in sorted(differences.items(), key = lambda item: item[1], reverse=True)]
-        ascending_table = table(table_cols, ascending_data, 5, 15, True, '(Ascending Order)', f'Guild XP data from **<t:{start_time}> to <t:{end_time}>**')
-        descending_table = table(table_cols, descending_data, 5, 15, True, '(Descending Order)', f'Guild XP data from **<t:{start_time}> to <t:{end_time}>**')
+        ascending_table = table(table_cols, ascending_data, 5, 15, True, '(Ascending Order)', f'<t:{start_time}> - <t:{end_time}>')
+        descending_table = table(table_cols, descending_data, 5, 15, True, '(Descending Order)', f'<t:{start_time}> - <t:{end_time}>')
         await paginator(self.bot, ctx, descending_table, None, ascending_table)
     
     def format(self, n : float):
