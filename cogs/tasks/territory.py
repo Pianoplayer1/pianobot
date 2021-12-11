@@ -29,4 +29,5 @@ async def run(bot : Pianobot):
             try:
                 await bot.get_channel(channel).send(temp_msg)
             except AttributeError:
-                print(f'Channel {channel} not found')
+                if channel != 0:
+                    print(f'Channel {channel} not found')

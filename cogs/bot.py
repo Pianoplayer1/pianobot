@@ -36,14 +36,10 @@ class Pianobot(commands.Bot):
 
     async def _http_session_start(self):
         self.session = aiohttp.ClientSession()
-    async def _http_session_close(self):
-        await self.session.close()
     
     def shutdown(self):
-        print('Shutting down...')
-        temp_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(temp_loop)
-        temp_loop.run_until_complete(self._http_session_close())
-        temp_loop.close()
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        asyncio.get_event_loop().run_until_complete(self.session.close())
+        asyncio.get_event_loop().close()
         db.disconnect(self.con)
         print('Bot exited')
