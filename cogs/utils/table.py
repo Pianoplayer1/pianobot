@@ -1,6 +1,6 @@
 from math import ceil
 
-def table(columns, rawData, seperator = 0, pageLen = 0, enum = False, label = ''):
+def table(columns, rawData, seperator = 0, pageLen = 0, enum = False, label = '', start_text = None):
     if enum:
         columns[list(columns.keys())[0]] -= 5
     message = []
@@ -13,7 +13,7 @@ def table(columns, rawData, seperator = 0, pageLen = 0, enum = False, label = ''
             data = rawData[page * pageLen : ]
         if len(data) == 0:
             data = rawData[page * pageLen : ]
-        message.append('```ml\n|')
+        message.append((start_text + '\n' if start_text else '') + '```ml\n|')
         
         if enum:
             message[page] += '     '
