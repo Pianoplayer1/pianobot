@@ -3,6 +3,7 @@ from discord import Embed
 from discord.ext import commands
 from datetime import datetime
 from math import floor
+from aiohttp import ClientSession
 
 class Sus(commands.Cog):
     def __init__(self, bot : Pianobot):
@@ -18,7 +19,7 @@ class Sus(commands.Cog):
 
         # Ashcon API
         try:
-            async with self.bot.session.get('https://api.ashcon.app/mojang/v2/user/' + player) as response:
+            async with ClientSession() as session, session.get('https://api.ashcon.app/mojang/v2/user/' + player) as response:
                 response = await response.json()
                 uuid = response['uuid']
                 first_name_change = datetime.strptime(response['username_history'][1]['changed_at'], '%Y-%m-%dT%H:%M:%S.%fZ') if len(response['username_history']) > 1 else None
@@ -29,32 +30,29 @@ class Sus(commands.Cog):
 
 
         # Wynncraft API
-        try:
-            async with self.bot.session.get(f'https://api.wynncraft.com/v2/player/{uuid}/stats') as response:
-                response = await response.json()
-                player_data = response['data'][0]
-        except IndexError:
+        player_data = await self.bot.corkus.player.get(player)
+        if not player_data.username:
             await ctx.send('Not a valid Wynncraft player!')
             return
 
-        first_wynncraft_login = datetime.strptime(player_data['meta']['firstJoin'], '%Y-%m-%dT%H:%M:%S.%fZ')
+        first_wynncraft_login = player_data.join_date
         first_wynncraft_login_score = get_date_score(first_wynncraft_login, 200)
-        wynncraft_playtime = floor(player_data['meta']['playtime'] * 4.7 / 60)
+        wynncraft_playtime = floor(player_data.playtime * 4.7 / 60)
         wynncraft_playtime_score = min(wynncraft_playtime, 100)
-        wynncraft_rank = player_data['meta']['tag']['value'] if player_data['meta']['tag']['value'] else 'NONE'
-        wynncraft_rank_score = min(['NONE', None, 'VIP', 'VIP+', 'HERO', 'CHAMPION'].index(wynncraft_rank) * 25, 100)
+        wynncraft_rank = player_data.tag
+        wynncraft_rank_score = min(['PLAYER', None, 'VIP', 'VIP+', 'HERO', 'CHAMPION'].index(wynncraft_rank) * 25, 100)
 
         wynncraft_level = 0
         wynncraft_quests = set()
-        for player_class in player_data['classes']:
-            wynncraft_quests.update(player_class['quests']['list'])
-            wynncraft_level += player_class['level']
+        for player_class in player_data.classes:
+            wynncraft_quests.update([quest.name for quest in player_class.quests])
+            wynncraft_level += player_class.combined_level
         wynncraft_level_score = min(wynncraft_level / 10, 100)
         wynncraft_quests_score = min(int(len(wynncraft_quests) / 2), 100)
 
 
         # Hypixel API
-        async with self.bot.session.get('https://api.hypixel.net/player', params = {'key': 'd9a6b029-99ea-4620-ba52-6df35c61486b', 'uuid': uuid}) as response:
+        async with ClientSession() as session, session.get('https://api.hypixel.net/player', params = {'key': 'd9a6b029-99ea-4620-ba52-6df35c61486b', 'uuid': uuid}) as response:
             response = await response.json()
             first_hypixel_login = None
             if response['player'] and response['player']['firstLogin']:

@@ -14,7 +14,7 @@ class OnCommandError(commands.Cog):
         if cog and cog._get_overridden_method(cog.cog_command_error) is not None:
             return
         if ctx.guild:
-            prefix = self.bot.query('SELECT * FROM `servers` WHERE `id` = %s;', ctx.guild.id)
+            prefix = self.bot.query('SELECT * FROM servers WHERE id = %s;', ctx.guild.id)
             prefix = prefix[0][1]
         else:
             prefix = '-'

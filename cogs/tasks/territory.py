@@ -1,33 +1,35 @@
-from time import time
 from ..bot import Pianobot
+from time import time
 
 async def run(bot : Pianobot):
-    db_terrs = bot.query('SELECT "name", "guild" FROM "territories";')
+    db_terrs = dict(bot.query('SELECT "name", "guild" FROM "territories";'))
     notify = None
-    async with bot.session.get('https://api.wynncraft.com/public_api.php?action=territoryList') as response:
-        terrs = (await response.json())['territories']
+    missing = []
+    territories = await bot.corkus.territory.list_all()
 
-        for terr, guild in db_terrs:
-            if terrs[terr]['guild'] != guild:  
-                bot.query('UPDATE `territories` SET `guild` = %s WHERE `name` = %s;', (terrs[terr]['guild'], terr))
-                if terrs[terr]['guild'] != 'Eden' and guild == 'Eden':
-                    notify = terr
+    for territory in territories:
+        if territory.name not in db_terrs.keys():
+            continue
+        if db_terrs[territory.name] != territory.guild:  
+            bot.query('UPDATE territories SET guild = %s WHERE name = %s;', (territory.guild.name, territory.name))
+        if territory.guild != 'Eden':
+            missing.append(territory)
+            if db_terrs[territory.name] == 'Eden':
+                notify = territory
+    if notify is None: return
 
-        if notify is None: return
+    terrs_msg = '\n'.join([f'- {terr.name} ({terr.guild})' for terr in missing][:10])
+    if len(missing) > 10:
+        terrs_msg += f'\n- ... ({len(missing) - 10} more)'
+    msg = f'{notify.guild} has taken control of {notify.name}!```All missing territories ({len(missing)}):\n\n{terrs_msg}```'
 
-        missing_terrs = [terr for entry in bot.query('SELECT `name` FROM `territories` WHERE `guild` != %s;', 'Eden') for terr in entry]
-        terrs_msg = '\n'.join([f'- {terr} ({terrs[terr]["guild"]})' for terr in missing_terrs][:10])
-        if len(missing_terrs) > 10:
-            terrs_msg += f'\n- ... ({len(missing_terrs) - 10} more)'
-        msg = f'{terrs[notify]["guild"]} has taken control of {notify}!```All missing territories ({len(missing_terrs)}):\n\n{terrs_msg}```'
-
-        for channel, role, last_ping, cooldown in bot.query('SELECT `channel`, `role`, `time`, `ping` FROM `servers`;'):
-            temp_msg = msg
-            if role != 0 and cooldown != 0 and time() >= (last_ping + cooldown):
-                temp_msg = f'<@&{role}>\n{msg}'
-                bot.query('UPDATE `servers` SET `time` = %s WHERE `channel` = %s;', (time(), channel))
-            try:
-                await bot.get_channel(channel).send(temp_msg)
-            except AttributeError:
-                if channel != 0:
-                    print(f'Channel {channel} not found')
+    for channel, role, last_ping, cooldown in bot.query('SELECT `channel`, `role`, `time`, `ping` FROM `servers`;'):
+        temp_msg = msg
+        if role != 0 and cooldown != 0 and time() >= (last_ping + cooldown):
+            temp_msg = f'<@&{role}>\n{msg}'
+            bot.query('UPDATE `servers` SET `time` = %s WHERE `channel` = %s;', (time(), channel))
+        try:
+            await bot.get_channel(channel).send(temp_msg)
+        except AttributeError:
+            if channel != 0:
+                print(f'Channel {channel} not found')

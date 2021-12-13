@@ -1,6 +1,5 @@
 from ..bot import Pianobot
 from discord.ext import commands
-from discord import File
 
 class PlayerActivity(commands.Cog):
     def __init__(self, bot : Pianobot):

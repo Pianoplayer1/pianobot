@@ -16,7 +16,7 @@ class Soulpoints(commands.Cog):
         now = time()
         data = [[server, f'{floor(20 - ((now - uptime) / 60) % 20):02}:{floor((1200 - (now - uptime) % 1200) % 60):02} minutes',
                  f'{floor((now - uptime) / 3600):02}:{floor((now - uptime) % 3600 / 60):02} hours']
-                for server, uptime in sorted(self.bot.query('SELECT `world`, `time` FROM `worlds`;'), key = lambda item: (now - item[1]) % 1200, reverse = True)]
+                for server, uptime in sorted(self.bot.query('SELECT world, time FROM worlds;'), key = lambda item: (now - item[1]) % 1200, reverse = True)]
 
         columns = {'Server' : 10, 'Next Soul Point' : 18, 'Uptime' : 18}
         await ctx.send(table(columns, data[:20])[0])

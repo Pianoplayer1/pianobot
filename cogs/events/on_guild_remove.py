@@ -9,7 +9,7 @@ class OnGuildRemove(Cog):
     @Cog.listener()
     async def on_guild_remove(self, guild : Guild):
         print(f'Left {guild.name}')
-        self.bot.query("DELETE FROM `servers` WHERE `id` = %s;", guild.id)
+        self.bot.query("DELETE FROM servers WHERE id = %s;", guild.id)
 
 def setup(bot : Pianobot):
     bot.add_cog(OnGuildRemove(bot))

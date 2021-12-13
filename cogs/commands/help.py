@@ -15,7 +15,7 @@ class Help(commands.Cog):
         help_text = 'I am a utility bot for various different Wynncraft related things.\n\nList of commands:\n```'
         prefix = '-'
         if ctx.guild:
-            prefix = self.bot.query('SELECT `prefix` FROM `servers` WHERE `id` = %s;', ctx.guild.id)[0][0]
+            prefix = self.bot.query('SELECT prefix FROM servers WHERE id = %s;', ctx.guild.id)[0][0]
 
         visible_commands = {cmd: [cmd.name] for cog in self.bot.cogs.values() for cmd in cog.get_commands() if ctx.guild or not cmd.hidden}
         for cmd in visible_commands:

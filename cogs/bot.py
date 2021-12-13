@@ -1,4 +1,5 @@
-import aiohttp, asyncio, discord
+import discord
+from corkus import Corkus
 from .utils import db
 from discord.ext import commands
 from os import listdir
@@ -12,7 +13,7 @@ class Pianobot(commands.Bot):
         self.load_extension_folder('cogs.commands')
         self.load_extension_folder('cogs.events')
         
-        asyncio.get_event_loop().run_until_complete(self._http_session_start())
+        self.corkus = Corkus()
         self.con = db.connect()
 
     async def _get_prefixes(self, _, message : discord.Message):
@@ -33,16 +34,7 @@ class Pianobot(commands.Bot):
     
     def query(self, sql : str, vals : tuple = None) -> tuple:
         return db.query(self.con, sql, vals)
-
-    async def _http_session_start(self):
-        self.session = aiohttp.ClientSession()
-    async def _http_session_close(self):
-        await self.session.close()
     
     def shutdown(self):
-        temp_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(temp_loop)
-        temp_loop.run_until_complete(self._http_session_close())
-        temp_loop.close()
         db.disconnect(self.con)
         print('Bot exited')
