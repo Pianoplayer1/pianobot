@@ -1,4 +1,4 @@
-import asyncio, discord
+import discord
 from corkus import Corkus
 from .utils import db
 from discord.ext import commands
@@ -36,6 +36,5 @@ class Pianobot(commands.Bot):
         return db.query(self.con, sql, vals)
     
     def shutdown(self):
-        asyncio.new_event_loop().run_until_complete(self.corkus.close())
         db.disconnect(self.con)
         print('Bot exited')
