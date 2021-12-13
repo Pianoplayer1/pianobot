@@ -5,7 +5,7 @@ from discord.ext import commands
 from datetime import datetime, timedelta
 import math
 
-class GuildXP(commands.Cog):
+class XP(commands.Cog):
     def __init__(self, bot : Pianobot):
         self.bot = bot
 
@@ -37,4 +37,4 @@ class GuildXP(commands.Cog):
         return f'{n / 10 ** (3 * pos):.2f}{names[pos]}'
 
 def setup(bot : Pianobot):
-    bot.add_cog(GuildXP(bot))
+    bot.add_cog(XP(bot))
