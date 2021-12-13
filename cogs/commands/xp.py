@@ -16,9 +16,6 @@ class GuildXP(commands.Cog):
     async def gxp(self, ctx : commands.Context):
         day = datetime.combine(datetime.utcnow().date(), datetime.min.time())
         day = day - timedelta(days = day.weekday())
-        if datetime.utcnow().day < 13:
-            await ctx.send(f'The weekly guild xp event starts tomorrow UTC time (<t:{1639353600}:R>)!')
-            return
 
         columns = [column[0] for column in self.bot.query('SELECT "column_name" FROM "information_schema"."columns" WHERE "table_name" = \'guildXP\';')]
         oldest_data = self.bot.query('SELECT * FROM "guildXP" WHERE time = %s;', day)[0]
