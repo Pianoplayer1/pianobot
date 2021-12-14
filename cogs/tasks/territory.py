@@ -18,10 +18,10 @@ async def run(bot : Pianobot):
                 notify = territory
     if notify is None: return
 
-    terrs_msg = '\n'.join([f'- {terr.name} ({terr.guild})' for terr in missing][:10])
+    terrs_msg = '\n'.join([f'- {terr.name} ({terr.guild.name})' for terr in missing][:10])
     if len(missing) > 10:
         terrs_msg += f'\n- ... ({len(missing) - 10} more)'
-    msg = f'{notify.guild} has taken control of {notify.name}!```All missing territories ({len(missing)}):\n\n{terrs_msg}```'
+    msg = f'{notify.guild.name} has taken control of {notify.name}!```All missing territories ({len(missing)}):\n\n{terrs_msg}```'
 
     for channel, role, last_ping, cooldown in bot.query('SELECT `channel`, `role`, `time`, `ping` FROM `servers`;'):
         temp_msg = msg
