@@ -2,10 +2,14 @@ from ..bot import Pianobot
 from time import time
 
 async def run(bot : Pianobot):
-    db_terrs = dict(bot.query('SELECT "name", "guild" FROM "territories";'))
+    db_terrs = dict(bot.query('SELECT name, guild FROM territories;'))
     notify = None
     missing = []
     territories = await bot.corkus.territory.list_all()
+    bot.query('TRUNCATE TABLE territory;')
+    for territory in territories:
+        if territory.guild.name == 'Eden':
+            bot.query('INSERT INTO territories (name, guild) VALUES (%s, %s);', (territory.name, territory.guild.name))
 
     for territory in territories:
         if territory.name not in db_terrs.keys():
