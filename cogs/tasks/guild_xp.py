@@ -37,8 +37,7 @@ async def run(bot : Pianobot) -> None:
     data = bot.query('SELECT * FROM "guildXP" ORDER BY time DESC LIMIT 2;')
     members = list(current_xp.keys())
     xp_diff = [[members[i], data[0][i + 1] - data[1][i + 1]] for i in range(len(members)) if data[0][i + 1] - data[1][i + 1] > 0]
-    #if len(xp_diff) == 0: return
-    xp_diff = [['Pianoplayer1', 1273912], ['M4DE', 123], ['Yugito', 1236187372]]
+    if len(xp_diff) == 0: return
 
     msg = '--------------------------------------------------------------------------------'
     for pos, (name, xp) in enumerate(sorted(xp_diff, key = lambda item: item[1], reverse = True)):
