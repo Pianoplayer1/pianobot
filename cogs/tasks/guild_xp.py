@@ -1,6 +1,6 @@
 from ..bot import Pianobot
 from datetime import datetime, timedelta
-import logging
+import logging, math
 
 async def run(bot : Pianobot) -> None:
     guild = await bot.corkus.guild.get('Eden')
@@ -33,3 +33,22 @@ async def run(bot : Pianobot) -> None:
         bot.query(sql, values)
     except:
         logging.getLogger('tasks').debug('Duplicate guild xp time')
+    
+    data = bot.query('SELECT * FROM "guildXP" ORDER BY time DESC LIMIT 2;')
+    members = list(current_xp.keys())
+    xp_diff = [[members[i], data[0][i + 1] - data[1][i + 1]] for i in range(len(members)) if data[0][i + 1] - data[1][i + 1] > 0]
+    #if len(xp_diff) == 0: return
+    xp_diff = [['Pianoplayer1', 1273912], ['M4DE', 123], ['Yugito', 1236187372]]
+
+    msg = '--------------------------------------------------------------------------------'
+    for pos, (name, xp) in enumerate(sorted(xp_diff, key = lambda item: item[1], reverse = True)):
+        msg += f'\n**#{pos} {name}** — `{format(xp)} XP | {format(xp / 5)} XP/min`'
+    msg += f'**Total: ** `{sum([item[1] for item in xp_diff])} XP`'
+    channel = bot.get_channel(764955778523332698)
+    if channel is not None:
+        await channel.send(msg)
+
+def format(n : float):
+    names = ['',' Thousand',' Million',' Billion',' Trillion']
+    pos = max(0, min(len(names) - 1, int(math.floor(0 if n == 0 else math.log10(abs(n)) / 3))))
+    return f'{round(n / 10 ** (3 * pos), 2):g}{names[pos]}'

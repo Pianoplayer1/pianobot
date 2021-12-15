@@ -46,7 +46,7 @@ class GuildXP(commands.Cog):
     def format(self, n : float):
         names = ['',' Thousand',' Million',' Billion',' Trillion']
         pos = max(0, min(len(names) - 1, int(math.floor(0 if n == 0 else math.log10(abs(n)) / 3))))
-        return f'{n / 10 ** (3 * pos):.2f}{names[pos]}'
+        return f'{round(n / 10 ** (3 * pos), 2):g}{names[pos]}'
 
 def setup(bot : Pianobot):
     bot.add_cog(GuildXP(bot))
