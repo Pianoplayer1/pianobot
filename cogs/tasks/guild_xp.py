@@ -41,8 +41,8 @@ async def run(bot : Pianobot) -> None:
 
     msg = '--------------------------------------------------------------------------------'
     for pos, (name, xp) in enumerate(sorted(xp_diff, key = lambda item: item[1], reverse = True)):
-        msg += f'\n**#{pos} {name}** — `{format(xp)} XP | {format(xp / 5)} XP/min`'
-    msg += f'**Total: ** `{sum([item[1] for item in xp_diff])} XP`'
+        msg += f'\n**#{pos + 1} {name}** — `{format(xp)} XP | {format(xp / 5)} XP/min`'
+    msg += f'\n**Total: ** `{sum([item[1] for item in xp_diff])} XP`'
     channel = bot.get_channel(764955778523332698)
     if channel is not None:
         await channel.send(msg)
