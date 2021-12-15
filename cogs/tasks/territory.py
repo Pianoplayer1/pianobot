@@ -6,7 +6,7 @@ async def run(bot : Pianobot):
     notify = None
     missing = []
     territories = await bot.corkus.territory.list_all()
-    bot.query('TRUNCATE TABLE territory;')
+    bot.query('TRUNCATE TABLE territories;')
     for territory in territories:
         if territory.guild.name == 'Eden':
             bot.query('INSERT INTO territories (name, guild) VALUES (%s, %s);', (territory.name, territory.guild.name))
