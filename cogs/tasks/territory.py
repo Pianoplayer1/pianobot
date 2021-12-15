@@ -10,9 +10,9 @@ async def run(bot : Pianobot):
     for territory in territories:
         if territory.name not in db_terrs.keys():
             continue
-        if db_terrs[territory.name] != territory.guild:  
+        if db_terrs[territory.name] != territory.guild.name:  
             bot.query('UPDATE territories SET guild = %s WHERE name = %s;', (territory.guild.name, territory.name))
-        if territory.guild != 'Eden':
+        if territory.guild.name != 'Eden':
             missing.append(territory)
             if db_terrs[territory.name] == 'Eden':
                 notify = territory
