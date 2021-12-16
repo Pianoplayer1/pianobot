@@ -13,30 +13,30 @@ def table(columns, rawData, seperator = 0, pageLen = 0, enum = False, label = ''
             data = rawData[page * pageLen : ]
         if len(data) == 0:
             data = rawData[page * pageLen : ]
-        message.append((start_text + '\n' if start_text else '') + '```ml\n|')
+        message.append((start_text + '\n' if start_text else '') + '```ml\n│')
         
         if enum:
             message[page] += '     '
         for column in columns:
-            message[page] += f' {column.ljust(columns[column]-1)}|'
+            message[page] += f' {column.ljust(columns[column]-1)}│'
         
         for row in data:
             if count == 0 or seperator != 0 and (count - page * pageLen) % seperator == 0:
-                message[page] += '\n+'
+                message[page] += '\n├'
                 if enum:
-                    message[page] += '-----'
-                for column in columns:
-                    message[page] += '-' * (columns[column]) + '+'
+                    message[page] += '─────'
+                for pos, column in enumerate(columns):
+                    message[page] += '─' * (columns[column]) + ('┼' if pos != len(columns) - 1 else '┤')
             count += 1
 
-            message[page] += '\n|'
+            message[page] += '\n│'
             if enum:
                 message[page] += f'{count}.'.rjust(5)
             for i in range(len(columns)):
                 try:
-                    message[page] += f' {str(row[i]).ljust(list(columns.values())[i]-1)}|'
+                    message[page] += f' {str(row[i]).ljust(list(columns.values())[i]-1)}│'
                 except IndexError:
-                    message[page] += ' ' * (list(columns.values())[i]) + '|'
+                    message[page] += ' ' * (list(columns.values())[i]) + '│'
                     
         if pageNum > 1:
             message[page] += f'\n\nPage {page + 1} / {pageNum} {label}'
