@@ -1,7 +1,8 @@
 from ..bot import Pianobot
 from discord import Embed
 from discord.ext import commands
-from datetime import datetime, timezone
+from datetime import datetime
+from pytz import timezone
 from math import floor
 from aiohttp import ClientSession
 
@@ -15,7 +16,7 @@ class Sus(commands.Cog):
                         help = 'View the approximate probability of a player being an alt account.',
                         usage = '<player>')
     async def sus(self, ctx : commands.Context, player : str):
-        get_date_score = lambda date, maxValue : min(int((datetime.now(timezone.utc) - date).days / maxValue * 100), 100)
+        get_date_score = lambda date, maxValue : min(int((datetime.utcnow() - date).days / maxValue * 100), 100)
 
         # Ashcon API
         try:
@@ -35,7 +36,7 @@ class Sus(commands.Cog):
             await ctx.send('Not a valid Wynncraft player!')
             return
 
-        first_wynncraft_login = player_data.join_date
+        first_wynncraft_login = timezone('UTC').localize(player_data.join_date)
         first_wynncraft_login_score = get_date_score(first_wynncraft_login, 200)
         wynncraft_playtime = floor(player_data.playtime.raw * 4.7 / 60)
         wynncraft_playtime_score = min(wynncraft_playtime, 100)
