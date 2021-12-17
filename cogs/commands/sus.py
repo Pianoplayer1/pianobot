@@ -37,7 +37,7 @@ class Sus(commands.Cog):
 
         first_wynncraft_login = player_data.join_date
         first_wynncraft_login_score = get_date_score(first_wynncraft_login, 200)
-        wynncraft_playtime = floor(player_data.playtime * 4.7 / 60)
+        wynncraft_playtime = floor(player_data.playtime.raw * 4.7 / 60)
         wynncraft_playtime_score = min(wynncraft_playtime, 100)
         wynncraft_rank = player_data.tag
         wynncraft_rank_score = min(['PLAYER', None, 'VIP', 'VIP+', 'HERO', 'CHAMPION'].index(wynncraft_rank) * 25, 100)
