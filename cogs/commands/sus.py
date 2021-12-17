@@ -36,7 +36,7 @@ class Sus(commands.Cog):
             await ctx.send('Not a valid Wynncraft player!')
             return
 
-        first_wynncraft_login = player_data.join_date.astimezone(timezone('UTC'))
+        first_wynncraft_login = player_data.join_date.replace(tzinfo = None)
         first_wynncraft_login_score = get_date_score(first_wynncraft_login, 200)
         wynncraft_playtime = floor(player_data.playtime.raw * 4.7 / 60)
         wynncraft_playtime_score = min(wynncraft_playtime, 100)
