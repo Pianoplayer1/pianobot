@@ -1,7 +1,7 @@
 from ..bot import Pianobot
 from discord import Embed
 from discord.ext import commands
-from datetime import datetime
+from datetime import datetime, timezone
 from math import floor
 from aiohttp import ClientSession
 
@@ -15,7 +15,7 @@ class Sus(commands.Cog):
                         help = 'View the approximate probability of a player being an alt account.',
                         usage = '<player>')
     async def sus(self, ctx : commands.Context, player : str):
-        get_date_score = lambda date, maxValue : min(int((datetime.utcnow() - date).days / maxValue * 100), 100)
+        get_date_score = lambda date, maxValue : min(int((datetime.now(timezone.utc) - date).days / maxValue * 100), 100)
 
         # Ashcon API
         try:
