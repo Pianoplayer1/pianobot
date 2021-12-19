@@ -17,7 +17,11 @@ class Inactivity(commands.Cog):
                         brief = 'Outputs the member inactivity times of a specified guild.',
                         help = 'This command returns a table with the times since each member of a specified guild has been last seen on the Wynncraft server.',
                         usage = '<guild>')
-    async def inactivity(self, ctx : commands.Context, *, guild : str):
+    async def inactivity(self, ctx: commands.Context, *, guild: str):
+        async with ctx.typing():
+            await activity(ctx, guild)
+
+    async def activity(self, ctx: commands.Context, guild: str):
         guilds = await self.bot.corkus.guild.list_all()
         guilds = [g.name for g in guilds]
         try:
