@@ -2,7 +2,7 @@ from ..bot import Pianobot
 from discord import Embed
 from discord.ext import commands
 from datetime import datetime
-from pytz import timezone
+from corkus.errors import BadRequest
 from math import floor
 from aiohttp import ClientSession
 
@@ -31,8 +31,9 @@ class Sus(commands.Cog):
 
 
         # Wynncraft API
-        player_data = await self.bot.corkus.player.get(player)
-        if not player_data.username:
+        try:
+            player_data = await self.bot.corkus.player.get(player)
+        except BadRequest:
             await ctx.send('Not a valid Wynncraft player!')
             return
 
