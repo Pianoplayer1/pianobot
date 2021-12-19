@@ -20,6 +20,7 @@ class Inactivity(commands.Cog):
     async def inactivity(self, ctx: commands.Context, *, guild: str):
         async with ctx.typing():
             await self.activity(ctx, guild)
+        print('Typing done')
 
     async def activity(self, ctx: commands.Context, guild: str):
         guilds = await self.bot.corkus.guild.list_all()
