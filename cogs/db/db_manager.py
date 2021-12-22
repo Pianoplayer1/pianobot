@@ -2,10 +2,13 @@ from . import connection, guild_activity, guild_xp, guilds, servers, territories
 
 class DBManager:
     def __init__(self):
-        self.con = connection.Connection()
-        self.guild_activity = guild_activity.Manager(self.con)
-        self.guild_xp = guild_xp.Manager(self.con)
-        self.guilds = guilds.Manager(self.con)
-        self.servers = servers.Manager(self.con)
-        self.territories = territories.Manager(self.con)
-        self.worlds = worlds.Manager(self.con)
+        self._con = connection.Connection()
+        self.guild_activity = guild_activity.Manager(self._con)
+        self.guild_xp = guild_xp.Manager(self._con)
+        self.guilds = guilds.Manager(self._con)
+        self.servers = servers.Manager(self._con)
+        self.territories = territories.Manager(self._con)
+        self.worlds = worlds.Manager(self._con)
+    
+    def disconnect(self):
+        self._con.disconnect()
