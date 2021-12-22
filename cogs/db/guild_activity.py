@@ -30,3 +30,7 @@ class Manager:
             self._db.query(sql, rounded_time, *data.values())
         except UniqueViolation:
             getLogger('database').debug('Duplicate guild activity time')
+
+    def cleanup(self):
+        self._db.query('DELETE FROM "guildActivity" WHERE time < (CURRENT_TIMESTAMP - \'7 DAY\'::interval) AND to_char(time, \'MI\') != \'00\'')
+        self._db.query('DELETE FROM "guildActivity" WHERE time < (CURRENT_TIMESTAMP - \'14 DAY\'::interval) AND to_char(time, \'HH24:MI\') != \'00:00\'')

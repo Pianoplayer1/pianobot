@@ -23,6 +23,8 @@ async def run(bot: Pianobot) -> None:
     if channel is not None:
         await channel.send(msg)
 
+    bot.db.guild_xp.cleanup()
+
 def format(n: float) -> str:
     names = ['',' Thousand',' Million',' Billion',' Trillion']
     if (n < 10000): return n

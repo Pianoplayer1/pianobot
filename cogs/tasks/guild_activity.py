@@ -18,6 +18,8 @@ async def run(bot: Pianobot) -> None:
 
     bot.db.guild_activity.add(guilds)
 
+    bot.db.guild_activity.cleanup()
+
 async def fetch(corkus: Corkus, guild_name: str, players: OnlinePlayers) -> dict[str, int]:
         guild = await corkus.guild.get(guild_name)
         try:
