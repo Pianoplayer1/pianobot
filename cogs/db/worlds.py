@@ -25,4 +25,4 @@ class Manager:
         self._db.query('INSERT INTO worlds VALUES (%s, %s);', world, time)
 
     def remove(self, world: str):
-        self._db.query('DELETE FROM servers WHERE world = %s;', world)
+        self._db.query('DELETE FROM worlds WHERE world = %s;', world)
