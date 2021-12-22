@@ -1,3 +1,6 @@
+from uuid import uuid4
+
+from discord import Embed
 from discord.ext import commands
 
 from ..bot import Pianobot
@@ -19,7 +22,11 @@ class PlayerActivity(commands.Cog):
         except ValueError:
             await ctx.send('Please provide a valid interval!')
             return
-        await ctx.send(f'https://wynnstats.dieterblancke.xyz/api/charts/onlinetime/{player}/{interval}')
+        embed = Embed()
+        embed.set_author(name=player, icon_url=f'https://mc-heads.net/head/{player}.png')
+        embed.set_image(url=f'https://wynnstats.dieterblancke.xyz/api/charts/onlinetime/{player}/{interval}?caching={uuid4()}')
+        embed.set_footer(text='Player tracking from \'WynnStats\' by Dieter Blancke')
+        await ctx.send(embed=embed)
 
 def setup(bot: Pianobot):
     bot.add_cog(PlayerActivity(bot))
