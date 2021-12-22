@@ -1,8 +1,9 @@
-from ..bot import Pianobot
 from time import time
 
-async def run(bot : Pianobot):
-    db_terrs = dict(bot.query('SELECT name, guild FROM territories;'))
+from ..bot import Pianobot
+
+async def run(bot: Pianobot):
+    db_terrs = {terr.name: terr for terr in bot.db.territories.get_all()}
     notify = None
     missing = []
     territories = await bot.corkus.territory.list_all()
@@ -10,11 +11,11 @@ async def run(bot : Pianobot):
     for territory in territories:
         if territory.name not in db_terrs.keys():
             continue
-        if db_terrs[territory.name] != territory.guild.name:  
-            bot.query('UPDATE territories SET guild = %s WHERE name = %s;', (territory.guild.name, territory.name))
+        if db_terrs[territory.name].guild != territory.guild.name:  
+            bot.db.territories.update(territory.name, territory.guild.name)
         if territory.guild.name != 'Eden':
             missing.append(territory)
-            if db_terrs[territory.name] == 'Eden':
+            if db_terrs[territory.name].guild == 'Eden':
                 notify = territory
     if notify is None: return
 
@@ -23,13 +24,13 @@ async def run(bot : Pianobot):
         terrs_msg += f'\n- ... ({len(missing) - 10} more)'
     msg = f'{notify.guild.name} has taken control of {notify.name}!```All missing territories ({len(missing)}):\n\n{terrs_msg}```'
 
-    for channel, role, last_ping, cooldown in bot.query('SELECT `channel`, `role`, `time`, `ping` FROM `servers`;'):
+    for server in bot.db.servers.get_all():
         temp_msg = msg
-        if role != 0 and cooldown != 0 and time() >= (last_ping + cooldown):
-            temp_msg = f'<@&{role}>\n{msg}'
-            bot.query('UPDATE `servers` SET `time` = %s WHERE `channel` = %s;', (time(), channel))
+        if server.role != 0 and server.ping != 0 and time() >= (server.time + server.ping):
+            temp_msg = f'<@&{server.role}>\n{msg}'
+            bot.db.servers.update_time(server.id, time())
         try:
-            await bot.get_channel(channel).send(temp_msg)
+            await bot.get_channel(server.channel).send(temp_msg)
         except AttributeError:
-            if channel != 0:
-                print(f'Channel {channel} not found')
+            if server.channel != 0:
+                print(f'Channel {server.channel} not found')

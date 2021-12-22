@@ -1,22 +1,27 @@
-from ..bot import Pianobot
-from discord import Embed
-from discord.ext import commands
 from datetime import datetime
-from corkus.errors import BadRequest
 from math import floor
+
 from aiohttp import ClientSession
 
+from corkus.errors import BadRequest
+
+from discord import Embed
+from discord.ext import commands
+
+from ..bot import Pianobot
+
 class Sus(commands.Cog):
-    def __init__(self, bot : Pianobot):
+    def __init__(self, bot: Pianobot):
         self.bot = bot
 
-    @commands.command(  name = 'sus',
-                        aliases = ['alt'],
-                        brief = 'Check the suspiciousness of a player.',
-                        help = 'View the approximate probability of a player being an alt account.',
-                        usage = '<player>')
-    async def sus(self, ctx : commands.Context, player : str):
-        get_date_score = lambda date, maxValue : min(int((datetime.utcnow() - date).days / maxValue * 100), 100)
+    @commands.command(name='sus',
+                      aliases=['alt'],
+                      brief='Check the suspiciousness of a player.',
+                      help='View the approximate probability of a player being an alt account.',
+                      usage='<player>')
+    async def sus(self, ctx: commands.Context, player: str):
+        await ctx.trigger_typing()
+        get_date_score = lambda date, maxValue: min(int((datetime.utcnow() - date).days / maxValue * 100), 100)
 
         # Ashcon API
         try:
@@ -82,5 +87,5 @@ class Sus(commands.Cog):
         await ctx.send(embed = embed)
 
 
-def setup(bot : Pianobot):
+def setup(bot: Pianobot):
     bot.add_cog(Sus(bot))

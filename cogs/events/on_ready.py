@@ -1,15 +1,17 @@
-from ..bot import Pianobot
+from logging import getLogger
+from time import time
+
 from discord.ext.commands import Cog
 from discord.ext.tasks import loop
-from ..tasks import guild_activity, guild_leaderboard, members, territory, worlds, guild_xp
-from time import time
-import logging
+
+from ..bot import Pianobot
+from ..tasks import guild_activity, guild_leaderboard, territory, worlds, guild_xp
 
 class OnReady(Cog):
-    def __init__(self, bot : Pianobot):
+    def __init__(self, bot: Pianobot):
         self.bot = bot
-        self.logger = logging.getLogger('tasks')
-    
+        self.logger = getLogger('tasks')
+
     @Cog.listener()
     async def on_ready(self):
         print('Bot booted up')
@@ -28,7 +30,6 @@ class OnReady(Cog):
 
     @loop(seconds=60)
     async def loop_1m(self):
-        #await members.run(self.bot)
         start = time()
         await guild_leaderboard.run(self.bot)
         self.logger.info(f'Guild Leaderboard finished in {time() - start} seconds')
@@ -42,5 +43,5 @@ class OnReady(Cog):
         await guild_xp.run(self.bot)
         self.logger.info(f'Guild XP finished in {time() - start} seconds')
 
-def setup(bot : Pianobot):
+def setup(bot: Pianobot):
     bot.add_cog(OnReady(bot))

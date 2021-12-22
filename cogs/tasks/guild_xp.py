@@ -1,42 +1,18 @@
-from ..bot import Pianobot
-from datetime import datetime, timedelta
-import logging, math
+from math import floor, log10
 
-async def run(bot : Pianobot) -> None:
+from ..bot import Pianobot
+
+async def run(bot: Pianobot) -> None:
     guild = await bot.corkus.guild.get('Eden')
     current_xp = {member.username: member.contributed_xp for member in guild.members}
-    columns = [column[0] for column in bot.query('SELECT "column_name" FROM "information_schema"."columns" WHERE "table_name" = \'guildXP\';')[1:]]
-    
-    to_add = set(current_xp.keys())
-    to_add.difference_update(columns)
-    add_string = ', '.join([f'ADD COLUMN "{name}" BIGINT DEFAULT 0 NOT NULL' for name in to_add])
-    to_remove = set(columns)
-    to_remove.difference_update(current_xp.keys())
-    remove_string = ', '.join([f'DROP COLUMN IF EXISTS "{name}"' for name in to_remove])
-    if add_string and remove_string:
-        remove_string = ', ' + remove_string
-    if add_string or remove_string:
-        bot.query(f'ALTER TABLE "guildXP" {add_string}{remove_string};')
 
-    time = datetime.utcnow()
-    interval = 300
-    seconds = (time.replace(tzinfo = None) - time.min).seconds
-    difference = (seconds + interval / 2) // interval * interval - seconds
-    rounded_time = str(time + timedelta(0, difference, -time.microsecond))
+    bot.db.guild_xp.update_columns(current_xp.keys())
+    bot.db.guild_xp.add(current_xp)
 
-    columns = '", "'.join(current_xp.keys())
-    placeholders = '%s' + ', %s' * len(current_xp)
-    sql = f'INSERT INTO "guildXP"("time", "{columns}") VALUES ({placeholders});'
-    values = (rounded_time, *current_xp.values())
-    
-    try:
-        bot.query(sql, values)
-    except:
-        logging.getLogger('tasks').debug('Duplicate guild xp time')
-    
-    data = bot.query('SELECT * FROM "guildXP" ORDER BY time DESC LIMIT 2;')
-    members = [column[0] for column in bot.query('SELECT column_name FROM information_schema.columns WHERE table_name = \'guildXP\';')[1:]]
-    xp_diff = [[members[i], data[0][i + 1] - data[1][i + 1]] for i in range(len(members)) if data[0][i + 1] - data[1][i + 1] > 0]
+    data = bot.db.guild_xp.get_last(2)
+    new = data[0]
+    old = data[1]
+    xp_diff = [[name, xp - old.data.get(name, 0)] for name, xp in new.data.items() if xp - old.data.get(name, 0) > 0]
     if len(xp_diff) == 0: return
 
     msg = '--------------------------------------------------------------------------------'
@@ -47,8 +23,8 @@ async def run(bot : Pianobot) -> None:
     if channel is not None:
         await channel.send(msg)
 
-def format(n : float):
+def format(n: float) -> str:
     names = ['',' Thousand',' Million',' Billion',' Trillion']
-    if (n < 1000000): return n
-    pos = max(0, min(len(names) - 1, int(math.floor(0 if n == 0 else math.log10(abs(n)) / 3))))
+    if (n < 10000): return n
+    pos = max(0, min(len(names) - 1, int(floor(0 if n == 0 else log10(abs(n)) / 3))))
     return f'{round(n / 10 ** (3 * pos), 2):g}{names[pos]}'

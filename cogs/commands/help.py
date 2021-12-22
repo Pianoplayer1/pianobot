@@ -1,21 +1,24 @@
-from ..bot import Pianobot
+from discord import Embed
 from discord.ext import commands
-import discord
+
+from ..bot import Pianobot
 
 class Help(commands.Cog):
-    def __init__(self, bot : Pianobot):
+    def __init__(self, bot: Pianobot):
         self.bot = bot
-    
-    @commands.command(  name = 'help',
-                        aliases = ['info'],
-                        brief = 'Shows this page; use help [command] for detailed description about a command.',
-                        help = 'This command gives you an overview of this bot and its commands. If you want more information on a specific command, enter that command name as an argument of the help command.',
-                        usage = '[command]')
-    async def help(self, ctx : commands.Context, command : str = None):
+
+    @commands.command(name='help',
+                      aliases=['info'],
+                      brief='Shows this page; use help [command] for detailed description about a command.',
+                      help='This command gives you an overview of this bot and its commands. If you want more information on a specific command, enter that command name as an argument of the help command.',
+                      usage='[command]')
+    async def help(self, ctx: commands.Context, command: str = None):
         help_text = 'I am a utility bot for various different Wynncraft related things.\n\nList of commands:\n```'
         prefix = '-'
         if ctx.guild:
-            prefix = self.bot.query('SELECT prefix FROM servers WHERE id = %s;', ctx.guild.id)[0][0]
+            server = self.bot.db.servers.get(ctx.guild.id)
+            if server:
+                prefix = server.prefix
 
         visible_commands = {cmd: [cmd.name] for cog in self.bot.cogs.values() for cmd in cog.get_commands() if ctx.guild or not cmd.hidden}
         for cmd in visible_commands:
@@ -31,7 +34,7 @@ class Help(commands.Cog):
                 usage = ' ' + cmd.usage if cmd.usage else ''
                 aliases = '\n'.join([f'`{prefix}{alias}`' for alias in cmd.aliases])
 
-                embed = discord.Embed(title = f'{cmd.name.capitalize()} command', description = cmd.help)
+                embed = Embed(title = f'{cmd.name.capitalize()} command', description = cmd.help)
                 embed.add_field(name = 'Usage', value = f'`{prefix}{cmd.name}{usage}`', inline = False)
                 if len(aliases) > 0:
                     embed.add_field(name = 'Aliases', value = aliases, inline = False)
@@ -41,5 +44,5 @@ class Help(commands.Cog):
 
         await ctx.send(help_text + '\n'.join([f'{prefix}{cmd.name.ljust(22)}{cmd.brief}' for cmd in visible_commands]) + '```')
 
-def setup(bot : Pianobot):
+def setup(bot: Pianobot):
     bot.add_cog(Help(bot))
