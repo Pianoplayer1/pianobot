@@ -12,7 +12,7 @@ class Prefix(commands.Cog):
                       brief='Updates the bot prefix for this server.',
                       help='Use this command to set a new bot prefix, which will be used to access this bot on this server. The prefix can consist of any letters, numbers and special characters, but make sure it does not conflict with another bot.',
                       usage='<new>',
-                      hidden=True)
+                      guild_only=True)
     @commands.guild_only()
     async def prefix(self, ctx: commands.Context, new: str):
         if len(new) > 3:

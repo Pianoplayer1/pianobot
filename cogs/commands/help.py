@@ -20,7 +20,7 @@ class Help(commands.Cog):
             if server:
                 prefix = server.prefix
 
-        visible_commands = {cmd: [cmd.name] for cog in self.bot.cogs.values() for cmd in cog.get_commands() if ctx.guild or not cmd.hidden}
+        visible_commands = {cmd: [cmd.name] for cog in self.bot.cogs.values() for cmd in cog.get_commands() if not cmd.hidden and (ctx.guild or not cmd.guild_only)}
         for cmd in visible_commands:
             visible_commands[cmd].extend(cmd.aliases)
 
