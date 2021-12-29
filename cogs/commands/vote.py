@@ -25,13 +25,15 @@ class Vote(commands.Cog):
         eden = await self.bot.corkus.guild.get('Eden')
         results = await gather(*[self.fetch(member) for member in eden.members])
         results = sorted(results, key=lambda x: (ranks.index(x['rank']), x['raw_time'], x['name']))
-        await gather(*[self.send(ctx, member) for member in results])
+        await gather(*[self.send(ctx, member) for member in results[:10]])
 
-        message = '''
+        message = f'''
 @everyone as decided somewhere above here, we will now vote on **every single member**'s rank, regardless of their current one! This was an idea to kind of clean up the rank distribution we have right now. In the above votes, you will find a member's ingame name, rank and inactivity time. Please take the time to look at each member and decide on their rank, even though it will take some time.
+For more information about the general idea of this mega-vote, look at https://discord.com/channels/682671629213368351/727608200895135784/922212425263120465.
+
 The reactions symbolize the following:
 :baby:  - Citizen (Recruit)
-:sanglasis:  - Legionnaire (Recruiter: able to access public bank)
+{get(ctx.guild.emojis, name='sanglasis')}  - Legionnaire (Recruiter: able to access public bank)
 :military_helmet:  - Legate (Captain: able to start wars)
 :warning:  - Tribune (Strategist: able to do economy & access private bank)
 :exclamation:  - Senate (Strategist)
@@ -41,10 +43,10 @@ The exclamation marks aren't there without a reason, remember that everyone with
 For the votes on <@235781853179543553>, <@290191000813568001>, <@718558765988970616>, <@284500595920863233>, <@232178035841957899> and <@437305878257860608>, consider their Senate applications in #elections too.
 Please refrain from memeing around on those votes, it's simply faster if you stay on topic and just vote.
                      
-Start voting at the top by clicking here: '''
+Start voting at the top by clicking here: {first_msg.jump_url}'''
 
-        await ctx.send(message + first_msg.jump_url)
-        await first_msg.edit(content='Start voting below here (although you can of course ignore Yugito\'s vote...)')
+        await ctx.send(message)
+        await first_msg.edit(content='Please take some time to vote on **everything** below (although you can probably ignore the first vote...)')
 
     async def fetch(self, member: Member):
         player = await member.fetch_player()
