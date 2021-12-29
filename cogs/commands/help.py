@@ -20,12 +20,13 @@ class Help(commands.Cog):
             if server:
                 prefix = server.prefix
 
-        visible_commands = {cmd: [cmd.name] for cog in self.bot.cogs.values() for cmd in cog.get_commands() if not cmd.hidden and (ctx.guild or cmd.description != 'guild_only')}
+        visible_commands = {cmd: [cmd.name.lower()] for cog in self.bot.cogs.values() for cmd in cog.get_commands()
+                            if not cmd.hidden and (ctx.guild or cmd.description != 'guild_only')}
         for cmd in visible_commands:
-            visible_commands[cmd].extend(cmd.aliases)
+            visible_commands[cmd].extend(map(str.lower, cmd.aliases))
 
         if command:
-            matching_commands = [cmd  for cmd, aliases in visible_commands.items() if command in aliases]
+            matching_commands = [cmd for cmd, aliases in visible_commands.items() if command.lower() in aliases]
 
             if len(matching_commands) == 0:
                 help_text = 'Please specify a valid command for detailed information about it!\n\nRefer to this list of available commands:\n```'
