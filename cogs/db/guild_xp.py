@@ -39,7 +39,7 @@ class Manager:
             return None
     
     def get_first(self, interval: str) -> Union[GuildXP, None]:
-        result = self._db.query(f'SELECT * FROM "guildXP" WHERE time > (CURRENT_TIMESTAMP - \'{interval}\'::interval) LIMIT 1;')
+        result = self._db.query(f'SELECT * FROM "guildXP" WHERE time > (CURRENT_TIMESTAMP - \'{interval}\'::interval) ORDER BY time ASC LIMIT 1;')
         members = self.get_members()
         if result:
             row = result[0]
