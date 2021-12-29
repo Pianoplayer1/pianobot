@@ -25,7 +25,7 @@ class Vote(commands.Cog):
         eden = await self.bot.corkus.guild.get('Eden')
         results = await gather(*[self.fetch(member) for member in eden.members])
         results = sorted(results, key=lambda x: (ranks.index(x['rank']), x['raw_time'], x['name']))
-        await gather(*[self.send(ctx, member) for member in results[:10]])
+        await gather(*[self.send(ctx, member) for member in results])
 
         message = f'''
 @everyone as decided somewhere above here, we will now vote on **every single member**'s rank, regardless of their current one! This was an idea to kind of clean up the rank distribution we have right now. In the above votes, you will find a member's ingame name, rank and inactivity time. Please take the time to look at each member and decide on their rank, even though it will take some time.
