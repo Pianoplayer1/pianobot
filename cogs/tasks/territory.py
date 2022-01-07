@@ -17,6 +17,13 @@ async def run(bot: Pianobot):
             missing.append(territory)
             if db_terrs[territory.name].guild == 'Eden':
                 notify = territory
+    if len(missing) == 0 and any(terr.guild != 'Eden' for terr in db_terrs.values()):
+        for server in bot.db.servers.get_all():
+            try:
+                await bot.get_channel(server.channel).send('Fully reclaimed!')
+            except AttributeError:
+                if server.channel != 0:
+                    print(f'Channel {server.channel} not found')
     if notify is None: return
 
     terrs_msg = '\n'.join([f'- {terr.name} ({terr.guild.name})' for terr in missing][:10])
