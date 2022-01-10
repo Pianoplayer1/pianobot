@@ -55,7 +55,7 @@ class Sus(commands.Cog):
             wynncraft_quests += len(player_class.quests)
             wynncraft_level += player_class.combined_level
         wynncraft_level_score = min(wynncraft_level / 10, 100)
-        wynncraft_quests_score = min(int(len(wynncraft_quests) / 2), 100)
+        wynncraft_quests_score = min(wynncraft_quests / 2), 100)
 
 
         # Hypixel API
