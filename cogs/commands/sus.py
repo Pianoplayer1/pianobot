@@ -50,9 +50,9 @@ class Sus(commands.Cog):
         wynncraft_rank_score = min(['PLAYER', None, 'VIP', 'VIP+', 'HERO', 'CHAMPION'].index(wynncraft_rank) * 25, 100)
 
         wynncraft_level = 0
-        wynncraft_quests = set()
+        wynncraft_quests = 0
         for player_class in player_data.classes:
-            wynncraft_quests.update([quest.name for quest in player_class.quests])
+            wynncraft_quests += len(player_class.quests)
             wynncraft_level += player_class.combined_level
         wynncraft_level_score = min(wynncraft_level / 10, 100)
         wynncraft_quests_score = min(int(len(wynncraft_quests) / 2), 100)
