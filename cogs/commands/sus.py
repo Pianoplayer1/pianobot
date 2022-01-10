@@ -71,7 +71,7 @@ class Sus(commands.Cog):
 
         embed_fields = ['Wynncraft Join Date', 'Wynncraft Playtime', 'Wynncraft Level', 'Wynncraft Quests', 'Wynncraft Rank', 'Minecraft Join Date']
         categories = [first_wynncraft_login.strftime('%B %d, %Y'), f'{wynncraft_playtime} hours', f'{wynncraft_level} (all classes)', 
-            f'{len(wynncraft_quests)} (all classes)', wynncraft_rank.capitalize(), f'~{oldest_date.strftime("%B %d, %Y")}']
+            f'{wynncraft_quests} (all classes)', wynncraft_rank.capitalize(), f'~{oldest_date.strftime("%B %d, %Y")}']
         scores = [first_wynncraft_login_score, wynncraft_playtime_score, wynncraft_level_score, wynncraft_quests_score, wynncraft_rank_score, oldest_date_score]
         total_score = round(100 - sum(scores) / len(scores), 2)
 
