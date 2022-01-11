@@ -14,7 +14,6 @@ class Connection:
         getLogger('database').debug('Disconnected from database')
 
     def query(self, sql: str, *args) -> tuple:
-        """Manual database queries (discouraged, use models instead)"""
         cursor = self.con.cursor()
         cursor.execute(sql, args)
         self.con.commit()
