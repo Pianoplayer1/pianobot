@@ -41,7 +41,7 @@ class MemberActivity(commands.Cog):
             
             display_time = f'{minutes} minutes'
             if minutes >= 60:
-                display_time = f'{minutes / 60:02}:{minutes % 60:02} hours'
+                display_time = f'{int(minutes / 60):02}:{minutes % 60:02} hours'
             
             results.append([minutes, [username, rank, display_time]])
 
