@@ -3,19 +3,6 @@ from typing import Union
 
 from .connection import Connection
 
-class MemberActvity:
-    def __init__(self, username, data):
-        self._username = username
-        self._data = data
-
-    @property
-    def username(self) -> str:
-        return self._username
-
-    @property
-    def data(self) -> dict[str: int]:
-        return self._data
-
 class Manager:
     def __init__(self, db: Connection):
         self._db = db
@@ -26,20 +13,19 @@ class Manager:
             return []
         return [column[0] for column in result[1:]]
 
-    def get(self, username: str) -> Union[MemberActvity, None]:
+    def get_one(self, username: str, week: str) -> Union[int, None]:
         result = self._db.query('SELECT * FROM member_activity WHERE username = %s;', username)
         weeks = self.get_weeks()
         if result:
             row = result[0]
-            data = {weeks[i]: row[i + 1] for i in range(len(weeks))}
-            return MemberActvity(row[0], data)
+            return row[weeks.index(week) + 1]
         else:
             return None
     
-    def get_all(self) -> list[MemberActvity]:
+    def get(self, week: str) -> dict[str, int]:
         results = self._db.query('SELECT * FROM member_activity;')
-        weeks = self.get_weeks()
-        return [MemberActvity(row[0], {weeks[i]: row[i + 1] for i in range(len(weeks))}) for row in results]
+        pos = self.get_weeks().index(week) + 1
+        return {row[0]: row[pos] for row in results}
 
     def add(self, names: list[str]):
         iso_date = datetime.utcnow().isocalendar()
