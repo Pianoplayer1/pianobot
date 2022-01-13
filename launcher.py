@@ -1,9 +1,9 @@
-from logging import basicConfig, WARNING
+from logging import basicConfig, INFO
 from os import getenv
 
 from cogs.bot import Pianobot
 
-basicConfig(level=WARNING)
+basicConfig(level=INFO)
 
 bot = Pianobot()
 bot.run(getenv('TOKEN'))
