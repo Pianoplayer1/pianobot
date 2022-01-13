@@ -23,7 +23,7 @@ class Pianobot(commands.Bot):
         self.corkus = Corkus()
         self.database = DBManager()
 
-        with open('tracked_guild.txt', 'r', encoding = 'UTF-8') as file:
+        with open('tracked_guilds.txt', 'r', encoding = 'UTF-8') as file:
             self.tracked_guilds = {
                 name: tag for line in file for (name, tag) in [line.strip().split(':')]
             }

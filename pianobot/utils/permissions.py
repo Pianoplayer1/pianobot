@@ -45,7 +45,16 @@ def check_permissions(
         'manage_webhooks',
         'manage_emojis',
         'use_slash_commands',
-        'request_to_speak']
+        'request_to_speak',
+        'manage_events',
+        'manage_threads',
+        'create_public_threads',
+        'create_private_threads',
+        'use_external_stickers',
+        'send_messages_in_threads',
+        'start_embedded_activities',
+        'moderate_members'
+    ]
     value = channel.permissions_for(member).value
 
     member_permissions = [perm for i, perm in enumerate(all_permissions) if value & pow(2, i) > 0]
