@@ -14,6 +14,8 @@ class Connection:
         getLogger('database').debug('Disconnected from database')
 
     def query(self, sql: str, *args) -> tuple:
+        if self.con.closed != 0:
+            self.__init__()
         cursor = self.con.cursor()
         cursor.execute(sql, args)
         self.con.commit()
