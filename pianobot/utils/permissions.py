@@ -5,7 +5,8 @@ from discord.channel import TextChannel
 def check_permissions(
     member : Union[Member, User],
     channel : TextChannel,
-    *permissions : tuple
+    *permissions : tuple,
+    all_guilds: bool = True
 ) -> bool:
     if isinstance(member, User):
         member = channel.guild.get_member(member.id)
@@ -57,7 +58,8 @@ def check_permissions(
     ]
     value = channel.permissions_for(member).value
 
-    member_permissions = [perm for i, perm in enumerate(all_permissions) if value & pow(2, i) > 0]
-    return member.id == 667445845792391208 or all(
-        permission in member_permissions for permission in permissions
+    existing = [perm for i, perm in enumerate(all_permissions) if value & pow(2, i) > 0]
+    return (
+        (all(permission in existing for permission in permissions) or 'administrator' in existing)
+        and (all_guilds or channel.guild.id in (682671629213368351, 713710628258185258))
     )

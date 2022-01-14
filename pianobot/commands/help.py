@@ -49,7 +49,9 @@ class Help(commands.Cog):
                 usage = ' ' + cmd.usage if cmd.usage else ''
                 aliases = '\n'.join([f'`{prefix}{alias}`' for alias in cmd.aliases])
 
-                embed = Embed(title = f'{cmd.name.capitalize()} command', description = cmd.help)
+                embed = Embed(
+                    title = f'{cmd.name.capitalize()} command',
+                    description = cmd.help.replace('[[prefix]]', prefix))
                 embed.add_field(
                     inline = False,
                     name = 'Usage',

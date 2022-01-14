@@ -39,7 +39,7 @@ class OnCommandError(commands.Cog):
                 pass
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(
-                f'One of your command arguments has the wrong type.'
+                'One of your command arguments is wrong.'
                 f' Refer to `{prefix}help {ctx.command}` for detailed information.'
             )
         elif isinstance(error, commands.MissingPermissions):

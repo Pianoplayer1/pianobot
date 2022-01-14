@@ -53,8 +53,17 @@ class ServerTable:
     def add(self, server_id: int):
         self._con.query('INSERT INTO servers (id) VALUES (%s);', server_id)
 
+    def update_channel(self, server_id: int, channel: int):
+        self._con.query('UPDATE servers SET channel = %s WHERE id = %s;', channel, server_id)
+
     def update_prefix(self, server_id: int, prefix: str):
         self._con.query('UPDATE servers SET prefix = %s WHERE id = %s;', prefix, server_id)
+
+    def update_ping(self, server_id: int, ping: int):
+        self._con.query('UPDATE servers SET ping = %s WHERE id = %s;', ping, server_id)
+
+    def update_role(self, server_id: int, role: int):
+        self._con.query('UPDATE servers SET role = %s WHERE id = %s;', role, server_id)
 
     def update_time(self, server_id: int, time: int):
         self._con.query('UPDATE servers SET time = %s WHERE id = %s;', time, server_id)
