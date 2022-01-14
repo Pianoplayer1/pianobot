@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from logging import getLogger
 from typing import Union
 
 from psycopg2.errors import UniqueViolation
 
 from pianobot.db import Connection
+from pianobot.utils.time import get_rounded_time
 
 class GuildXP:
     def __init__(self, time, data):
@@ -70,18 +71,12 @@ class GuildXPTable:
             self._con.query(f'ALTER TABLE "guildXP" {add_string}{remove_string};')
 
     def add(self, data: dict[str: int]):
-        time = datetime.utcnow()
-        interval = 300
-        seconds = (time.replace(tzinfo = None) - time.min).seconds
-        difference = (seconds + interval / 2) // interval * interval - seconds
-        rounded_time = str(time + timedelta(0, difference, -time.microsecond))
-
         columns = '", "'.join(data.keys())
         placeholders = '%s' + ', %s' * len(data)
         sql = f'INSERT INTO "guildXP"(time, "{columns}") VALUES ({placeholders});'
 
         try:
-            self._con.query(sql, rounded_time, *data.values())
+            self._con.query(sql, get_rounded_time(minutes = 5), *data.values())
         except UniqueViolation:
             getLogger('database').debug('Duplicate guild xp time')
 
