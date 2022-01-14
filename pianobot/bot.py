@@ -10,10 +10,12 @@ from pianobot.db.db_manager import DBManager
 
 class Pianobot(commands.Bot):
     def __init__(self) -> None:
+        intents = Intents.default()
+        intents.members = True
         super().__init__(
             command_prefix = self._get_prefixes,
             help_command = None,
-            intents = Intents.all(),
+            intents = intents,
             case_insensitive = True
         )
 
