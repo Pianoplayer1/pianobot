@@ -20,7 +20,10 @@ async def territories(bot: Pianobot):
     if len(missing) == 0 and any(terr.guild != 'Eden' for terr in db_terrs.values()):
         for server in bot.database.servers.get_all():
             try:
-                await bot.get_channel(server.channel).send('Fully reclaimed!')
+                print(server.channel)
+                cha = bot.get_channel(server.channel)
+                print(cha)
+                await cha.send('Fully reclaimed!')
             except AttributeError:
                 if server.channel != 0:
                     print(f'Channel {server.channel} not found')
