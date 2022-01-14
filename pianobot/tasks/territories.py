@@ -1,5 +1,7 @@
 from time import time
 
+from discord.errors import Forbidden
+
 from pianobot import Pianobot
 
 async def territories(bot: Pianobot):
@@ -24,7 +26,7 @@ async def territories(bot: Pianobot):
                 cha = bot.get_channel(server.channel)
                 print(cha)
                 await cha.send('Fully reclaimed!')
-            except AttributeError:
+            except (AttributeError, Forbidden):
                 if server.channel != 0:
                     print(f'Channel {server.channel} not found')
     if notify is None:
@@ -45,6 +47,6 @@ async def territories(bot: Pianobot):
             bot.database.servers.update_time(server.id, time())
         try:
             await bot.get_channel(server.channel).send(temp_msg)
-        except AttributeError:
+        except (AttributeError, Forbidden):
             if server.channel != 0:
                 print(f'Channel {server.channel} not found')
