@@ -1,9 +1,11 @@
 [MASTER]
 init-hook='import sys; sys.path.append(".")'
 disable=
+    assigning-non-slot,
     missing-module-docstring,
     missing-class-docstring,
     missing-function-docstring,
+    no-name-in-module,
     too-few-public-methods,
     too-many-arguments,
     too-many-branches,
