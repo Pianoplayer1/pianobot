@@ -1,4 +1,4 @@
-from asyncio import gather
+from asyncio import gather, TimeoutError as AsyncioTimeoutError
 from logging import getLogger
 
 from corkus import Corkus
@@ -16,6 +16,8 @@ async def guild_activity(bot: Pianobot):
     for res in results:
         if res is not None:
             guilds.update(res)
+    if len(guilds) != len(bot.tracked_guilds):
+        return
 
     bot.database.guild_activity.add(guilds)
 
@@ -25,6 +27,6 @@ async def fetch(corkus: Corkus, guild_name: str, players: OnlinePlayers) -> dict
     try:
         guild = await corkus.guild.get(guild_name)
         return {guild.name: sum(players.is_player_online(m.username) for m in guild.members)}
-    except (CorkusTimeoutError, KeyError):
+    except (AsyncioTimeoutError, CorkusTimeoutError, KeyError):
         getLogger('tasks').warning('Error when fetching %s\'s activity!', guild)
         return {}
