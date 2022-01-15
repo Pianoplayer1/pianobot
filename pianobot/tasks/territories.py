@@ -41,7 +41,7 @@ async def territories(bot: Pianobot):
         temp_msg = msg
         if server.role != 0 and server.ping != 0 and time() >= (server.time + server.ping):
             temp_msg = f'<@&{server.role}>\n{msg}'
-            bot.database.servers.update_time(server.id, time())
+            bot.database.servers.update_time(server.server_id, time())
         try:
             await bot.get_channel(server.channel).send(temp_msg)
         except (AttributeError, Forbidden):
