@@ -3,13 +3,14 @@ from typing import Union
 from pianobot.db import Connection
 
 class Server:
-    def __init__(self, server_id, prefix, channel, role, time, ping):
+    def __init__(self, server_id, prefix, channel, role, time, ping, rank):
         self._server_id = server_id
         self._prefix = prefix
         self._channel = channel
         self._role = role
         self._time = time
         self._ping = ping
+        self._rank = rank
 
     @property
     def server_id(self) -> int:
@@ -35,19 +36,23 @@ class Server:
     def ping(self) -> int:
         return self._ping
 
+    @property
+    def rank(self) -> int:
+        return self._rank
+
 class ServerTable:
     def __init__(self, con: Connection):
         self._con = con
 
     def get_all(self) -> list[Server]:
         result = self._con.query('SELECT * FROM servers;')
-        return [Server(row[0], row[1], row[2], row[3], row[4], row[5]) for row in result]
+        return [Server(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in result]
 
     def get(self, server_id: int) -> Union[Server, None]:
         result = self._con.query('SELECT * FROM servers WHERE id = %s;', server_id)
         if result:
             row = result[0]
-            return Server(row[0], row[1], row[2], row[3], row[4], row[5])
+            return Server(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
         return None
 
     def add(self, server_id: int):
@@ -61,6 +66,9 @@ class ServerTable:
 
     def update_ping(self, server_id: int, ping: int):
         self._con.query('UPDATE servers SET ping = %s WHERE id = %s;', ping, server_id)
+
+    def update_rank(self, server_id: int, rank: int):
+        self._con.query('UPDATE servers SET rank = %s WHERE id = %s;', rank, server_id)
 
     def update_role(self, server_id: int, role: int):
         self._con.query('UPDATE servers SET role = %s WHERE id = %s;', role, server_id)
