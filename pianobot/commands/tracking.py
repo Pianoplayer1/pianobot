@@ -108,7 +108,7 @@ class Tracking(commands.Cog):
             embed.add_field(
                 inline = False,
                 name = (
-                    f'Ping cooldown: {current_server.ping} minutes'
+                    f'Ping cooldown: {current_server.ping // 60} minutes'
                     if current_server.ping > 0 else 'Pings disabled'
                 ),
                 value = f'*Configure with* `{current_server.prefix}tracking ping <minutes>`*.*'
