@@ -1,9 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from logging import getLogger
 
 from psycopg2.errors import UniqueViolation
 
 from pianobot.db import Connection
+from pianobot.utils import get_rounded_time
 
 class GuildActivityTable:
     def __init__(self, con: Connection):
@@ -16,11 +17,7 @@ class GuildActivityTable:
         ))
 
     def add(self, data: dict[str: int]):
-        time = datetime.utcnow()
-        interval = 300
-        seconds = (time.replace(tzinfo = None) - time.min).seconds
-        difference = (seconds + interval / 2) // interval * interval - seconds
-        rounded_time = str(time + timedelta(0, difference, -time.microsecond))
+        rounded_time = get_rounded_time(minutes = 5)
 
         columns = '", "'.join(data.keys())
         placeholders = '%s' + ', %s' * len(data)

@@ -74,16 +74,23 @@ class Tracking(commands.Cog):
         elif action.lower() == 'rank':
             current_rank = current_server.rank
             if arg is None:
-                if current_rank < 0 or current_rank > 5:
+                if current_rank == -1:
                     await ctx.send('Pings are always on, regardless of online members.')
                 else:
-                    await ctx.send(f'Pings are disabled when a {ranks[current_rank]} is online!')
+                    await ctx.send(
+                        f'Pings are disabled when at least one {ranks[current_rank]} is online.'
+                    )
                 return
-            if not isinstance(arg, int) or arg < 0 or arg > 5:
+            if not isinstance(arg, int) or arg < -1 or arg > 5:
                 await ctx.send('You must specify a rank by its number of stars (ingame)!')
                 return
             self.bot.database.servers.update_rank(ctx.guild.id, arg)
-            await ctx.send(f'Pings will be deactivated when at least one {ranks[arg]} is online.')
+            if arg == -1:
+                await ctx.send('Ping are now always active.')
+            else:
+                await ctx.send(
+                    f'Pings will be deactivated when at least one {ranks[arg]} is online.'
+                )
         else:
             channel = ctx.guild.get_channel(current_server.channel)
             role = ctx.guild.get_role(current_server.role)
@@ -124,7 +131,9 @@ class Tracking(commands.Cog):
                     'use -1 as value to ping regardless of online members.*'
                 )
             )
-            embed.set_footer(text = f'For more information, run `{current_server.prefix}help tracking`.')
+            embed.set_footer(
+                text = f'For more information, run `{current_server.prefix}help tracking`.'
+            )
             await ctx.send(embed = embed)
 
 def setup(bot: Pianobot):

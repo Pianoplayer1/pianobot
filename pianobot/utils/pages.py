@@ -1,9 +1,12 @@
-import asyncio
+from __future__ import annotations
+from asyncio import TimeoutError
+from typing import TYPE_CHECKING
 
 from discord import Message, Reaction, User
 from discord.ext.commands import Context
 
-from pianobot.bot import Pianobot
+if TYPE_CHECKING:
+    from pianobot import Pianobot
 
 async def paginator(
     bot: Pianobot,
@@ -62,7 +65,7 @@ async def paginator(
                 page = 1
                 await message.edit(content=f'{contents[page-1]}')
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             await message.remove_reaction('⏭️', bot.user)
             await message.remove_reaction('▶️', bot.user)
             if reverse_contents is not None:

@@ -37,9 +37,21 @@ async def territories(bot: Pianobot):
         f'```All missing territories ({len(missing)}):\n\n{terrs_msg}```'
     )
 
+    eden = await bot.corkus.guild.get('Eden')
+    player_list = await bot.corkus.network.online_players()
+    highest_rank = max(
+        (int(member.rank) for member in eden.members if player_list.is_player_online(member)),
+        default = -1
+    )
+
     for server in bot.database.servers.get_all():
         temp_msg = msg
-        if server.role != 0 and server.ping != 0 and time() >= (server.time + server.ping):
+        if (
+            server.role != 0
+            and server.ping != 0
+            and time() >= (server.time + server.ping)
+            and (6 if server.rank == -1 else server.rank) > highest_rank
+        ):
             temp_msg = f'<@&{server.role}>\n{msg}'
             bot.database.servers.update_time(server.server_id, time())
         try:

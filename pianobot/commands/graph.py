@@ -22,7 +22,7 @@ class Graph(commands.Cog):
             input_guild, interval = input_guild.split(' -')
             try:
                 interval = int(interval)
-            except TypeError:
+            except ValueError:
                 await ctx.send('Interval must be a number!')
                 return
 
