@@ -38,7 +38,7 @@ class Pianobot(commands.Bot):
             f'<@!{self.user.id}>',
             f'<@{self.user.id}>'
         ]
-        prefixes.append(get_prefix(self, message.guild))
+        prefixes.append(get_prefix(self.database.servers, message.guild))
         return prefixes
 
     def _load_extension_folder(self, path: str) -> None:
