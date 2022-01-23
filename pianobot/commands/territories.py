@@ -6,15 +6,14 @@ from pianobot.utils import check_permissions, paginator, table
 class Territories(commands.Cog):
     def __init__(self, bot: Pianobot):
         self.bot = bot
-    
+
     @commands.command(
         aliases = ['claim', 'terrs'],
         brief = 'Lets you view and edit the territory list.',
         descirption = 'guild_only',
-        help = (
+        help =
             'Depending on the option you pass, you can either view a list of territories the bots'
-            ' listens to or add / delete territories from the list.'
-        ),
+            ' listens to or add / delete territories from the list.',
         name = 'territories',
         usage = '<add | del | list> [territory], [territory] ...'
     )

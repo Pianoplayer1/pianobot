@@ -7,16 +7,17 @@ from discord.ext import commands
 from discord.ext.commands.errors import ExtensionFailed
 
 from pianobot.db.db_manager import DBManager
+from pianobot.utils import get_prefix
 
 class Pianobot(commands.Bot):
     def __init__(self) -> None:
         intents = Intents.default()
         intents.members = True
         super().__init__(
+            case_insensitive = True,
             command_prefix = self._get_prefixes,
             help_command = None,
-            intents = intents,
-            case_insensitive = True
+            intents = intents
         )
 
         self._load_extension_folder('pianobot.commands')
@@ -37,12 +38,7 @@ class Pianobot(commands.Bot):
             f'<@!{self.user.id}>',
             f'<@{self.user.id}>'
         ]
-        if message.guild is None:
-            prefixes.append('-')
-        else:
-            server = self.database.servers.get(message.guild.id)
-            if server:
-                prefixes.append(server.prefix)
+        prefixes.append(get_prefix(self, message.guild))
         return prefixes
 
     def _load_extension_folder(self, path: str) -> None:

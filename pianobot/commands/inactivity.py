@@ -1,5 +1,4 @@
 from asyncio import gather, sleep
-from datetime import datetime, timezone
 
 from corkus.objects import Member
 
@@ -7,9 +6,7 @@ from discord import Message
 from discord.ext import commands
 
 from pianobot import Pianobot
-from pianobot.utils import paginator
-from pianobot.utils import check_permissions
-from pianobot.utils import table
+from pianobot.utils import check_permissions, format_last_seen, paginator, table
 
 class Inactivity(commands.Cog):
     def __init__(self, bot: Pianobot):
@@ -83,25 +80,9 @@ class Inactivity(commands.Cog):
 
 async def fetch(member: Member) -> list:
     player = await member.fetch_player()
+    raw_days, display_time = format_last_seen(player)
 
-    if player.online:
-        days_offline = 0
-        display_time = 'Online'
-    else:
-        diff = datetime.now(timezone.utc) - player.last_online
-        days_offline = diff.days + (diff.seconds / 86400)
-        value = days_offline
-        unit = 'day'
-        if value < 1:
-            value *= 24
-            unit = 'hour'
-            if value < 1:
-                value *= 60
-                unit = 'minute'
-        if round(value) != 1:
-            unit += 's'
-        display_time = f'{round(value)} {unit}'
-    return [days_offline, [member.username, member.rank.value.title(), display_time]]
+    return [raw_days, [member.username, member.rank.value.title(), display_time]]
 
 def setup(bot: Pianobot):
     bot.add_cog(Inactivity(bot))

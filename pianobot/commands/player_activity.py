@@ -12,7 +12,8 @@ class PlayerActivity(commands.Cog):
     @commands.command(
         aliases = ['pAct'],
         brief = 'Outputs the activity of a given player in a given interval.',
-        help = 'This command returns a bar graph with the number of minutes'
+        help =
+            'This command returns a bar graph with the number of minutes'
             ' a given player has been online in the last days.',
         name = 'playerActivity',
         usage = '<player> [days]'

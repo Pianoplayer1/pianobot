@@ -5,6 +5,7 @@ from discord import HTTPException
 from discord.ext import commands
 
 from pianobot import Pianobot
+from pianobot.utils import get_prefix
 
 class OnCommandError(commands.Cog):
     def __init__(self, bot: Pianobot):
@@ -21,11 +22,7 @@ class OnCommandError(commands.Cog):
             cog.cog_command_error
         ) is not None:
             return
-        prefix = '-'
-        if ctx.guild:
-            server = self.bot.database.servers.get(ctx.guild.id)
-            if server:
-                prefix = server.prefix
+        prefix = get_prefix(self.bot.database.servers, ctx.guild)
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(

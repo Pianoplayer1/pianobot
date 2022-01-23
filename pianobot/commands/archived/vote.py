@@ -1,5 +1,4 @@
 from asyncio import gather
-from datetime import datetime, timezone
 
 from corkus.objects import Member
 
@@ -8,7 +7,7 @@ from discord.ext import commands
 from discord.utils import get
 
 from pianobot import Pianobot
-from pianobot.utils.permissions import check_permissions
+from pianobot.utils import check_permissions, format_last_seen
 
 class Vote(commands.Cog):
     def __init__(self, bot: Pianobot):
@@ -59,26 +58,10 @@ Start voting at the top by clicking here: {first_msg.jump_url}'''
 
 async def fetch(member: Member) -> dict:
     player = await member.fetch_player()
+    raw_days, display_time = format_last_seen(player)
 
-    if player.online:
-        days_offline = 0
-        display_time = 'Online'
-    else:
-        diff = datetime.now(timezone.utc) - player.last_online
-        days_offline = diff.days + (diff.seconds / 86400)
-        value = days_offline
-        unit = 'day'
-        if value < 1:
-            value *= 24
-            unit = 'hour'
-            if value < 1:
-                value *= 60
-                unit = 'minute'
-        if round(value) != 1:
-            unit += 's'
-        display_time = f'{round(value)} {unit}'
     return {'name': member.username.replace('_', '\\_'), 'rank': member.rank.value.title(),
-            'last_seen': display_time, 'raw_time': days_offline}
+            'last_seen': display_time, 'raw_time': raw_days}
 
 async def send(ctx: commands.Context, member: dict):
     msg: Message = await ctx.send(f'{member["name"]} ({member["rank"]}) - {member["last_seen"]}')

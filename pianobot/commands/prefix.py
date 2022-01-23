@@ -11,7 +11,8 @@ class Prefix(commands.Cog):
         aliases = ['pre'],
         brief = 'Updates the bot prefix for this server.',
         description = 'guild_only',
-        help = 'Use this command to set a new bot prefix, which will be used to access this bot on'
+        help =
+            'Use this command to set a new bot prefix, which will be used to access this bot on'
             ' this server. The prefix can consist of any letters, numbers and special characters,'
             ' but make sure it does not conflict with another bot.',
         name = 'prefix',

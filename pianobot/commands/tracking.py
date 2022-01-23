@@ -14,7 +14,7 @@ class Tracking(commands.Cog):
         aliases = ['channel', 'cooldown', 'track'],
         brief = 'Lets you configure tracking for Eden\'s territories.',
         description = 'guild_only',
-        help = (
+        help =
             'This bot keeps track of Eden  \'s territory claim (configurable with'
             ' `[[prefix]]territories`) and sends messages when a territory gets taken, optionally'
             ' with a ping.\n\nUse `[[prefix]]tracking channel` to enable  tracking messages for'
@@ -22,8 +22,7 @@ class Tracking(commands.Cog):
             ' `[[prefix]]tracking ping <minutes>`, use 0 to disable pings completely.\nThe role'
             ' that should get pinged is set with `[[prefix]]tracking role <id | mention>`, mention'
             ' the role or use its id for the second argument.\n To disable pings when a certain (or'
-            ' above) rank is online, use `[[prefix]]tracking rank <no. of stars ingame>`.'
-        ),
+            ' above) rank is online, use `[[prefix]]tracking rank <no. of stars ingame>`.',
         name = 'tracking',
         usage = '<channel | ping | role> [arguments]'
     )

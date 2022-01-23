@@ -1,6 +1,11 @@
-from typing import Union
-from discord import Member, User
+from __future__ import annotations
+from typing import TYPE_CHECKING, Union
+
+from discord import Guild, Member, User
 from discord.channel import TextChannel
+
+if TYPE_CHECKING:
+    from pianobot.db import ServerTable
 
 def check_permissions(
     member : Union[Member, User],
@@ -63,3 +68,10 @@ def check_permissions(
         (all(permission in existing for permission in permissions) or 'administrator' in existing)
         and (all_guilds or channel.guild.id in (682671629213368351, 713710628258185258))
     )
+
+def get_prefix(servers: ServerTable, guild: Guild) -> str:
+    if guild is not None:
+        server = servers.get(guild.id)
+        if server is not None:
+            return server.prefix
+    return '-'

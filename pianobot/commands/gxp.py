@@ -14,11 +14,12 @@ class GXP(commands.Cog):
     @commands.command(
         aliases = ['guildXP', 'xp'],
         brief = 'Outputs Eden\'s guild experience contributions in a set interval.',
-        help = 'This command returns a list with the amount of guild experience members of Eden'
-            ' have gained in the current or, if specified with `final`, the last week.'
-            ' For custom intervals, provide a unit specifier (such as `d` for day) and a number'
-            ' (e.g. `3`) after the command (the previous examples would form the command `[[prefix]]'
-            'gxp d 3` and thus give out the guild experience gained in the last three days).',
+        help =
+            'This command returns a list with the amount of guild experience members of Eden have'
+            ' gained in the current or, if specified with `final`, the last week. For custom'
+            ' intervals, provide a unit specifier (such as `d` for day) and a number (e.g. `3`)'
+            ' after the command (the previous examples would form the command `[[prefix]] gxp d 3`'
+            ' and thus give out the guild experience gained in the last three days).',
         name = 'gxp',
         usage = '[final | ::custom interval::]',
     )

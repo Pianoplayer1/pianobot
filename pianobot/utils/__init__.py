@@ -1,4 +1,4 @@
 from .pages import paginator
-from .permissions import check_permissions
+from .discord import check_permissions, get_prefix
 from .table import table
-from .time import get_rounded_time
+from .time import format_last_seen, get_rounded_time

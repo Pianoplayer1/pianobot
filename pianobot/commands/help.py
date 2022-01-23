@@ -2,6 +2,7 @@ from discord import Embed
 from discord.ext import commands
 
 from pianobot import Pianobot
+from pianobot.utils import get_prefix
 
 class Help(commands.Cog):
     def __init__(self, bot: Pianobot):
@@ -10,7 +11,8 @@ class Help(commands.Cog):
     @commands.command(
         aliases = ['info'],
         brief = 'Shows this page; use help [command] for detailed description about a command.',
-        help = 'This command gives you an overview of this bot and its commands.'
+        help =
+            'This command gives you an overview of this bot and its commands.'
             ' If you want more information on a specific command,'
             ' enter that command name as an argument of the help command.',
         name = 'help',
@@ -21,11 +23,7 @@ class Help(commands.Cog):
             'I am a utility bot for various different Wynncraft related things.\n\n'
             'List of commands:\n```'
         )
-        prefix = '-'
-        if ctx.guild:
-            server = self.bot.database.servers.get(ctx.guild.id)
-            if server:
-                prefix = server.prefix
+        prefix = get_prefix(self.bot.database.servers, ctx.guild)
 
         visible_commands = {cmd: [cmd.name.lower()]
             for cog in self.bot.cogs.values()

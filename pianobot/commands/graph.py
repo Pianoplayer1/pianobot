@@ -11,7 +11,8 @@ class Graph(commands.Cog):
 
     @commands.command(
         brief = 'Outputs the member activity of a guild as a line graph.',
-        help = 'This command returns a line graph with the number of members'
+        help =
+            'This command returns a line graph with the number of members'
             ' online in the last days.',
         name = 'graph',
         usage = '<guild> -[days]'
