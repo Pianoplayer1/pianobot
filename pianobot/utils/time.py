@@ -27,4 +27,4 @@ def format_last_seen(player: Player) -> list[int, str]:
         if round(value) != 1:
             unit += 's'
         display_time = f'{round(value)} {unit}'
-    return display_time
+    return days_offline, display_time
