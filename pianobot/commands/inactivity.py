@@ -41,7 +41,7 @@ class Inactivity(commands.Cog):
                 f'Several guild names include `{guild}`.'
                 ' Enter the number of one of the following guilds to view their inactivity.\n'
                 ' To leave this prompt, type `exit`:\n\n'
-                '\n'.join([f'{match + 1}. {matches[match]}' for match in range(len(matches))])
+                + '\n'.join([f'{match + 1}. {matches[match]}' for match in range(len(matches))])
             )
 
             def check(msg: Message):

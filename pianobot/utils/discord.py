@@ -1,19 +1,19 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Union
 
-from discord import Guild, Member, User
+from discord import ClientUser, Guild, Member, User
 from discord.channel import TextChannel
 
 if TYPE_CHECKING:
     from pianobot.db import ServerTable
 
 def check_permissions(
-    member : Union[Member, User],
+    member : Union[ClientUser, Member, User],
     channel : TextChannel,
     *permissions : tuple,
     all_guilds: bool = True
 ) -> bool:
-    if isinstance(member, User):
+    if isinstance(member, User) or isinstance(member, ClientUser):
         member = channel.guild.get_member(member.id)
         if member is None:
             return False
