@@ -19,6 +19,8 @@ class PlayerActivity(commands.Cog):
         usage = '<player> [days]'
     )
     async def graph(self, ctx: commands.Context, player: str, interval: str = '14'):
+        await ctx.send('Player tracking is currently not available.')
+        return
         if interval.startswith('-'):
             interval = interval[1:]
         try:
