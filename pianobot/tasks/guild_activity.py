@@ -28,5 +28,5 @@ async def fetch(corkus: Corkus, guild_name: str, players: OnlinePlayers) -> dict
         guild = await corkus.guild.get(guild_name)
         return {guild.name: sum(players.is_player_online(m.username) for m in guild.members)}
     except (CorkusTimeoutError, KeyError, TypeError):
-        getLogger('tasks').warning('Error when fetching %s\'s activity!', guild)
+        getLogger('tasks').warning('Error when fetching %s\'s activity!', guild_name)
         return {}
