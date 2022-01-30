@@ -1,5 +1,6 @@
 from asyncio import gather
 from logging import getLogger
+from typing import Union
 
 from corkus import Corkus
 from corkus.errors import CorkusTimeoutError
@@ -16,17 +17,15 @@ async def guild_activity(bot: Pianobot):
     for res in results:
         if res is not None:
             guilds.update(res)
-    if len(guilds) != len(bot.tracked_guilds):
-        return
 
     bot.database.guild_activity.add(guilds)
 
     bot.database.guild_activity.cleanup()
 
-async def fetch(corkus: Corkus, guild_name: str, players: OnlinePlayers) -> dict[str, int]:
+async def fetch(corkus: Corkus, name: str, players: OnlinePlayers) -> Union[dict[str, int], None]:
     try:
-        guild = await corkus.guild.get(guild_name)
+        guild = await corkus.guild.get(name)
         return {guild.name: sum(players.is_player_online(m.username) for m in guild.members)}
-    except (CorkusTimeoutError, KeyError, TypeError):
-        getLogger('tasks').warning('Error when fetching %s\'s activity!', guild_name)
-        return {}
+    except CorkusTimeoutError:
+        getLogger('tasks').warning('Error when fetching %s\'s activity!', name)
+        return None

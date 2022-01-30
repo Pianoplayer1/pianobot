@@ -12,8 +12,8 @@ class GuildActivityTable:
 
     def get(self, guild: str, interval: int) -> dict[datetime: int]:
         return dict(self._con.query(
-            f'SELECT time, "{guild}" FROM "guildActivity" WHERE time > '
-            f'(CURRENT_TIMESTAMP - \'{interval} day\'::interval) ORDER BY time ASC;'
+            f'SELECT time, "{guild}" FROM "guildActivity" WHERE time > (CURRENT_TIMESTAMP - '
+            f'\'{interval} day\'::interval) AND "{guild}" IS NOT NULL ORDER BY time ASC;'
         ))
 
     def add(self, data: dict[str: int]):

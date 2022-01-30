@@ -1,4 +1,4 @@
-corkus.py==1.2.0
+corkus.py==1.2.1
 discord.py==1.7.1
 matplotlib==3.4.3
 psycopg2==2.9.2
