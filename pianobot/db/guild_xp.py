@@ -1,6 +1,5 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Union
 
 from psycopg2.errors import UniqueViolation
 
@@ -30,7 +29,7 @@ class GuildXPTable:
         )
         return [] if len(result) <= 1 else [column[0] for column in result[1:]]
 
-    def get(self, time: datetime) -> Union[GuildXP, None]:
+    def get(self, time: datetime) -> GuildXP | None:
         result = self._con.query('SELECT * FROM "guildXP" WHERE time = %s;', time)
         members = self.get_members()
         if len(result) > 0:
@@ -39,7 +38,7 @@ class GuildXPTable:
             return GuildXP(row[0], data)
         return None
 
-    def get_first(self, interval: str) -> Union[GuildXP, None]:
+    def get_first(self, interval: str) -> GuildXP | None:
         result = self._con.query(
             f'SELECT * FROM "guildXP" WHERE time > (CURRENT_TIMESTAMP - \'{interval}\'::interval) '
             'ORDER BY time ASC LIMIT 1;'

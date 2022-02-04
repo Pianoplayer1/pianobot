@@ -1,5 +1,3 @@
-from typing import Union
-
 from pianobot.db import Connection
 
 class Server:
@@ -48,7 +46,7 @@ class ServerTable:
         result = self._con.query('SELECT * FROM servers;')
         return [Server(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in result]
 
-    def get(self, server_id: int) -> Union[Server, None]:
+    def get(self, server_id: int) -> Server | None:
         result = self._con.query('SELECT * FROM servers WHERE id = %s;', server_id)
         if result:
             row = result[0]

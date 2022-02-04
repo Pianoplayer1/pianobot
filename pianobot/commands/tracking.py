@@ -1,5 +1,3 @@
-from typing import Union
-
 from discord import Embed, Role
 from discord.ext import commands
 
@@ -27,7 +25,7 @@ class Tracking(commands.Cog):
         usage = '<channel | ping | role> [arguments]'
     )
     @commands.guild_only()
-    async def tracking(self, ctx: commands.Context, action: str = '', arg: Union[int, Role] = None):
+    async def tracking(self, ctx: commands.Context, action: str = '', arg: int | Role = None):
         if not check_permissions(ctx.author, ctx.channel, 'manage_channels'):
             await ctx.send('You don\'t have the required permissions to perform this action!')
             return

@@ -1,6 +1,5 @@
 from asyncio import gather
 from logging import getLogger
-from typing import Union
 
 from corkus import Corkus
 from corkus.errors import CorkusTimeoutError
@@ -22,7 +21,7 @@ async def guild_activity(bot: Pianobot):
 
     bot.database.guild_activity.cleanup()
 
-async def fetch(corkus: Corkus, name: str, players: OnlinePlayers) -> Union[dict[str, int], None]:
+async def fetch(corkus: Corkus, name: str, players: OnlinePlayers) -> dict[str, int] | None:
     try:
         guild = await corkus.guild.get(name)
         return {guild.name: sum(players.is_player_online(m.username) for m in guild.members)}

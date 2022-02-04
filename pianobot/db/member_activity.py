@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Union
 
 from pianobot.db import Connection
 
@@ -16,7 +15,7 @@ class MemberActivityTable:
             return []
         return [column[0] for column in result[1:]]
 
-    def get_one(self, username: str, week: str) -> Union[int, None]:
+    def get_one(self, username: str, week: str) -> int | None:
         result = self._con.query('SELECT * FROM member_activity WHERE username = %s;', username)
         weeks = self.get_weeks()
         if result:
