@@ -8,7 +8,7 @@ def table(
     enum: bool = False,
     label: str = '',
     start_text: str = None
-) -> str:
+) -> list[str]:
     if enum:
         columns[list(columns.keys())[0]] -= 5
     message = []
