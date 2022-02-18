@@ -11,5 +11,5 @@ def main():
     bot.run(getenv('TOKEN'))
     bot.shutdown()
 
-if __name__ == 'main':
+if __name__ == '__main__':
     main()
