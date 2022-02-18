@@ -51,8 +51,8 @@ class OnCommandError(commands.Cog):
         elif isinstance(error, commands.CommandNotFound):
             pass
         else:
-            print(f'Ignoring exception in command {ctx.command}:', file = stderr)
-            print_exception(type(error), error, error.__traceback__, file = stderr)
+            print(f'Ignoring exception in command {ctx.command}:', file=stderr)
+            print_exception(type(error), error, error.__traceback__, file=stderr)
 
 def setup(bot: Pianobot):
     bot.add_cog(OnCommandError(bot))

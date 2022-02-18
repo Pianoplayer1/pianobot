@@ -12,26 +12,26 @@ class GXP(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        aliases = ['guildXP', 'xp'],
-        brief = 'Outputs Eden\'s guild experience contributions in a set interval.',
-        help =
+        aliases=['guildXP', 'xp'],
+        brief='Outputs Eden\'s guild experience contributions in a set interval.',
+        help=
             'This command returns a list with the amount of guild experience members of Eden have'
             ' gained in the current or, if specified with `final`, the last week. For custom'
             ' intervals, provide a unit specifier (such as `d` for day) and a number (e.g. `3`)'
             ' after the command (the previous examples would form the command `[[prefix]] gxp d 3`'
             ' and thus give out the guild experience gained in the last three days).',
-        name = 'gxp',
-        usage = '[final | ::custom interval::]',
+        name='gxp',
+        usage='[final | ::custom interval::]',
     )
     async def gxp(self, ctx: commands.Context, unit: str = '', interval: int = 1):
         first_weekday = datetime.combine(datetime.utcnow().date(), datetime.min.time())
-        first_weekday = first_weekday - timedelta(days = first_weekday.weekday())
+        first_weekday = first_weekday - timedelta(days=first_weekday.weekday())
 
         if unit == '':
             oldest_data = self.bot.database.guild_xp.get(first_weekday)
             newest_data = self.bot.database.guild_xp.get_last()[0]
         elif unit == 'final':
-            oldest_data = self.bot.database.guild_xp.get(first_weekday - timedelta(days = 7))
+            oldest_data = self.bot.database.guild_xp.get(first_weekday - timedelta(days=7))
             newest_data = self.bot.database.guild_xp.get(first_weekday)
         else:
             if unit.startswith('-'):

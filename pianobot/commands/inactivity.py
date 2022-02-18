@@ -13,12 +13,12 @@ class Inactivity(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        aliases = ['act', 'activity', 'inact'],
-        brief = 'Outputs the member inactivity times of a specified guild.',
-        help = 'This command returns a table with the times since each member of'
+        aliases=['act', 'activity', 'inact'],
+        brief='Outputs the member inactivity times of a specified guild.',
+        help='This command returns a table with the times since each member of'
             ' a specified guild has been last seen on the Wynncraft server.',
-        name = 'inactivity',
-        usage = '<guild>'
+        name='inactivity',
+        usage='<guild>'
     )
     async def inactivity(self, ctx: commands.Context, *, guild: str):
         await ctx.trigger_typing()
@@ -47,7 +47,7 @@ class Inactivity(commands.Cog):
             def check(msg: Message):
                 return msg.author == ctx.author and msg.channel == ctx.channel
 
-            answer_msg = await self.bot.wait_for('message', check = check)
+            answer_msg = await self.bot.wait_for('message', check=check)
             if ctx.guild and check_permissions(self.bot.user, ctx.channel, ['manage_messages']):
                 await answer_msg.delete()
 

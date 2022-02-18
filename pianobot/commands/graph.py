@@ -10,12 +10,12 @@ class Graph(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        brief = 'Outputs the member activity of a guild as a line graph.',
-        help =
+        brief='Outputs the member activity of a guild as a line graph.',
+        help=
             'This command returns a line graph with the number of members'
             ' online in the last days.',
-        name = 'graph',
-        usage = '<guild> -[days]'
+        name='graph',
+        usage='<guild> -[days]'
     )
     async def graph(self, ctx: commands.Context, *, input_guild: str):
         interval: int = 1
@@ -47,7 +47,7 @@ class Graph(commands.Cog):
         pyplot.ylabel('Player Count')
         plot.savefig('graph.png')
 
-        await ctx.send(file = File('graph.png'))
+        await ctx.send(file=File('graph.png'))
 
 def setup(bot: Pianobot):
     bot.add_cog(Graph(bot))

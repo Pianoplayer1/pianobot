@@ -8,14 +8,14 @@ class Territories(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        aliases = ['claim', 'terrs'],
-        brief = 'Lets you view and edit the territory list.',
-        descirption = 'guild_only',
-        help =
+        aliases=['claim', 'terrs'],
+        brief='Lets you view and edit the territory list.',
+        descirption='guild_only',
+        help=
             'Depending on the option you pass, you can either view a list of territories the bots'
             ' listens to or add / delete territories from the list.',
-        name = 'territories',
-        usage = '<add | del | list> [territory], [territory] ...'
+        name='territories',
+        usage='<add | del | list> [territory], [territory] ...'
     )
     @commands.guild_only()
     async def territories(self, ctx: commands.Context, action: str, *, territories: str = ''):
@@ -37,7 +37,7 @@ class Territories(commands.Cog):
                 )
             )
         elif action.lower() == 'add':
-            if not check_permissions(ctx.author, ctx.channel, 'manage_server', all_guilds = False):
+            if not check_permissions(ctx.author, ctx.channel, 'manage_server', all_guilds=False):
                 await ctx.send('You don\'t have the required permissions to perform this action!')
                 return
             if len(territories) == 0:

@@ -11,13 +11,14 @@ class MemberActivity(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        aliases = ['mAct'],
-        brief = 'Outputs the member activity times of Eden for a calendar week.',
-        help = 'This command returns a table with the times each member of Eden'
+        aliases=['mAct'],
+        brief='Outputs the member activity times of Eden for a calendar week.',
+        help=
+            'This command returns a table with the times each member of Eden'
             ' has been active on the Wynncraft server.'
             ' Optionally, use a week number and a year to get activity times of a certain week.',
-        name = 'memberActivity',
-        usage ='[week] [year]'
+        name='memberActivity',
+        usage='[week] [year]'
     )
     async def member_activity(self, ctx: commands.Context, week: int = None, year: int = None):
         iso_date = datetime.utcnow().isocalendar()

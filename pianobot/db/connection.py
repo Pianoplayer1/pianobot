@@ -6,10 +6,10 @@ import psycopg2
 class Connection:
     def __init__(self):
         self.con = psycopg2.connect(
-            database = getenv('PG_DB'),
-            host = getenv('PG_HOST'),
-            password = getenv('PG_PASS'),
-            user = getenv('PG_USER')
+            database=getenv('PG_DB'),
+            host=getenv('PG_HOST'),
+            password=getenv('PG_PASS'),
+            user=getenv('PG_USER')
         )
         self.con.autocommit = True
         getLogger('database').debug('Connected to database')

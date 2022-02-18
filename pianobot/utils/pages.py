@@ -43,7 +43,7 @@ async def paginator(
     while True:
         try:
             reaction: Reaction = None
-            reaction, user = await bot.wait_for('reaction_add', check = check, timeout = 300)
+            reaction, user = await bot.wait_for('reaction_add', check=check, timeout=300)
             await message.remove_reaction(reaction, user)
 
             if str(reaction.emoji) == '⏭️' and page < len(contents):

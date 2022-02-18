@@ -9,14 +9,14 @@ class Help(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        aliases = ['info'],
-        brief = 'Shows this page; use help [command] for detailed description about a command.',
-        help =
+        aliases=['info'],
+        brief='Shows this page; use help [command] for detailed description about a command.',
+        help=
             'This command gives you an overview of this bot and its commands.'
             ' If you want more information on a specific command,'
             ' enter that command name as an argument of the help command.',
-        name = 'help',
-        usage = '[command]'
+        name='help',
+        usage='[command]'
     )
     async def help(self, ctx: commands.Context, command: str = None):
         help_text = (
@@ -48,20 +48,21 @@ class Help(commands.Cog):
                 aliases = '\n'.join([f'`{prefix}{alias}`' for alias in cmd.aliases])
 
                 embed = Embed(
-                    title = f'{cmd.name.capitalize()} command',
-                    description = cmd.help.replace('[[prefix]]', prefix))
+                    title=f'{cmd.name.capitalize()} command',
+                    description=cmd.help.replace('[[prefix]]', prefix)
+                )
                 embed.add_field(
-                    inline = False,
-                    name = 'Usage',
-                    value = f'`{prefix}{cmd.name}{usage}`'
+                    inline=False,
+                    name='Usage',
+                    value=f'`{prefix}{cmd.name}{usage}`'
                 )
                 if len(aliases) > 0:
-                    embed.add_field(inline = False, name = 'Aliases', value = aliases)
-                embed.set_footer(text =
+                    embed.add_field(inline=False, name='Aliases', value=aliases)
+                embed.set_footer(text=
                     '<Required Argument>   [Optional Argument]\n'
                     'You can use aliases instead of the command name.'
                 )
-                await ctx.send(embed = embed)
+                await ctx.send(embed=embed)
                 return
 
         await ctx.send(

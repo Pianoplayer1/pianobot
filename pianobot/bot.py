@@ -14,10 +14,10 @@ class Pianobot(commands.Bot):
         intents = Intents.default()
         intents.members = True
         super().__init__(
-            case_insensitive = True,
-            command_prefix = self._get_prefixes,
-            help_command = None,
-            intents = intents
+            case_insensitive=True,
+            command_prefix=self._get_prefixes,
+            help_command=None,
+            intents=intents
         )
 
         self._load_extension_folder('pianobot.commands')
@@ -26,7 +26,7 @@ class Pianobot(commands.Bot):
         self.corkus = Corkus()
         self.database = DBManager()
 
-        with open('tracked_guilds.txt', 'r', encoding = 'UTF-8') as file:
+        with open('tracked_guilds.txt', 'r', encoding='UTF-8') as file:
             self.tracked_guilds = {
                 name: tag for line in file for (name, tag) in [line.strip().split(':')]
             }
