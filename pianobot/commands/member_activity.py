@@ -17,13 +17,8 @@ class MemberActivity(commands.Cog):
             'This command returns a table with the times each member of Eden'
             ' has been active on the Wynncraft server.'
             ' Optionally, use a week number and a year to get activity times of a certain week.',
-<<<<<<< HEAD
-        name = 'memberActivity',
-        usage ='[calendar week] [year]'
-=======
         name='memberActivity',
-        usage='[week] [year]'
->>>>>>> 9de4e47358a03de08c80d1d4347d92ab2926d8bd
+        usage='[calendar week] [year]'
     )
     async def member_activity(self, ctx: commands.Context, week: int = None, year: int = None):
         iso_date = datetime.utcnow().isocalendar()

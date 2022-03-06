@@ -21,13 +21,8 @@ class Tracking(commands.Cog):
             ' that should get pinged is set with `[[prefix]]tracking role <id | mention>`, mention'
             ' the role or use its id for the second argument.\n To disable pings when a certain (or'
             ' above) rank is online, use `[[prefix]]tracking rank <no. of stars ingame>`.',
-<<<<<<< HEAD
-        name = 'tracking',
-        usage = '<"channel" | "ping" | "role"> [arguments]'
-=======
         name='tracking',
-        usage='<channel | ping | role> [arguments]'
->>>>>>> 9de4e47358a03de08c80d1d4347d92ab2926d8bd
+        usage='<"channel" | "ping" | "role"> [arguments]'
     )
     @commands.guild_only()
     async def tracking(self, ctx: commands.Context, action: str = '', arg: int | Role = None):

@@ -14,13 +14,8 @@ class Territories(commands.Cog):
         help=
             'Depending on the option you pass, you can either view a list of territories the bots'
             ' listens to or add / delete territories from the list.',
-<<<<<<< HEAD
-        name = 'territories',
-        usage = '<"add" | "del" | "list"> [territory], [territory] ...'
-=======
         name='territories',
-        usage='<add | del | list> [territory], [territory] ...'
->>>>>>> 9de4e47358a03de08c80d1d4347d92ab2926d8bd
+        usage='<"add" | "del" | "list"> [territory], [territory] ...'
     )
     @commands.guild_only()
     async def territories(self, ctx: commands.Context, action: str, *, territories: str = ''):
