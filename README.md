@@ -6,7 +6,7 @@ Utility bot for the [Discord server](https://discord.gg/P4bss3w) of the Wynncraf
 ## List of commands
 For more information about a command, run `<prefix>help <command>` in [Eden's Discord server](https://discord.gg/P4bss3w).
 
-Every command has to be prefixed with a server-wide prefix you can view by mentioning the bot followed by `help`. The listed aliases can be used instead of a command name. \[Square brackets\] stand for optional, <Angle brackets> for required arguments.
+Every command has to be prefixed with a server-wide prefix you can view by mentioning the bot followed by `help`. The listed aliases can be used instead of a command name. [Square brackets\] stand for optional, \<Angle brackets\> for required arguments.
 
 Command | Description | Aliases
 ------- | ----------- | -------
