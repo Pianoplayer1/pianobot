@@ -1,5 +1,5 @@
 from logging import getLogger
-from time import time
+from time import perf_counter
 
 from discord.ext.commands import Cog
 from discord.ext.tasks import loop
@@ -28,30 +28,30 @@ class OnReady(Cog):
 
     @loop(seconds=30)
     async def loop_30s(self):
-        start = time()
+        start = perf_counter()
         await territories(self.bot)
-        self.logger.info('Territory finished in %s seconds', time() - start)
-        start = time()
+        self.logger.info('Territory finished in %s seconds', perf_counter() - start)
+        start = perf_counter()
         await worlds(self.bot)
-        self.logger.info('World finished in %s seconds', time() - start)
+        self.logger.info('World finished in %s seconds', perf_counter() - start)
 
     @loop(seconds=60)
     async def loop_1m(self):
-        start = time()
+        start = perf_counter()
         await guild_leaderboard(self.bot)
-        self.logger.info('Guild Leaderboard finished in %s seconds', time() - start)
-        start = time()
+        self.logger.info('Guild Leaderboard finished in %s seconds', perf_counter() - start)
+        start = perf_counter()
         await member_activity(self.bot)
-        self.logger.info('Member Activity finished in %s seconds', time() - start)
+        self.logger.info('Member Activity finished in %s seconds', perf_counter() - start)
 
     @loop(seconds=300)
     async def loop_5m(self):
-        start = time()
+        start = perf_counter()
         await guild_activity(self.bot)
-        self.logger.info('Guild Activity finished in %s seconds', time() - start)
-        start = time()
+        self.logger.info('Guild Activity finished in %s seconds', perf_counter() - start)
+        start = perf_counter()
         await guild_xp(self.bot)
-        self.logger.info('Guild XP finished in %s seconds', time() - start)
+        self.logger.info('Guild XP finished in %s seconds', perf_counter() - start)
 
 def setup(bot: Pianobot):
     bot.add_cog(OnReady(bot))

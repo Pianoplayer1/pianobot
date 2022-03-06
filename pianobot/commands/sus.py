@@ -15,11 +15,11 @@ class Sus(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        aliases = ['alt'],
-        brief = 'Check the suspiciousness of a player.',
-        help = 'View the approximate probability of a player being an alt account.',
-        name = 'sus',
-        usage = '<player>'
+        aliases=['alt'],
+        brief='Check the suspiciousness of a player.',
+        help='View the approximate probability of a player being an alt account.',
+        name='sus',
+        usage='<player>'
     )
     async def sus(self, ctx: commands.Context, player: str):
         await ctx.trigger_typing()
@@ -66,7 +66,7 @@ class Sus(commands.Cog):
         # Hypixel API
         async with ClientSession() as session, session.get(
             'https://api.hypixel.net/player',
-            params = {'key': 'd9a6b029-99ea-4620-ba52-6df35c61486b', 'uuid': uuid}
+            params={'key': 'd9a6b029-99ea-4620-ba52-6df35c61486b', 'uuid': uuid}
         ) as response:
             response = await response.json()
             first_hypixel_login = None
@@ -115,17 +115,17 @@ class Sus(commands.Cog):
         total_score = round(100 - sum(scores) / len(scores), 2)
 
         embed = Embed(
-            color = 0x00ff00 if total_score < 40 else (0xff0000 if total_score < 20 else 0xffff00),
-            description = 'The rating is based on following components:',
-            title = f'Suspiciousness of {player}: {total_score}%'
+            color=0x00ff00 if total_score < 40 else (0xff0000 if total_score < 20 else 0xffff00),
+            description='The rating is based on following components:',
+            title=f'Suspiciousness of {player}: {total_score}%'
         )
         for field, category, score in zip(embed_fields, categories, scores):
             embed.add_field(
-                inline = True,
-                name = field,
-                value = f'{category}\n{round(100 - score, 2)}% sus'
+                inline=True,
+                name=field,
+                value=f'{category}\n{round(100 - score, 2)}% sus'
             )
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
 def setup(bot: Pianobot):
     bot.add_cog(Sus(bot))

@@ -14,8 +14,8 @@ class Vote(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        hidden = True,
-        name = 'vote'
+        hidden=True,
+        name='vote'
     )
     async def vote(self, ctx: commands.Context):
         if not check_permissions(ctx.author, ctx.channel, 'manage_channels'):

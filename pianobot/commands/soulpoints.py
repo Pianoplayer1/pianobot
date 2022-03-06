@@ -11,14 +11,14 @@ class Soulpoints(commands.Cog):
         self.bot = bot
 
     @commands.command(
-        aliases = ['sp'],
-        brief = 'Returns a list of the next Wynncraft servers that will give you soul points.',
-        help =
+        aliases=['sp'],
+        brief='Returns a list of the next Wynncraft servers that will give you soul points.',
+        help=
             'If you are low on soul points, you can join one of the servers the bot returns to'
             ' get one or two soul points soon. The timers of the bot are not 100% accurate, so'
             ' if you do not get a soul point in the displayed time after joining the server,'
             ' you may join another one from the top of the list.',
-        name = 'soulpoints'
+        name='soulpoints'
     )
     async def soulpoints(self, ctx: commands.Context):
         worlds = [[world.world, world.time] for world in self.bot.database.worlds.get_all()]
