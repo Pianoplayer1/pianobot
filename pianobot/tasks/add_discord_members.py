@@ -16,5 +16,5 @@ async def add_discord_members(bot : Pianobot):
             bot.database.discord_members.add_or_update(
                 member.id,
                 member.nick or member.name,
-                member.avatar_url
+                str(member.avatar_url)
             )

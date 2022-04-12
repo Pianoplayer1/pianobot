@@ -12,7 +12,7 @@ class OnMemberRemove(Cog):
         self.bot.database.discord_members.update_and_remove(
             member.id,
             member.nick or member.name,
-            member.avatar_url
+            str(member.avatar_url)
         )
 
 def setup(bot: Pianobot):

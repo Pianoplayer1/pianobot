@@ -12,7 +12,7 @@ class OnMemberJoin(Cog):
         self.bot.database.discord_members.add_or_update(
             member.id,
             member.nick or member.name,
-            member.avatar_url
+            str(member.avatar_url)
         )
 
 def setup(bot: Pianobot):
