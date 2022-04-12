@@ -24,7 +24,7 @@ class Connection:
         getLogger('database').debug('Connected to database %s', self._database)
 
     def disconnect(self):
-        self.con.close()
+        self._con.close()
         getLogger('database').debug('Disconnected from database %s', self._database)
 
     def query(self, sql: str, *args) -> tuple:
