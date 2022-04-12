@@ -14,6 +14,7 @@ class OnMemberRemove(Cog):
             member.nick or member.name,
             str(member.avatar_url)
         )
+        self.bot.database.discord_member_roles.remove_all(member.id)
 
 def setup(bot: Pianobot):
     bot.add_cog(OnMemberRemove(bot))

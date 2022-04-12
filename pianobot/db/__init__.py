@@ -1,4 +1,5 @@
 from .connection import Connection
+from .discord_member_roles import DiscordMemberRoleTable
 from .discord_members import DiscordMemberTable
 from .discord_roles import DiscordRoleTable
 from .guild_activity import GuildActivityTable

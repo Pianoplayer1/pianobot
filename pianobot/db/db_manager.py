@@ -2,6 +2,7 @@ from os import getenv
 
 from pianobot.db import (
     Connection,
+    DiscordMemberRoleTable,
     DiscordMemberTable,
     DiscordRoleTable,
     GuildActivityTable,
@@ -37,6 +38,7 @@ class DBManager:
             getenv('PG_SITE_PASS'),
             getenv('PG_SITE_USER')
         )
+        self.discord_member_roles = DiscordMemberRoleTable(self._con_website)
         self.discord_members = DiscordMemberTable(self._con_website)
         self.discord_roles = DiscordRoleTable(self._con_website)
 
