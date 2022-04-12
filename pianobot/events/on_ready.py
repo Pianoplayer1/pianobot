@@ -7,6 +7,7 @@ from discord.ext.tasks import loop
 from pianobot import Pianobot
 from pianobot.tasks import (
     add_discord_members,
+    add_discord_roles,
     guild_activity,
     guild_leaderboard,
     member_activity,
@@ -33,6 +34,9 @@ class OnReady(Cog):
         start = perf_counter()
         await add_discord_members(self.bot)
         self.logger.info('Discord members finished in %s seconds', perf_counter() - start)
+        start = perf_counter()
+        await add_discord_roles(self.bot)
+        self.logger.info('Discord roles finished in %s seconds', perf_counter() - start)
 
     @loop(seconds=30)
     async def loop_30s(self):
