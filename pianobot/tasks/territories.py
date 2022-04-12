@@ -1,3 +1,4 @@
+from logging import getLogger
 from time import time
 
 from discord.errors import Forbidden
@@ -25,7 +26,7 @@ async def territories(bot: Pianobot):
                 await bot.get_channel(server.channel).send('Fully reclaimed!')
             except (AttributeError, Forbidden):
                 if server.channel != 0:
-                    print(f'Channel {server.channel} not found')
+                    getLogger('tasks.territories').warning('Channel %s not found', server.channel)
     if notify is None:
         return
 
@@ -58,4 +59,4 @@ async def territories(bot: Pianobot):
             await bot.get_channel(server.channel).send(temp_msg)
         except (AttributeError, Forbidden):
             if server.channel != 0:
-                print(f'Channel {server.channel} not found')
+                getLogger('tasks.territories').warning('Channel %s not found', server.channel)

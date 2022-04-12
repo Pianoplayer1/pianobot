@@ -1,5 +1,5 @@
-from sys import stderr
-from traceback import print_exception
+from logging import getLogger
+from traceback import TracebackException
 
 from discord import HTTPException
 from discord.ext import commands
@@ -12,7 +12,7 @@ class OnCommandError(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx: commands.Context, error):
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
         if hasattr(ctx.command, 'on_error'):
             return
         cog: commands.Cog = ctx.cog
@@ -51,8 +51,16 @@ class OnCommandError(commands.Cog):
         elif isinstance(error, commands.CommandNotFound):
             pass
         else:
-            print(f'Ignoring exception in command {ctx.command}:', file=stderr)
-            print_exception(type(error), error, error.__traceback__, file=stderr)
+            getLogger('commands').warning(
+                'Ignoring exception in command %s:\n%s',
+                ctx.command,
+                "".join(TracebackException(
+                    type(error),
+                    error,
+                    error.__traceback__,
+                    compact=True
+                ).format())
+            )
 
 def setup(bot: Pianobot):
     bot.add_cog(OnCommandError(bot))

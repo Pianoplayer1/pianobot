@@ -1,3 +1,4 @@
+from logging import getLogger
 from os import listdir
 
 from corkus import Corkus
@@ -25,6 +26,7 @@ class Pianobot(commands.Bot):
 
         self.corkus = Corkus()
         self.database = DBManager()
+        self.logger = getLogger('bot')
 
         with open('tracked_guilds.txt', 'r', encoding='UTF-8') as file:
             self.tracked_guilds = {
@@ -47,9 +49,8 @@ class Pianobot(commands.Bot):
             try:
                 self.load_extension(f'{path.replace("/", ".")}.{extension}')
             except ExtensionFailed as exc:
-                print(f'Could not load ./{path}/{extension}')
-                print(exc.__cause__)
+                self.logger.warning('Could not load ./%s/%s\n%s', path, extension, exc.__cause__)
 
     def shutdown(self) -> None:
         self.database.disconnect()
-        print('Bot exited')
+        self.logger.info('Bot exited')

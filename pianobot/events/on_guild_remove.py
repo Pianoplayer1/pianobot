@@ -9,7 +9,7 @@ class OnGuildRemove(Cog):
 
     @Cog.listener()
     async def on_guild_remove(self, guild: Guild):
-        print(f'Left {guild.name}')
+        self.bot.logger.info(f'Left {guild.name}')
         self.bot.database.servers.remove(guild.id)
 
 def setup(bot: Pianobot):

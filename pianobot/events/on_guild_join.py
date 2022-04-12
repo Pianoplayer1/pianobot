@@ -9,7 +9,7 @@ class OnGuildJoin(Cog):
 
     @Cog.listener()
     async def on_guild_join(self, guild: Guild):
-        print(f'Joined {guild.name}')
+        self.bot.logger.info(f'Joined {guild.name}')
         self.bot.database.servers.add(guild.id)
 
 def setup(bot: Pianobot):
