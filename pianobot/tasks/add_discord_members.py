@@ -11,13 +11,13 @@ async def add_discord_members(bot : Pianobot):
             member.id not in db_members
             or db_members[member.id].nickname != (member.nick or member.name)
             or db_members[member.id].username != member.name
-            or db_members[member.id].tag != member.tag
+            or db_members[member.id].tag != int(member.discriminator.split('#')[1])
             or db_members[member.id].avatar_url != str(member.avatar_url)
         ):
             bot.database.discord_members.add_or_update(
                 member.id,
                 member.nick or member.name,
                 member.name,
-                member.tag,
+                int(member.discriminator.split('#')[1]),
                 str(member.avatar_url)
             )

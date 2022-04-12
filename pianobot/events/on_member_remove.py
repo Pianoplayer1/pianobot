@@ -13,7 +13,7 @@ class OnMemberRemove(Cog):
             member.id,
             member.nick or member.name,
             member.name,
-            member.tag,
+            int(member.discriminator.split('#')[1]),
             str(member.avatar_url)
         )
         self.bot.database.discord_member_roles.remove_all(member.id)
