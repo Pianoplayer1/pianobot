@@ -33,14 +33,14 @@ class OnReady(Cog):
     @loop(count=1)
     async def loop_once(self):
         start = perf_counter()
-        await add_discord_member_roles(self.bot)
-        self.logger.info('Discord member roles finished in %s seconds', perf_counter() - start)
-        start = perf_counter()
         await add_discord_members(self.bot)
         self.logger.info('Discord members finished in %s seconds', perf_counter() - start)
         start = perf_counter()
         await add_discord_roles(self.bot)
         self.logger.info('Discord roles finished in %s seconds', perf_counter() - start)
+        start = perf_counter()
+        await add_discord_member_roles(self.bot)
+        self.logger.info('Discord member roles finished in %s seconds', perf_counter() - start)
 
     @loop(seconds=30)
     async def loop_30s(self):
