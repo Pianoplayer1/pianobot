@@ -7,6 +7,7 @@ async def add_discord_members(bot : Pianobot):
     discord_members: list[Member] = bot.get_guild(682671629213368351).members
 
     for member in discord_members:
+        print(member.discriminator)
         if (
             member.id not in db_members
             or db_members[member.id].nickname != (member.nick or member.name)
@@ -14,7 +15,6 @@ async def add_discord_members(bot : Pianobot):
             or db_members[member.id].tag != int(member.discriminator.split('#')[1])
             or db_members[member.id].avatar_url != str(member.avatar_url)
         ):
-            print(member.discriminator)
             bot.database.discord_members.add_or_update(
                 member.id,
                 member.nick or member.name,
