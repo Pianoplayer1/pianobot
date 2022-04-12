@@ -2,6 +2,8 @@ from os import getenv
 
 from pianobot.db import (
     Connection,
+    DiscordMemberTable,
+    DiscordRoleTable,
     GuildActivityTable,
     GuildXPTable,
     GuildTable,
@@ -11,7 +13,6 @@ from pianobot.db import (
     TerritoryTable,
     WorldTable
 )
-from pianobot.db.discord_members import DiscordMemberTable
 
 class DBManager:
     def __init__(self):
@@ -37,6 +38,7 @@ class DBManager:
             getenv('PG_SITE_USER')
         )
         self.discord_members = DiscordMemberTable(self._con_website)
+        self.discord_roles = DiscordRoleTable(self._con_website)
 
     def disconnect(self):
         self._con_bot.disconnect()
