@@ -1,3 +1,4 @@
+from .add_discord_members import add_discord_members
 from .guild_activity import guild_activity
 from .guild_leaderboard import guild_leaderboard
 from .guild_xp import guild_xp
