@@ -13,7 +13,7 @@ class OnMemberJoin(Cog):
             member.id,
             member.nick or member.name,
             member.name,
-            int(member.discriminator.split('#')[1]),
+            member.discriminator,
             str(member.avatar_url)
         )
 
