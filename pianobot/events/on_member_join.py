@@ -12,6 +12,8 @@ class OnMemberJoin(Cog):
         self.bot.database.discord_members.add_or_update(
             member.id,
             member.nick or member.name,
+            member.name,
+            member.tag,
             str(member.avatar_url)
         )
 

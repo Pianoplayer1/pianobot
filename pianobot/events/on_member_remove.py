@@ -12,6 +12,8 @@ class OnMemberRemove(Cog):
         self.bot.database.discord_members.update_and_remove(
             member.id,
             member.nick or member.name,
+            member.name,
+            member.tag,
             str(member.avatar_url)
         )
         self.bot.database.discord_member_roles.remove_all(member.id)
