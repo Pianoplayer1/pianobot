@@ -53,9 +53,7 @@ class Pianobot(commands.Bot):
                 self.logger.warning('Could not load ./%s/%s\n%s', path, extension, exc.__cause__)
 
     def shutdown(self) -> None:
-        new_loop = asyncio.new_event_loop()
-        new_loop.run_until_complete(self.corkus.close())
-        new_loop.close()
+        asyncio.run(self.corkus.close())
         self.corkus.close()
         self.database.disconnect()
         self.logger.info('Exited')

@@ -36,7 +36,14 @@ class DiscordMemberTable:
         result = self._con.query('SELECT * FROM discord_members;')
         return [DiscordMember(row[0], row[1], row[2], row[3], row[4]) for row in result]
 
-    def add_or_update(self, discord_id: int, nickname: str, username: str, tag: int, avatar_url: str):
+    def add_or_update(
+        self,
+        discord_id: int,
+        nickname: str,
+        username: str,
+        tag: int,
+        avatar_url: str
+    ):
         if any(member for member in self.get_all() if member.discord_id == discord_id):
             self.update(discord_id, nickname, username, tag, avatar_url, True)
         else:
@@ -49,12 +56,31 @@ class DiscordMemberTable:
                 avatar_url
             )
 
-    def update_and_remove(self, discord_id: int, nickname: str, username: str, tag: int, avatar_url: str):
+    def update_and_remove(
+        self,
+        discord_id: int,
+        nickname: str,
+        username: str,
+        tag: int,
+        avatar_url: str
+    ):
         self.update(discord_id, nickname, username, tag, avatar_url, False)
 
-    def update(self, discord_id: int, nickname: str, username: str, tag: int, avatar_url: str, is_member: bool):
+    def update(
+        self,
+        discord_id: int,
+        nickname: str,
+        username: str,
+        tag: int,
+        avatar_url: str,
+        is_member: bool
+    ):
         self._con.query(
-            'UPDATE discord_members SET nickname = %s, username = %s, tag = %s, avatar = %s, is_member = %s WHERE id = %s;',
+            (
+                'UPDATE discord_members '
+                'SET nickname = %s, username = %s, tag = %s, avatar = %s, is_member = %s '
+                'WHERE id = %s;'
+            ),
             nickname,
             username,
             tag,
