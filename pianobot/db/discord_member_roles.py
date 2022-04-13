@@ -38,6 +38,6 @@ class DiscordMemberRoleTable:
             member_id,
             role_id
         )
-    
+
     def remove_all(self, member_id: int):
         self._con.query('DELETE FROM discord_member_roles WHERE member_id = %s', member_id)

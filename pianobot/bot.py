@@ -54,7 +54,7 @@ class Pianobot(commands.Bot):
 
     def shutdown(self) -> None:
         new_loop = asyncio.new_event_loop()
-        new_loop.run_until_complete(self.corkus.close)
+        new_loop.run_until_complete(self.corkus.close())
         new_loop.close()
         self.corkus.close()
         self.database.disconnect()
