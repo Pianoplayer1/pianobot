@@ -1,3 +1,4 @@
+import asyncio
 from logging import getLogger
 from os import listdir
 
@@ -52,6 +53,9 @@ class Pianobot(commands.Bot):
                 self.logger.warning('Could not load ./%s/%s\n%s', path, extension, exc.__cause__)
 
     def shutdown(self) -> None:
+        new_loop = asyncio.new_event_loop()
+        new_loop.run_until_complete(self.corkus.close)
+        new_loop.close()
         self.corkus.close()
         self.database.disconnect()
         self.logger.info('Exited')
