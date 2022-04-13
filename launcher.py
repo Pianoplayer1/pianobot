@@ -1,14 +1,14 @@
-from logging import basicConfig, getLogger, ERROR, INFO
-from os import getenv
+import logging
+import os
 
 from pianobot import Pianobot
 
 def main():
-    basicConfig(level=INFO)
-    getLogger('discord.gateway').setLevel(ERROR)
+    logging.basicConfig(level=logging.INFO)
+    logging.getLogger('discord').setLevel(logging.WARNING)
 
     bot = Pianobot()
-    bot.run(getenv('TOKEN'))
+    bot.run(os.getenv('TOKEN'))
     bot.shutdown()
 
 if __name__ == '__main__':

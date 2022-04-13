@@ -52,5 +52,6 @@ class Pianobot(commands.Bot):
                 self.logger.warning('Could not load ./%s/%s\n%s', path, extension, exc.__cause__)
 
     def shutdown(self) -> None:
+        self.corkus.close()
         self.database.disconnect()
-        self.logger.info('Bot exited')
+        self.logger.info('Exited')

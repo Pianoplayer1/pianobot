@@ -24,7 +24,7 @@ class OnReady(Cog):
 
     @Cog.listener()
     async def on_ready(self):
-        self.bot.logger.info('Bot booted up')
+        self.bot.logger.info('Booted up')
         self.loop_once.start()
         self.loop_30s.start()
         self.loop_1m.start()
