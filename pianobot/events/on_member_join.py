@@ -9,13 +9,7 @@ class OnMemberJoin(Cog):
 
     @Cog.listener()
     async def on_member_join(self, member: Member):
-        self.bot.database.discord_members.add_or_update(
-            member.id,
-            member.nick or member.name,
-            member.name,
-            member.discriminator,
-            str(member.avatar_url)
-        )
+        self.bot.database.discord_members.add_or_update(member)
 
 def setup(bot: Pianobot):
     bot.add_cog(OnMemberJoin(bot))

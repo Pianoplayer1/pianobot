@@ -9,7 +9,7 @@ from pianobot.db import (
     GuildXPTable,
     GuildTable,
     MemberActivityTable,
-    MemberTable,
+    MinecraftMemberTable,
     ServerTable,
     TerritoryTable,
     WorldTable
@@ -27,7 +27,6 @@ class DBManager:
         self.guild_xp = GuildXPTable(self._con_bot)
         self.guilds = GuildTable(self._con_bot)
         self.member_activity = MemberActivityTable(self._con_bot)
-        self.members = MemberTable(self._con_bot)
         self.servers = ServerTable(self._con_bot)
         self.territories = TerritoryTable(self._con_bot)
         self.worlds = WorldTable(self._con_bot)
@@ -41,6 +40,7 @@ class DBManager:
         self.discord_member_roles = DiscordMemberRoleTable(self._con_website)
         self.discord_members = DiscordMemberTable(self._con_website)
         self.discord_roles = DiscordRoleTable(self._con_website)
+        self.minecraft_members = MinecraftMemberTable(self._con_website)
 
     def disconnect(self):
         self._con_bot.disconnect()

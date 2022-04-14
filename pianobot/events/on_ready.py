@@ -11,10 +11,11 @@ from pianobot.tasks import (
     add_discord_roles,
     guild_activity,
     guild_leaderboard,
+    guild_xp,
     member_activity,
     territories,
-    worlds,
-    guild_xp
+    update_minecraft_members,
+    worlds
 )
 
 class OnReady(Cog):
@@ -68,6 +69,9 @@ class OnReady(Cog):
         start = perf_counter()
         await guild_xp(self.bot)
         self.logger.debug('Guild XP finished in %s seconds', perf_counter() - start)
+        start = perf_counter()
+        await update_minecraft_members(self.bot)
+        self.logger.debug('Minecraft members finished in %s seconds', perf_counter() - start)
 
 def setup(bot: Pianobot):
     bot.add_cog(OnReady(bot))

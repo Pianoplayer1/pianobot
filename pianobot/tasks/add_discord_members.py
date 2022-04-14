@@ -14,10 +14,4 @@ async def add_discord_members(bot : Pianobot):
             or db_members[member.id].tag != member.discriminator
             or db_members[member.id].avatar_url != str(member.avatar_url)
         ):
-            bot.database.discord_members.add_or_update(
-                member.id,
-                member.nick or member.name,
-                member.name,
-                member.discriminator,
-                str(member.avatar_url)
-            )
+            bot.database.discord_members.add_or_update(member)
