@@ -13,17 +13,23 @@ async def update_minecraft_members(bot : Pianobot):
         bot.database.minecraft_members.remove(uuid)
 
 async def process(member: Member, bot: Pianobot, db_members: list[MinecraftMember]):
+    player = await member.fetch_player()
     if member.uuid.string() not in db_members:
         bot.database.minecraft_members.add(
             member.uuid.string(),
-            member.join_date
+            member.username,
+            member.rank.name,
+            member.join_date,
+            player.last_online,
+            player.online,
+            member.contributed_xp
         )
-    player = await member.fetch_player()
-    bot.database.minecraft_members.update(
-        member.uuid.string(),
-        member.username,
-        member.rank.name,
-        player.last_online,
-        player.online,
-        member.contributed_xp
-    )
+    else:
+        bot.database.minecraft_members.update(
+            member.uuid.string(),
+            member.username,
+            member.rank.name,
+            player.last_online,
+            player.online,
+            member.contributed_xp
+        )

@@ -50,11 +50,26 @@ class MinecraftMemberTable:
             MinecraftMember(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in res
         ]
 
-    def add(self, uuid: str, joined: datetime):
+    def add(
+        self,
+        uuid: str,
+        name: str,
+        rank: str,
+        joined: datetime,
+        last_seen: datetime,
+        online: bool,
+        gxp: int
+    ):
         self._con.query(
-            'INSERT INTO minecraft_members (uuid, joined) VALUES (%s, %s);',
+            'INSERT INTO minecraft_members VALUES (%s, %s, %s, %s, %s, %s, %s);',
             uuid,
-            joined)
+            name,
+            rank,
+            joined,
+            last_seen,
+            online,
+            gxp,
+        )
 
     def update(self, uuid: str, name: str, rank: str, last_seen: datetime, online: bool, gxp: int):
         self._con.query(

@@ -43,12 +43,13 @@ class DiscordMemberTable:
             self.update(member, True)
         else:
             self._con.query(
-                'INSERT INTO discord_members VALUES (%s, %s, %s, %s, %s, 1);',
+                'INSERT INTO discord_members VALUES (%s, %s, %s, %s, %s, %s);',
                 member.id,
                 member.nick or member.name,
                 member.name,
                 member.discriminator,
-                str(member.avatar_url)
+                str(member.avatar_url),
+                True
             )
 
     def update_and_remove(self, member: Member):
@@ -63,6 +64,6 @@ class DiscordMemberTable:
             member.name,
             member.discriminator,
             str(member.avatar_url),
-            1 if is_member else 0,
+            is_member,
             member.id
         )
