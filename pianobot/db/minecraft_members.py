@@ -74,7 +74,7 @@ class MinecraftMemberTable:
     def update(self, uuid: str, name: str, rank: str, last_seen: datetime, online: bool, gxp: int):
         self._con.query(
             'UPDATE minecraft_members '
-            'SET name = %s, rank = %s, last_seen = %s, joined = %s, xp = %s '
+            'SET name = %s, rank = %s, last_seen = %s, online = %s, xp = %s '
             'WHERE uuid = %s;',
             name,
             rank,
