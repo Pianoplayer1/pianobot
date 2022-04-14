@@ -33,7 +33,7 @@ class MinecraftMember:
         return self._last_seen
 
     @property
-    def online(self) -> int:
+    def online(self) -> bool:
         return self._online
 
     @property
@@ -83,6 +83,6 @@ class MinecraftMemberTable:
             gxp,
             uuid
         )
-    
+
     def remove(self, uuid: str):
         self._con.query('DELETE FROM minecraft_members WHERE uuid = %s;', uuid)
