@@ -10,21 +10,21 @@ from pianobot.tasks import (
     add_discord_members,
     add_discord_roles,
     guild_activity,
-    guild_leaderboard,
     guild_xp,
     member_activity,
     territories,
     update_minecraft_members,
-    worlds
+    worlds,
 )
 
+
 class OnReady(Cog):
-    def __init__(self, bot: Pianobot):
+    def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
         self.logger = getLogger('tasks')
 
     @Cog.listener()
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         self.bot.logger.info('Booted up')
         self.loop_once.start()
         self.loop_30s.start()
@@ -32,7 +32,7 @@ class OnReady(Cog):
         self.loop_5m.start()
 
     @loop(count=1)
-    async def loop_once(self):
+    async def loop_once(self) -> None:
         start = perf_counter()
         await add_discord_members(self.bot)
         self.logger.debug('Discord members finished in %s seconds', perf_counter() - start)
@@ -44,7 +44,7 @@ class OnReady(Cog):
         self.logger.debug('Discord member roles finished in %s seconds', perf_counter() - start)
 
     @loop(seconds=30)
-    async def loop_30s(self):
+    async def loop_30s(self) -> None:
         start = perf_counter()
         await territories(self.bot)
         self.logger.debug('Territory finished in %s seconds', perf_counter() - start)
@@ -53,16 +53,13 @@ class OnReady(Cog):
         self.logger.debug('World finished in %s seconds', perf_counter() - start)
 
     @loop(seconds=60)
-    async def loop_1m(self):
-        start = perf_counter()
-        await guild_leaderboard(self.bot)
-        self.logger.debug('Guild Leaderboard finished in %s seconds', perf_counter() - start)
+    async def loop_1m(self) -> None:
         start = perf_counter()
         await member_activity(self.bot)
         self.logger.debug('Member Activity finished in %s seconds', perf_counter() - start)
 
     @loop(seconds=300)
-    async def loop_5m(self):
+    async def loop_5m(self) -> None:
         start = perf_counter()
         await guild_activity(self.bot)
         self.logger.debug('Guild Activity finished in %s seconds', perf_counter() - start)
@@ -73,5 +70,6 @@ class OnReady(Cog):
         await update_minecraft_members(self.bot)
         self.logger.debug('Minecraft members finished in %s seconds', perf_counter() - start)
 
-def setup(bot: Pianobot):
+
+def setup(bot: Pianobot) -> None:
     bot.add_cog(OnReady(bot))

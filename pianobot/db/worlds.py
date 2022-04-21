@@ -1,7 +1,8 @@
 from pianobot.db import Connection
 
+
 class World:
-    def __init__(self, world, time):
+    def __init__(self, world: str, time: int) -> None:
         self._world = world
         self._time = time
 
@@ -13,16 +14,17 @@ class World:
     def time(self) -> int:
         return self._time
 
+
 class WorldTable:
-    def __init__(self, con: Connection):
+    def __init__(self, con: Connection) -> None:
         self._con = con
 
     def get_all(self) -> list[World]:
-        result = self._con.query('SELECT * FROM worlds;')
+        result = self._con.query('SELECT * FROM worlds')
         return [World(row[0], row[1]) for row in result]
 
-    def add(self, world: str, time: int):
-        self._con.query('INSERT INTO worlds VALUES (%s, %s);', world, time)
+    def add(self, world: str, time: float) -> None:
+        self._con.query('INSERT INTO worlds VALUES (%s, %s)', world, time)
 
-    def remove(self, world: str):
-        self._con.query('DELETE FROM worlds WHERE world = %s;', world)
+    def remove(self, world: str) -> None:
+        self._con.query('DELETE FROM worlds WHERE world = %s', world)

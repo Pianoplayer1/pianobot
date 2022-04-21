@@ -3,14 +3,16 @@ from discord.ext.commands import Cog
 
 from pianobot import Pianobot
 
+
 class OnGuildJoin(Cog):
-    def __init__(self, bot: Pianobot):
+    def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
     @Cog.listener()
-    async def on_guild_join(self, guild: Guild):
+    async def on_guild_join(self, guild: Guild) -> None:
         self.bot.logger.info(f'Joined {guild.name}')
         self.bot.database.servers.add(guild.id)
 
-def setup(bot: Pianobot):
+
+def setup(bot: Pianobot) -> None:
     bot.add_cog(OnGuildJoin(bot))

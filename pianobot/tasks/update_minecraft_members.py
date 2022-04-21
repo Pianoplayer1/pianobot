@@ -1,18 +1,20 @@
 from asyncio import gather
 
-from corkus.objects import Member
+from corkus.objects.member import Member
 
 from pianobot import Pianobot
 from pianobot.db.minecraft_members import MinecraftMember
 
-async def update_minecraft_members(bot : Pianobot):
+
+async def update_minecraft_members(bot: Pianobot) -> None:
     db_members = {member.uuid: member for member in bot.database.minecraft_members.get_all()}
     eden = await bot.corkus.guild.get('Eden')
     await gather(*[process(member, bot, db_members) for member in eden.members])
     for uuid in set(db_members).difference({member.uuid.string() for member in eden.members}):
         bot.database.minecraft_members.remove(uuid)
 
-async def process(member: Member, bot: Pianobot, db_members: dict[str, MinecraftMember]):
+
+async def process(member: Member, bot: Pianobot, db_members: dict[str, MinecraftMember]) -> None:
     uuid = member.uuid.string()
     player = await member.fetch_player()
     if uuid not in db_members:
@@ -23,7 +25,7 @@ async def process(member: Member, bot: Pianobot, db_members: dict[str, Minecraft
             member.join_date,
             player.last_online,
             player.online,
-            member.contributed_xp
+            member.contributed_xp,
         )
     elif (
         member.username != db_members[uuid].name
@@ -38,5 +40,5 @@ async def process(member: Member, bot: Pianobot, db_members: dict[str, Minecraft
             member.rank.name.capitalize(),
             player.last_online,
             player.online,
-            member.contributed_xp
+            member.contributed_xp,
         )

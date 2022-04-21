@@ -2,8 +2,18 @@ from datetime import datetime
 
 from pianobot.db import Connection
 
+
 class MinecraftMember:
-    def __init__(self, uuid, name, rank, joined, last_seen, online, gxp):
+    def __init__(
+        self,
+        uuid: str,
+        name: str,
+        rank: str,
+        joined: datetime,
+        last_seen: datetime,
+        online: bool,
+        gxp: int,
+    ) -> None:
         self._uuid = uuid
         self._name = name
         self._rank = rank
@@ -40,12 +50,13 @@ class MinecraftMember:
     def gxp(self) -> int:
         return self._gxp
 
+
 class MinecraftMemberTable:
-    def __init__(self, con: Connection):
+    def __init__(self, con: Connection) -> None:
         self._con = con
 
     def get_all(self) -> list[MinecraftMember]:
-        res = self._con.query('SELECT * FROM minecraft_members;')
+        res = self._con.query('SELECT * FROM minecraft_members')
         return [
             MinecraftMember(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in res
         ]
@@ -58,10 +69,10 @@ class MinecraftMemberTable:
         joined: datetime,
         last_seen: datetime,
         online: bool,
-        gxp: int
-    ):
+        gxp: int,
+    ) -> None:
         self._con.query(
-            'INSERT INTO minecraft_members VALUES (%s, %s, %s, %s, %s, %s, %s);',
+            'INSERT INTO minecraft_members VALUES (%s, %s, %s, %s, %s, %s, %s)',
             uuid,
             name,
             rank,
@@ -71,18 +82,19 @@ class MinecraftMemberTable:
             gxp,
         )
 
-    def update(self, uuid: str, name: str, rank: str, last_seen: datetime, online: bool, gxp: int):
+    def update(
+        self, uuid: str, name: str, rank: str, last_seen: datetime, online: bool, gxp: int
+    ) -> None:
         self._con.query(
-            'UPDATE minecraft_members '
-            'SET name = %s, rank = %s, last_seen = %s, online = %s, xp = %s '
-            'WHERE uuid = %s;',
+            'UPDATE minecraft_members SET name = %s, rank = %s, last_seen = %s, online = %s, xp ='
+            ' %s WHERE uuid = %s',
             name,
             rank,
             last_seen,
             online,
             gxp,
-            uuid
+            uuid,
         )
 
-    def remove(self, uuid: str):
-        self._con.query('DELETE FROM minecraft_members WHERE uuid = %s;', uuid)
+    def remove(self, uuid: str) -> None:
+        self._con.query('DELETE FROM minecraft_members WHERE uuid = %s', uuid)

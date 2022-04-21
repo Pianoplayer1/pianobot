@@ -1,26 +1,28 @@
 from asyncio import gather, sleep
 
-from corkus.objects import Member
-
+from corkus.objects.member import Member
 from discord import Message
 from discord.ext import commands
 
 from pianobot import Pianobot
 from pianobot.utils import check_permissions, format_last_seen, paginator, table
 
+
 class Inactivity(commands.Cog):
-    def __init__(self, bot: Pianobot):
+    def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
     @commands.command(
         aliases=['act', 'activity', 'inact'],
         brief='Outputs the member inactivity times of a specified guild.',
-        help='This command returns a table with the times since each member of'
-            ' a specified guild has been last seen on the Wynncraft server.',
+        help=(
+            'This command returns a table with the times since each member of a specified guild'
+            ' has been last seen on the Wynncraft server.'
+        ),
         name='inactivity',
-        usage='<guild>'
+        usage='<guild>',
     )
-    async def inactivity(self, ctx: commands.Context, *, guild: str):
+    async def inactivity(self, ctx: commands.Context, *, guild: str) -> None:
         await ctx.trigger_typing()
         guilds = await self.bot.corkus.guild.list_all()
         guilds = [g.name for g in guilds]
@@ -44,20 +46,20 @@ class Inactivity(commands.Cog):
                 + '\n'.join([f'{match + 1}. {matches[match]}' for match in range(len(matches))])
             )
 
-            def check(msg: Message):
+            def check(msg: Message) -> bool:
                 return msg.author == ctx.author and msg.channel == ctx.channel
 
             answer_msg = await self.bot.wait_for('message', check=check)
-            if ctx.guild and check_permissions(self.bot.user, ctx.channel, ['manage_messages']):
+            if ctx.guild and check_permissions(self.bot.user, ctx.channel, 'manage_messages'):
                 await answer_msg.delete()
 
             try:
                 guild = matches[int(answer_msg.content) - 1]
             except (IndexError, ValueError):
                 if answer_msg.content == 'exit':
-                    await message.edit(content = 'Prompt exited.')
+                    await message.edit(content='Prompt exited.')
                 else:
-                    await message.edit(content = 'Invalid input, exited prompt.')
+                    await message.edit(content='Invalid input, exited prompt.')
                 await sleep(6)
                 await message.delete()
                 return
@@ -70,7 +72,7 @@ class Inactivity(commands.Cog):
 
         guild_stats = await self.bot.corkus.guild.get(guild)
         results = await gather(*[fetch(member) for member in guild_stats.members])
-        results = [result[1] for result in sorted(results, key = lambda item: item[0])]
+        results = [result[1] for result in sorted(results, key=lambda item: item[0])]
 
         columns = {f'{guild} Members': 36, 'Rank': 26, 'Time Inactive': 26}
         ascending_table = table(columns, results, 5, 15, True, '(Ascending Order)')
@@ -78,11 +80,13 @@ class Inactivity(commands.Cog):
         descending_table = table(columns, results, 5, 15, True, '(Descending Order)')
         await paginator(self.bot, ctx, descending_table, message, ascending_table)
 
-async def fetch(member: Member) -> list:
+
+async def fetch(member: Member) -> tuple[float, tuple[str, str, str]]:
     player = await member.fetch_player()
     raw_days, display_time = format_last_seen(player)
 
-    return [raw_days, [member.username, member.rank.value.title(), display_time]]
+    return raw_days, (member.username, member.rank.value.title(), display_time)
 
-def setup(bot: Pianobot):
+
+def setup(bot: Pianobot) -> None:
     bot.add_cog(Inactivity(bot))

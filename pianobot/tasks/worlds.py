@@ -2,7 +2,8 @@ from time import time
 
 from pianobot import Pianobot
 
-async def worlds(bot: Pianobot):
+
+async def worlds(bot: Pianobot) -> None:
     world_names = {world.world for world in bot.database.worlds.get_all()}
     online_players = await bot.corkus.network.online_players()
 

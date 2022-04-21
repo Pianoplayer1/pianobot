@@ -7,8 +7,9 @@ from corkus.objects.online_players import OnlinePlayers
 
 from pianobot import Pianobot
 
-async def guild_activity(bot: Pianobot):
-    guilds = {guild: None for guild in bot.tracked_guilds}
+
+async def guild_activity(bot: Pianobot) -> None:
+    guilds: dict[str, int | None] = {guild: None for guild in bot.tracked_guilds}
 
     players = await bot.corkus.network.online_players()
     results = await gather(*[fetch(bot.corkus, guild, players) for guild in guilds])
@@ -20,6 +21,7 @@ async def guild_activity(bot: Pianobot):
     bot.database.guild_activity.add(guilds)
 
     bot.database.guild_activity.cleanup()
+
 
 async def fetch(corkus: Corkus, name: str, players: OnlinePlayers) -> dict[str, int] | None:
     try:

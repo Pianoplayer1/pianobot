@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from asyncio import TimeoutError as AsyncioTimeoutError
 from typing import TYPE_CHECKING
 
@@ -8,20 +9,21 @@ from discord.ext.commands import Context
 if TYPE_CHECKING:
     from pianobot import Pianobot
 
+
 async def paginator(
     bot: Pianobot,
     ctx: Context,
     normal_contents: list[str],
-    message: Message = None,
-    reverse_contents: list[str] = None
-):
+    message: Message | None = None,
+    reverse_contents: list[str] | None = None,
+) -> None:
     contents = normal_contents
     page = 1
 
     if message is None:
-        message = await ctx.send(contents[page-1])
+        message = await ctx.send(contents[page - 1])
     else:
-        await message.edit(content = contents[page-1])
+        await message.edit(content=contents[page - 1])
 
     if len(contents) == 1:
         return
@@ -33,16 +35,15 @@ async def paginator(
     await message.add_reaction('▶️')
     await message.add_reaction('⏭️')
 
-    def check(reaction: Reaction, user: User):
+    def check(_reaction: Reaction, _user: User) -> bool:
         return (
-            user != bot.user
-            and str(reaction.emoji) in ['⏮️', '◀️', '🔁','▶️', '⏭️']
-            and reaction.message == message
+            _user != bot.user
+            and str(_reaction.emoji) in ['⏮️', '◀️', '🔁', '▶️', '⏭️']
+            and _reaction.message == message
         )
 
     while True:
         try:
-            reaction: Reaction = None
             reaction, user = await bot.wait_for('reaction_add', check=check, timeout=300)
             await message.remove_reaction(reaction, user)
 
@@ -52,7 +53,7 @@ async def paginator(
             elif str(reaction.emoji) == '▶️' and page != len(contents):
                 page += 1
                 await message.edit(content=f'{contents[page-1]}')
-            elif str(reaction.emoji) == '🔁':
+            elif str(reaction.emoji) == '🔁' and reverse_contents is not None:
                 if contents == normal_contents:
                     contents = reverse_contents
                 else:

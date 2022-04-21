@@ -1,22 +1,24 @@
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
-from discord import ClientUser, Guild, Member, User
-from discord.channel import TextChannel
+from discord import ClientUser, DMChannel, GroupChannel, Guild, Member, TextChannel, User
 
 if TYPE_CHECKING:
     from pianobot.db import ServerTable
 
+
 def check_permissions(
-    member : ClientUser | Member | User,
-    channel : TextChannel,
-    *permissions : tuple,
-    all_guilds: bool = True
+    user: ClientUser | Member | User,
+    channel: DMChannel | GroupChannel | TextChannel,
+    *permissions: str,
+    all_guilds: bool = True,
 ) -> bool:
-    if isinstance(member, (ClientUser, User)):
-        member = channel.guild.get_member(member.id)
-        if member is None:
-            return False
+    if not isinstance(channel, TextChannel):
+        return False
+    member = channel.guild.get_member(user.id)
+    if member is None:
+        return False
 
     all_permissions = [
         'create_instant_invite',
@@ -59,17 +61,17 @@ def check_permissions(
         'use_external_stickers',
         'send_messages_in_threads',
         'start_embedded_activities',
-        'moderate_members'
+        'moderate_members',
     ]
     value = channel.permissions_for(member).value
 
     existing = [perm for i, perm in enumerate(all_permissions) if value & pow(2, i) > 0]
     return (
-        (all(permission in existing for permission in permissions) or 'administrator' in existing)
-        and (all_guilds or channel.guild.id in (682671629213368351, 713710628258185258))
-    )
+        all(permission in existing for permission in permissions) or 'administrator' in existing
+    ) and (all_guilds or channel.guild.id in (682671629213368351, 713710628258185258))
 
-def get_prefix(servers: ServerTable, guild: Guild) -> str:
+
+def get_prefix(servers: ServerTable, guild: Guild | None) -> str:
     if guild is not None:
         server = servers.get(guild.id)
         if server is not None:

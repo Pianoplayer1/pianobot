@@ -1,17 +1,19 @@
 from datetime import datetime, timedelta, timezone
 
-from corkus.objects import Player
+from corkus.objects.player import Player
 
-def get_rounded_time(minutes: int):
+
+def get_rounded_time(minutes: int) -> str:
     time = datetime.utcnow()
     interval = minutes * 60
     seconds = (time.replace(tzinfo=None) - time.min).seconds
     difference = (seconds + interval / 2) // interval * interval - seconds
     return str(time + timedelta(0, difference, -time.microsecond))
 
-def format_last_seen(player: Player) -> list[int, str]:
+
+def format_last_seen(player: Player) -> tuple[float, str]:
     if player.online:
-        days_offline = 0
+        days_offline = 0.0
         display_time = 'Online'
     else:
         diff = datetime.now(timezone.utc) - player.last_online

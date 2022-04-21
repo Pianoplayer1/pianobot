@@ -1,5 +1,6 @@
 from math import ceil
 
+
 def table(
     columns: dict[str, int],
     raw_data: list[list[str]],
@@ -7,7 +8,7 @@ def table(
     page_len: int = 0,
     enum: bool = False,
     label: str = '',
-    start_text: str = None
+    start_text: str | None = None,
 ) -> list[str]:
     if enum:
         columns[list(columns.keys())[0]] -= 5
@@ -16,11 +17,11 @@ def table(
     page_num = 1 if page_len == 0 else ceil(len(raw_data) / page_len)
     for page in range(page_num):
         try:
-            data = raw_data[page * page_len : (page+1) * page_len]
+            data = raw_data[page * page_len : (page + 1) * page_len]
         except IndexError:
-            data = raw_data[page * page_len : ]
+            data = raw_data[page * page_len :]
         if len(data) == 0:
-            data = raw_data[page * page_len : ]
+            data = raw_data[page * page_len :]
         message.append((start_text + '\n' if start_text else '') + '```ml\n│')
 
         if enum:
@@ -34,9 +35,8 @@ def table(
                 if enum:
                     message[page] += '─────'
                 for pos, column in enumerate(columns):
-                    message[page] += (
-                        '─' * (columns[column])
-                        + ('┼' if pos != len(columns) - 1 else '┤')
+                    message[page] += '─' * (columns[column]) + (
+                        '┼' if pos != len(columns) - 1 else '┤'
                     )
             count += 1
 

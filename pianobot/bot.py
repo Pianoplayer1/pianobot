@@ -3,15 +3,15 @@ from logging import getLogger
 from os import listdir
 
 from corkus import Corkus
-
 from discord import Intents, Message
-from discord.ext import commands
+from discord.ext.commands import Bot
 from discord.ext.commands.errors import ExtensionFailed
 
 from pianobot.db.db_manager import DBManager
 from pianobot.utils import get_prefix
 
-class Pianobot(commands.Bot):
+
+class Pianobot(Bot):
     def __init__(self) -> None:
         intents = Intents.default()
         intents.members = True
@@ -19,7 +19,7 @@ class Pianobot(commands.Bot):
             case_insensitive=True,
             command_prefix=self._get_prefixes,
             help_command=None,
-            intents=intents
+            intents=intents,
         )
 
         self._load_extension_folder('pianobot.commands')
@@ -34,14 +34,14 @@ class Pianobot(commands.Bot):
                 name: tag for line in file for (name, tag) in [line.strip().split(':')]
             }
 
-    async def _get_prefixes(self, _, message: Message) -> list[str]:
+    async def _get_prefixes(self, _: Bot, message: Message) -> list[str]:
         prefixes = [
             f'<@!{self.user.id}> ',
             f'<@{self.user.id}> ',
             f'<@!{self.user.id}>',
-            f'<@{self.user.id}>'
+            f'<@{self.user.id}>',
+            get_prefix(self.database.servers, message.guild),
         ]
-        prefixes.append(get_prefix(self.database.servers, message.guild))
         return prefixes
 
     def _load_extension_folder(self, path: str) -> None:

@@ -1,42 +1,45 @@
 from discord import File
 from discord.ext import commands
-
 from matplotlib import dates, pyplot
 
 from pianobot import Pianobot
 
+
 class Graph(commands.Cog):
-    def __init__(self, bot: Pianobot):
+    def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
     @commands.command(
         brief='Outputs the member activity of a guild as a line graph.',
-        help=
-            'This command returns a line graph with the number of members'
-            ' online in the last days.',
+        help=(
+            'This command returns a line graph with the number of members online in the last days.'
+        ),
         name='graph',
-        usage='<guild> -[days]'
+        usage='<guild> -[days]',
     )
-    async def graph(self, ctx: commands.Context, *, input_guild: str):
-        interval: int = 1
+    async def graph(self, ctx: commands.Context, *, input_guild: str) -> None:
+        interval = 1
         if '-' in input_guild:
-            input_guild, interval = input_guild.split(' -')
+            input_guild, str_interval = input_guild.split(' -')
             try:
-                interval = int(interval)
+                interval = int(str_interval)
             except ValueError:
                 await ctx.send('Interval must be a number!')
                 return
 
         guild = next(
-            (k for k, v in self.bot.tracked_guilds.items()
-                if k.lower() == input_guild.lower() or v.lower() == input_guild.lower()),
-            None
+            (
+                k
+                for k, v in self.bot.tracked_guilds.items()
+                if k.lower() == input_guild.lower() or v.lower() == input_guild.lower()
+            ),
+            None,
         )
         if guild is None:
             await ctx.send(f'`{input_guild}` is not a tracked guild!')
             return
 
-        data = self.bot.database.guild_activity.get(guild, interval)
+        data = self.bot.database.guild_activity.get(guild, f'{interval} day')
 
         plot, axes = pyplot.subplots()
         axes.plot(data.keys(), data.values())
@@ -49,5 +52,6 @@ class Graph(commands.Cog):
 
         await ctx.send(file=File('graph.png'))
 
-def setup(bot: Pianobot):
+
+def setup(bot: Pianobot) -> None:
     bot.add_cog(Graph(bot))

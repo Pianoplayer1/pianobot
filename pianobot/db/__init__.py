@@ -4,7 +4,6 @@ from .discord_members import DiscordMemberTable
 from .discord_roles import DiscordRoleTable
 from .guild_activity import GuildActivityTable
 from .guild_xp import GuildXPTable
-from .guilds import GuildTable
 from .member_activity import MemberActivityTable
 from .minecraft_members import MinecraftMemberTable
 from .servers import ServerTable

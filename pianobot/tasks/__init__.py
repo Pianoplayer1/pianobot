@@ -2,9 +2,8 @@ from .add_discord_member_roles import add_discord_member_roles
 from .add_discord_members import add_discord_members
 from .add_discord_roles import add_discord_roles
 from .guild_activity import guild_activity
-from .guild_leaderboard import guild_leaderboard
 from .guild_xp import guild_xp
 from .member_activity import member_activity
-from .update_minecraft_members import update_minecraft_members
 from .territories import territories
+from .update_minecraft_members import update_minecraft_members
 from .worlds import worlds
