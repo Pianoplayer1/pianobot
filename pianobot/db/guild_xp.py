@@ -38,8 +38,8 @@ class GuildXPTable:
     def get_first(self, interval: str) -> GuildXP | None:
         return self._bind(
             self._con.query(
-                f'SELECT * FROM "guildXP" WHERE time > (CURRENT_TIMESTAMP - {interval}::interval)'
-                ' ORDER BY time LIMIT 1'
+                'SELECT * FROM "guildXP" WHERE time > (CURRENT_TIMESTAMP -'
+                f' \'{interval}\'::interval) ORDER BY time LIMIT 1'
             )
         )
 
