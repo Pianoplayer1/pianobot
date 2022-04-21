@@ -12,7 +12,7 @@ class Connection:
         self._user = user
         self._con = self.connect()
 
-    def connect(self) -> psycopg2.connection:
+    def connect(self):
         con = psycopg2.connect(
             database=self._database,
             host=self._host,
