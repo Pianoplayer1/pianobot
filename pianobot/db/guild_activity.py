@@ -17,7 +17,7 @@ class GuildActivityTable:
             f'SELECT time, {guild} FROM "guildActivity" WHERE time > (CURRENT_TIMESTAMP -'
             f' \'{interval}\'::interval) AND {guild} IS NOT NULL ORDER BY time'
         )
-        return {} if len(result) == 0 else {result[0][0]: result[0][1]}
+        return {} if len(result) == 0 else {row[0]: row[1] for row in result}
 
     def add(self, data: dict[str, int | None]) -> None:
         rounded_time = get_rounded_time(minutes=5)
