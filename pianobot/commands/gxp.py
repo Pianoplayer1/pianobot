@@ -2,9 +2,10 @@ import math
 from datetime import datetime, timedelta
 
 from discord.ext import commands
+from discord.utils import format_dt
 
 from pianobot import Pianobot
-from pianobot.utils import paginator
+from pianobot.utils import legacy_paginator
 from pianobot.utils import table
 
 
@@ -30,15 +31,15 @@ class GXP(commands.Cog):
         first_weekday = first_weekday - timedelta(days=first_weekday.weekday())
 
         if unit == '':
-            oldest_data = self.bot.database.guild_xp.get(first_weekday)
-            last_data = self.bot.database.guild_xp.get_last()
+            oldest_data = await self.bot.database.guild_xp.get(first_weekday)
+            last_data = await self.bot.database.guild_xp.get_last()
             if len(last_data) == 0:
                 newest_data = None
             else:
                 newest_data = last_data[0]
         elif unit == 'final':
-            oldest_data = self.bot.database.guild_xp.get(first_weekday - timedelta(days=7))
-            newest_data = self.bot.database.guild_xp.get(first_weekday)
+            oldest_data = await self.bot.database.guild_xp.get(first_weekday - timedelta(days=7))
+            newest_data = await self.bot.database.guild_xp.get(first_weekday)
         else:
             if unit.startswith('-'):
                 unit = unit[1:]
@@ -49,8 +50,10 @@ class GXP(commands.Cog):
                 await ctx.send('Not a valid time unit!')
                 return
 
-            oldest_data = self.bot.database.guild_xp.get_first(f'{interval} {formatted_unit}')
-            recent_data = self.bot.database.guild_xp.get_last(2)
+            oldest_data = await self.bot.database.guild_xp.get_first(
+                f'{interval} {formatted_unit}'
+            )
+            recent_data = await self.bot.database.guild_xp.get_last(2)
             if oldest_data is None or oldest_data.time == recent_data[0].time:
                 oldest_data = recent_data[1]
             newest_data = recent_data[0]
@@ -58,10 +61,7 @@ class GXP(commands.Cog):
             await ctx.send('No data could be found. Try again later!')
             return
 
-        time = (
-            f'<t:{round((oldest_data.time - datetime(1970, 1, 1)).total_seconds())}>'
-            f' - <t:{round((newest_data.time - datetime(1970, 1, 1)).total_seconds())}>'
-        )
+        time = f'{format_dt(oldest_data.time)} - {format_dt(newest_data.time)}'
         differences = [
             [name, display(xp)]
             for name, xp in sorted(
@@ -74,7 +74,7 @@ class GXP(commands.Cog):
         ascending_table = table(table_cols, differences, 5, 15, True, '(Ascending Order)', time)
         differences.reverse()
         descending_table = table(table_cols, differences, 5, 15, True, '(Descending Order)', time)
-        await paginator(self.bot, ctx, descending_table, None, ascending_table)
+        await legacy_paginator(self.bot, ctx, descending_table, None, ascending_table)
 
 
 def display(num: int | float) -> str:
@@ -86,5 +86,5 @@ def display(num: int | float) -> str:
     return f'{num / 10 ** (3 * pos):.2f}{names[pos]}'
 
 
-def setup(bot: Pianobot) -> None:
-    bot.add_cog(GXP(bot))
+async def setup(bot: Pianobot) -> None:
+    await bot.add_cog(GXP(bot))

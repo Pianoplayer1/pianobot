@@ -19,17 +19,17 @@ class TerritoryTable:
     def __init__(self, con: Connection) -> None:
         self._con = con
 
-    def add(self, name: str, guild: str | None) -> None:
-        self._con.query(
-            'INSERT INTO territories VALUES (%s, %s) ON CONFLICT (name) DO NOTHING', name, guild
+    async def add(self, name: str, guild: str | None) -> None:
+        await self._con.execute(
+            'INSERT INTO territories VALUES ($1, $2) ON CONFLICT (name) DO NOTHING', name, guild
         )
 
-    def get_all(self) -> list[Territory]:
-        result = self._con.query('SELECT name, guild FROM territories')
+    async def get_all(self) -> list[Territory]:
+        result = await self._con.query('SELECT name, guild FROM territories')
         return [Territory(row[0], row[1]) for row in result]
 
-    def remove(self, name: str) -> None:
-        self._con.query('DELETE FROM territories WHERE name = %s', name)
+    async def remove(self, name: str) -> None:
+        await self._con.execute('DELETE FROM territories WHERE name = $1', name)
 
-    def update(self, name: str, guild: str | None) -> None:
-        self._con.query('UPDATE territories SET guild = %s WHERE name = %s', guild, name)
+    async def update(self, name: str, guild: str | None) -> None:
+        await self._con.execute('UPDATE territories SET guild = $1 WHERE name = $2', guild, name)

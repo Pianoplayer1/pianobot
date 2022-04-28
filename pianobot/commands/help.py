@@ -25,7 +25,7 @@ class Help(commands.Cog):
             'I am a utility bot for various different Wynncraft related things.\n\nList of'
             ' commands:\n```'
         )
-        prefix = get_prefix(self.bot.database.servers, ctx.guild)
+        prefix = await get_prefix(self.bot.database.servers, ctx.guild)
 
         visible_commands = {
             cmd: [cmd.name.lower()]
@@ -73,5 +73,5 @@ class Help(commands.Cog):
         )
 
 
-def setup(bot: Pianobot) -> None:
-    bot.add_cog(Help(bot))
+async def setup(bot: Pianobot) -> None:
+    await bot.add_cog(Help(bot))

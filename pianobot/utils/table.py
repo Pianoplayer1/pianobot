@@ -7,7 +7,7 @@ def table(
     seperator: int = 0,
     page_len: int = 0,
     enum: bool = False,
-    label: str = '',
+    label: str | None = None,
     start_text: str | None = None,
 ) -> list[str]:
     if enum:
@@ -50,7 +50,9 @@ def table(
                     message[page] += ' ' * (list(columns.values())[i]) + '│'
 
         if page_num > 1:
-            message[page] += f'\n\nPage {page + 1} / {page_num} {label}'
+            message[page] += f'\n\nPage {page + 1} / {page_num}'
+            if label is not None:
+                message[page] += f' {label}'
         message[page] += '```'
 
     return message

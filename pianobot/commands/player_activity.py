@@ -1,12 +1,13 @@
 from uuid import uuid4
 
-from discord import Embed
+from corkus.errors import BadRequest
+from discord import Embed, Interaction, app_commands
 from discord.ext import commands
 
 from pianobot import Pianobot
 
 
-class PlayerActivity(commands.Cog):
+class LegacyPlayerActivity(commands.Cog):
     def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
@@ -20,7 +21,13 @@ class PlayerActivity(commands.Cog):
         name='playerActivity',
         usage='<player> [days]',
     )
-    async def graph(self, ctx: commands.Context, player: str, interval: str = '14') -> None:
+    async def pact(self, ctx: commands.Context, player: str, interval: str = '14') -> None:
+        await ctx.send(
+            '```prolog\nNote: this command has been updated with a slash command version:\n     '
+            ' \'/pact <player> [days]\' is the new way to access player activity charts.\n     '
+            ' \'-pAct <player> [interval]\' (the command you just used) will only work for'
+            ' limited time.```'
+        )
         if interval.startswith('-'):
             interval = interval[1:]
         try:
@@ -40,5 +47,37 @@ class PlayerActivity(commands.Cog):
         await ctx.send(embed=embed)
 
 
-def setup(bot: Pianobot) -> None:
-    bot.add_cog(PlayerActivity(bot))
+class PlayerActivity(commands.Cog):
+    def __init__(self, bot: Pianobot) -> None:
+        self.bot = bot
+
+    @app_commands.command(description='Activity of a Wynncraft player in a set interval')
+    @app_commands.describe(
+        player='Username of the player to get activity for',
+        days='How many days the data should go back',
+    )
+    async def pact(self, interaction: Interaction, player: str, days: int = 14) -> None:
+        try:
+            wynn_player = await self.bot.corkus.player.get(player)
+        except BadRequest:
+            await interaction.response.send_message('Not a valid Wynncraft player!')
+            return
+
+        embed = Embed()
+        embed.set_author(
+            icon_url=f'https://mc-heads.net/head/{wynn_player.username}.png',
+            name=wynn_player.username,
+        )
+        embed.set_image(
+            url=(
+                'https://wynnstats.dieterblancke.xyz/api/charts'
+                f'/onlinetime/{wynn_player.username}/{days}?caching={uuid4()}'
+            )
+        )
+        embed.set_footer(text='Player tracking from \'WynnStats\' by Dieter Blancke')
+        await interaction.response.send_message(embed=embed)
+
+
+async def setup(bot: Pianobot) -> None:
+    await bot.add_cog(LegacyPlayerActivity(bot))
+    await bot.add_cog(PlayerActivity(bot))

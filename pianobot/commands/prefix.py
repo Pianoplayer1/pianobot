@@ -1,7 +1,6 @@
 from discord.ext import commands
 
 from pianobot import Pianobot
-from pianobot.utils import check_permissions
 
 
 class Prefix(commands.Cog):
@@ -27,12 +26,12 @@ class Prefix(commands.Cog):
         if len(new) > 3:
             await ctx.send('A prefix cannot be longer than 3 characters!')
             return
-        if not check_permissions(ctx.author, ctx.channel, 'manage_guild'):
+        if not ctx.channel.permissions_for(ctx.author).manage_guild:
             await ctx.send('You don\'t have the required permissions to perform this action!')
             return
-        self.bot.database.servers.update_prefix(ctx.guild.id, new)
+        await self.bot.database.servers.update_prefix(ctx.guild.id, new)
         await ctx.send(f'Prefix changed to \'{new}\'')
 
 
-def setup(bot: Pianobot) -> None:
-    bot.add_cog(Prefix(bot))
+async def setup(bot: Pianobot) -> None:
+    await bot.add_cog(Prefix(bot))

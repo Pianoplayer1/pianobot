@@ -1,18 +1,22 @@
+from __future__ import annotations
+
 from math import floor, log10
+from typing import TYPE_CHECKING
 
 from discord import TextChannel
 
-from pianobot import Pianobot
+if TYPE_CHECKING:
+    from pianobot import Pianobot
 
 
 async def guild_xp(bot: Pianobot) -> None:
     guild = await bot.corkus.guild.get('Eden')
     current_xp = {member.username: member.contributed_xp for member in guild.members}
 
-    bot.database.guild_xp.update_columns(list(current_xp.keys()))
-    bot.database.guild_xp.add(current_xp)
+    await bot.database.guild_xp.update_columns(list(current_xp.keys()))
+    await bot.database.guild_xp.add(current_xp)
 
-    data = bot.database.guild_xp.get_last(2)
+    data = await bot.database.guild_xp.get_last(2)
     new = data[0]
     old = data[1]
     xp_diff = [
@@ -31,7 +35,7 @@ async def guild_xp(bot: Pianobot) -> None:
     if channel is not None and isinstance(channel, TextChannel):
         await channel.send(msg)
 
-    bot.database.guild_xp.cleanup()
+    await bot.database.guild_xp.cleanup()
 
 
 def display(num: float) -> str:

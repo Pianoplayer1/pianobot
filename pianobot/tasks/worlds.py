@@ -1,17 +1,21 @@
-from time import time
+from __future__ import annotations
 
-from pianobot import Pianobot
+from time import time
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pianobot import Pianobot
 
 
 async def worlds(bot: Pianobot) -> None:
-    world_names = {world.world for world in bot.database.worlds.get_all()}
+    world_names = {world.world for world in await bot.database.worlds.get_all()}
     online_players = await bot.corkus.network.online_players()
 
     for server in online_players.servers:
         if server.name in world_names:
             world_names.remove(server.name)
         else:
-            bot.database.worlds.add(server.name, time())
+            await bot.database.worlds.add(server.name, time())
 
     for world in world_names:
-        bot.database.worlds.remove(world)
+        await bot.database.worlds.remove(world)

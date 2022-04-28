@@ -16,7 +16,7 @@ class OnCommandError(commands.Cog):
     async def on_command_error(self, ctx: commands.Context, error: commands.CommandError) -> None:
         if hasattr(ctx.command, 'on_error'):
             return
-        prefix = get_prefix(self.bot.database.servers, ctx.guild)
+        prefix = await get_prefix(self.bot.database.servers, ctx.guild)
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(
@@ -30,12 +30,12 @@ class OnCommandError(commands.Cog):
                 pass
         elif isinstance(error, commands.errors.BadArgument):
             await ctx.send(
-                'One of your command arguments is wrong. Refer to `{prefix}help {ctx.command}` for'
-                ' detailed information.'
+                f'One of your command arguments is wrong. Refer to `{prefix}help {ctx.command}`'
+                ' for detailed information.'
             )
         elif isinstance(error, commands.MissingPermissions):
             if ctx.guild:
-                perms = ''.join(f'\n- `{perm}`' for perm in error.missing_perms)
+                perms = ''.join(f'\n- `{perm}`' for perm in error.missing_permissions)
                 await ctx.send(
                     'You do not have the required permissions to run this command!\nFollowing'
                     f' permissions are needed:\n{perms}'
@@ -43,7 +43,7 @@ class OnCommandError(commands.Cog):
             else:
                 await ctx.send(f'`{prefix}{ctx.command}` cannot be used in private messages.')
         elif isinstance(error, commands.CommandNotFound):
-            pass
+            self.bot.logger.info(error.args[0])
         else:
             getLogger('commands').warning(
                 'Ignoring exception in command %s:\n%s',
@@ -56,5 +56,5 @@ class OnCommandError(commands.Cog):
             )
 
 
-def setup(bot: Pianobot) -> None:
-    bot.add_cog(OnCommandError(bot))
+async def setup(bot: Pianobot) -> None:
+    await bot.add_cog(OnCommandError(bot))

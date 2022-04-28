@@ -46,37 +46,39 @@ class ServerTable:
     def __init__(self, con: Connection) -> None:
         self._con = con
 
-    def get_all(self) -> list[Server]:
-        result = self._con.query('SELECT * FROM servers')
+    async def get_all(self) -> list[Server]:
+        result = await self._con.query('SELECT * FROM servers')
         return [Server(row[0], row[1], row[2], row[3], row[4], row[5], row[6]) for row in result]
 
-    def get(self, server_id: int) -> Server | None:
-        result = self._con.query('SELECT * FROM servers WHERE id = %s', server_id)
+    async def get(self, server_id: int) -> Server | None:
+        result = await self._con.query('SELECT * FROM servers WHERE id = $1', server_id)
         if result:
             row = result[0]
             return Server(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
         return None
 
-    def add(self, server_id: int) -> None:
-        self._con.query('INSERT INTO servers (id) VALUES (%s)', server_id)
+    async def add(self, server_id: int) -> None:
+        await self._con.execute('INSERT INTO servers (id) VALUES ($1)', server_id)
 
-    def update_channel(self, server_id: int, channel: int) -> None:
-        self._con.query('UPDATE servers SET channel = %s WHERE id = %s', channel, server_id)
+    async def update_channel(self, server_id: int, channel: int) -> None:
+        await self._con.execute(
+            'UPDATE servers SET channel = $1 WHERE id = $2', channel, server_id
+        )
 
-    def update_prefix(self, server_id: int, prefix: str) -> None:
-        self._con.query('UPDATE servers SET prefix = %s WHERE id = %s', prefix, server_id)
+    async def update_prefix(self, server_id: int, prefix: str) -> None:
+        await self._con.execute('UPDATE servers SET prefix = $1 WHERE id = $2', prefix, server_id)
 
-    def update_ping(self, server_id: int, ping: int) -> None:
-        self._con.query('UPDATE servers SET ping = %s WHERE id = %s', ping, server_id)
+    async def update_ping(self, server_id: int, ping: int) -> None:
+        await self._con.execute('UPDATE servers SET ping = $1 WHERE id = $2', ping, server_id)
 
-    def update_rank(self, server_id: int, rank: int) -> None:
-        self._con.query('UPDATE servers SET rank = %s WHERE id = %s', rank, server_id)
+    async def update_rank(self, server_id: int, rank: int) -> None:
+        await self._con.execute('UPDATE servers SET rank = $1 WHERE id = $2', rank, server_id)
 
-    def update_role(self, server_id: int, role: int) -> None:
-        self._con.query('UPDATE servers SET role = %s WHERE id = %s', role, server_id)
+    async def update_role(self, server_id: int, role: int) -> None:
+        await self._con.execute('UPDATE servers SET role = $1 WHERE id = $2', role, server_id)
 
-    def update_time(self, server_id: int, time: float) -> None:
-        self._con.query('UPDATE servers SET time = %s WHERE id = %s', time, server_id)
+    async def update_time(self, server_id: int, time: float) -> None:
+        await self._con.execute('UPDATE servers SET time = $1 WHERE id = $2', time, server_id)
 
-    def remove(self, server_id: int) -> None:
-        self._con.query('DELETE FROM servers WHERE id = %s', server_id)
+    async def remove(self, server_id: int) -> None:
+        await self._con.execute('DELETE FROM servers WHERE id = $1', server_id)

@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 from logging import getLogger
 from time import time
+from typing import TYPE_CHECKING
 
 from discord import TextChannel
 from discord.errors import Forbidden
 
-from pianobot import Pianobot
+if TYPE_CHECKING:
+    from pianobot import Pianobot
 
 
 async def territories(bot: Pianobot) -> None:
-    db_terrs = {terr.name: terr for terr in bot.database.territories.get_all()}
+    db_terrs = {terr.name: terr for terr in await bot.database.territories.get_all()}
     notify = None
     missing = []
     wynn_territories = await bot.corkus.territory.list_all()
@@ -18,15 +22,15 @@ async def territories(bot: Pianobot) -> None:
         if territory.name not in db_terrs.keys():
             continue
         if db_terrs[territory.name].guild != guild_name:
-            bot.database.territories.update(territory.name, guild_name)
+            await bot.database.territories.update(territory.name, guild_name)
         if guild_name != 'Eden':
             missing.append(territory)
             if db_terrs[territory.name].guild == 'Eden' and territory.guild is not None:
                 notify = territory
     if len(missing) == 0 and any(terr.guild != 'Eden' for terr in db_terrs.values()):
-        for server in bot.database.servers.get_all():
+        for server in await bot.database.servers.get_all():
             try:
-                channel = bot.get_channel(server.channel)
+                channel = await bot.fetch_channel(server.channel)
                 if channel is None or not isinstance(channel, TextChannel):
                     raise AttributeError
                 await channel.send('Fully reclaimed!')
@@ -51,7 +55,7 @@ async def territories(bot: Pianobot) -> None:
         default=-1,
     )
 
-    for server in bot.database.servers.get_all():
+    for server in await bot.database.servers.get_all():
         temp_msg = msg
         if (
             server.role != 0
@@ -60,9 +64,9 @@ async def territories(bot: Pianobot) -> None:
             and (6 if server.rank == -1 else server.rank) > highest_rank
         ):
             temp_msg = f'<@&{server.role}>\n{msg}'
-            bot.database.servers.update_time(server.server_id, time())
+            await bot.database.servers.update_time(server.server_id, time())
         try:
-            channel = bot.get_channel(server.channel)
+            channel = await bot.fetch_channel(server.channel)
             if channel is None or not isinstance(channel, TextChannel):
                 raise AttributeError
             await channel.send(temp_msg)

@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 from asyncio import gather
 from logging import getLogger
+from typing import TYPE_CHECKING
 
 from corkus import Corkus
 from corkus.errors import CorkusTimeoutError
 from corkus.objects.online_players import OnlinePlayers
 
-from pianobot import Pianobot
+if TYPE_CHECKING:
+    from pianobot import Pianobot
 
 
 async def guild_activity(bot: Pianobot) -> None:
@@ -18,9 +22,9 @@ async def guild_activity(bot: Pianobot) -> None:
         if res is not None:
             guilds.update(res)
 
-    bot.database.guild_activity.add(guilds)
+    await bot.database.guild_activity.add(guilds)
 
-    bot.database.guild_activity.cleanup()
+    await bot.database.guild_activity.cleanup()
 
 
 async def fetch(corkus: Corkus, name: str, players: OnlinePlayers) -> dict[str, int] | None:

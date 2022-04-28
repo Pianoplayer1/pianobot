@@ -1,150 +1,213 @@
-from discord import Embed, Role, TextChannel
-from discord.ext import commands
+from discord import Embed, Interaction, Role, app_commands
 
 from pianobot import Pianobot
-from pianobot.utils import check_permissions
 
 
-class Tracking(commands.Cog):
+RANKS = ['Recruit', 'Recruiter', 'Captain', 'Strategist', 'Chief', 'Owner']
+
+
+class Tracking(app_commands.Group):
     def __init__(self, bot: Pianobot) -> None:
+        super().__init__(
+            description='View or configure territory tracking options for this server',
+            guild_only=True,
+        )
         self.bot = bot
 
-    @commands.command(
-        aliases=['channel', 'cooldown', 'track'],
-        brief='Lets you configure tracking for Eden\'s territories.',
-        description='guild_only',
-        help=(
-            'This bot keeps track of Eden  \'s territory claim (configurable with'
-            ' `[[prefix]]territories`) and sends messages when a territory gets taken, optionally'
-            ' with a ping.\n\nUse `[[prefix]]tracking channel` to enable  tracking messages for'
-            ' that channel, do that again to stop tracking.\nSet the cooldown between pings with'
-            ' `[[prefix]]tracking ping <minutes>`, use 0 to disable pings completely.\nThe role'
-            ' that should get pinged is set with `[[prefix]]tracking role <id | mention>`, mention'
-            ' the role or use its id for the second argument.\n To disable pings when a certain'
-            ' (or above) rank is online, use `[[prefix]]tracking rank <no. of stars in-game>`.'
-        ),
-        name='tracking',
-        usage='<"channel" | "ping" | "role"> [arguments]',
-    )
-    @commands.guild_only()
-    async def tracking(
-        self, ctx: commands.Context, action: str = '', arg: Role | None = None
-    ) -> None:
-        if ctx.guild is None or not isinstance(ctx.channel, TextChannel):
+    @app_commands.command(description='Overview of current territory tracking options')
+    async def overview(self, interaction: Interaction) -> None:
+        if interaction.guild is None:
+            await interaction.response.send_message('This command can only be used in a server.')
             return
-        if not check_permissions(ctx.author, ctx.channel, 'manage_channels'):
-            await ctx.send('You don\'t have the required permissions to perform this action!')
-            return
-        current_server = self.bot.database.servers.get(ctx.guild.id)
+        current_server = await self.bot.database.servers.get(interaction.guild_id)
         if current_server is None:
-            await ctx.send('An internal error occurred, please try agan later.')
+            await interaction.response.send_message(
+                'An internal error occurred, please try again later.'
+            )
             return
-        ranks = ['Recruit', 'Recruiter', 'Captain', 'Strategist', 'Chief', 'Owner']
-        if action.lower() == 'channel':
-            if current_server.channel == ctx.channel.id:
-                self.bot.database.servers.update_channel(ctx.guild.id, 0)
-                await ctx.send('Territory tracking toggled off.')
-            else:
-                self.bot.database.servers.update_channel(ctx.guild.id, ctx.channel.id)
-                await ctx.send(f'Territory tracking will be sent in {ctx.channel.mention}.')
-        elif action.lower() in ('cooldown', 'ping'):
-            if arg is None:
-                text = (
-                    'is currently disabled.'
-                    if current_server.ping == 0
-                    else f'cooldown: `{int(current_server.ping / 60)} minutes`'
-                )
-                await ctx.send(f'Territory ping {text}')
-                return
-            if not isinstance(arg, int):
-                await ctx.send('You must specify the ping cooldown time in minutes!')
-                return
-            self.bot.database.servers.update_ping(ctx.guild.id, arg * 60)
-            if arg == 0:
-                await ctx.send('Territory ping toggled off.')
-            else:
-                await ctx.send(f'Territory ping cooldown changed to {arg} minutes.')
-        elif action.lower() == 'role':
-            if arg is None:
-                role = ctx.guild.get_role(current_server.role)
-                if role is None:
-                    current_role = 'None'
-                else:
-                    current_role = f'`{role.name}`'
-                await ctx.send(f'Territory ping role: {current_role}')
-                return
-            self.bot.database.servers.update_role(ctx.guild.id, arg.id)
-            await ctx.send(f'Territory ping role changed to {arg.name}.')
-        elif action.lower() == 'rank':
-            current_rank = current_server.rank
-            if arg is None:
-                if current_rank == -1:
-                    await ctx.send('Pings are always on, regardless of online members.')
-                else:
-                    await ctx.send(
-                        f'Pings are disabled when at least one {ranks[current_rank]} is online.'
-                    )
-                return
-            if not isinstance(arg, int) or arg < -1 or arg > 5:
-                await ctx.send('You must specify a rank by its number of stars (ingame)!')
-                return
-            self.bot.database.servers.update_rank(ctx.guild.id, arg)
-            if arg == -1:
-                await ctx.send('Ping are now always active.')
-            else:
-                await ctx.send(
-                    f'Pings will be deactivated when at least one {ranks[arg]} is online.'
-                )
+        channel = interaction.guild.get_channel(current_server.channel)
+        role = interaction.guild.get_role(current_server.role)
+        role_msg = 'does not ping' if role is None else f'pings {role.mention}'
+
+        embed = Embed(
+            description=(
+                f'Not active at the moment. Use `{current_server.prefix}tracking channel`'
+                ' to start territory tracking!'
+            )
+            if channel is None
+            else (
+                f'Currently running in {channel.mention}, {role_msg} if a territory gets taken.'
+            ),
+            color=0xFFFF00 if current_server.channel is None else 0x00FF00,
+        )
+        embed.set_author(
+            name='Eden Territory Tracking',
+            icon_url=(
+                'https://cdn.discordapp.com/attachments/'
+                '784114583974445077/802578487252090950/eden100.png'
+            ),
+        )
+        embed.add_field(
+            inline=False,
+            name=(
+                f'Ping cooldown: {current_server.ping // 60} minutes'
+                if current_server.ping > 0
+                else 'Pings disabled'
+            ),
+            value=f'*Configure with* `{current_server.prefix}tracking ping <minutes>`*.*',
+        )
+        embed.add_field(
+            inline=False,
+            name=(
+                'Pings regardless of online members'
+                if current_server.rank == -1
+                else f'Pings unless a {RANKS[current_server.rank]} is online'
+            ),
+            value=(
+                f'*Configure with* `{current_server.prefix}tracking rank <stars>`*, '
+                'use -1 as value to ping regardless of online members.*'
+            ),
+        )
+        embed.set_footer(text=f'For more information, run `{current_server.prefix}help tracking`.')
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(
+        description='Set this channel for tracking messages, use command again to disable tracking'
+    )
+    async def channel(self, interaction: Interaction) -> None:
+        if interaction.guild is None:
+            await interaction.response.send_message('This command can only be used in a server.')
+            return
+        current_server = await self.bot.database.servers.get(interaction.guild_id)
+        if current_server is None:
+            await interaction.response.send_message(
+                'An internal error occurred, please try again later.'
+            )
+            return
+        if not interaction.permissions.manage_channels:
+            await interaction.response.send_message(
+                'You don\'t have the required permissions to perform this action!'
+            )
+            return
+        if current_server.channel == interaction.channel_id:
+            await self.bot.database.servers.update_channel(interaction.guild_id, 0)
+            await interaction.response.send_message('Territory tracking toggled off.')
         else:
-            channel = ctx.guild.get_channel(current_server.channel)
-            role = ctx.guild.get_role(current_server.role)
-            role_msg = 'does not ping' if role is None else f'pings {role.mention}'
+            await self.bot.database.servers.update_channel(
+                interaction.guild_id, interaction.channel_id
+            )
+            await interaction.response.send_message(
+                f'Territory tracking will be sent in {interaction.channel.mention}.'
+            )
 
-            embed = Embed(
-                description=(
-                    f'Not active at the moment. Use `{current_server.prefix}tracking channel`'
-                    ' to start territory tracking!'
+    @app_commands.command(description='View or configure the territory tracking ping interval')
+    @app_commands.describe(interval='The new ping interval in minutes, 0 to turn pings off')
+    async def ping(self, interaction: Interaction, interval: int | None = None) -> None:
+        if interaction.guild is None:
+            await interaction.response.send_message('This command can only be used in a server.')
+            return
+        current_server = await self.bot.database.servers.get(interaction.guild_id)
+        if current_server is None:
+            await interaction.response.send_message(
+                'An internal error occurred, please try again later.'
+            )
+            return
+        if interval is None:
+            text = (
+                'is currently disabled.'
+                if current_server.ping == 0
+                else f'cooldown: `{int(current_server.ping / 60)} minutes`'
+            )
+            await interaction.response.send_message(f'Territory ping {text}')
+            return
+        if not interaction.permissions.manage_channels:
+            await interaction.response.send_message(
+                'You don\'t have the required permissions to perform this action!'
+            )
+            return
+        await self.bot.database.servers.update_ping(interaction.guild_id, interval * 60)
+        if interval == 0:
+            await interaction.response.send_message('Territory ping toggled off.')
+        else:
+            await interaction.response.send_message(
+                f'Territory ping cooldown changed to {interval} minutes.'
+            )
+
+    @app_commands.command(description='View or configure the role this bot will ping')
+    @app_commands.describe(role='The role that will get pinged')
+    async def role(self, interaction: Interaction, role: Role | None = None) -> None:
+        if interaction.guild is None:
+            await interaction.response.send_message('This command can only be used in a server.')
+            return
+        current_server = await self.bot.database.servers.get(interaction.guild_id)
+        if current_server is None:
+            await interaction.response.send_message(
+                'An internal error occurred, please try again later.'
+            )
+            return
+        if role is None:
+            role = interaction.guild.get_role(current_server.role)
+            if role is None:
+                current_role = 'None'
+            else:
+                current_role = f'`{role.name}`'
+            await interaction.response.send_message(f'Territory ping role: {current_role}')
+            return
+        if not interaction.permissions.manage_channels:
+            await interaction.response.send_message(
+                'You don\'t have the required permissions to perform this action!'
+            )
+            return
+        await self.bot.database.servers.update_role(interaction.guild_id, role.id)
+        await interaction.response.send_message(f'Territory ping role changed to {role.name}.')
+
+    @app_commands.command(description='Configure when pings will happen or view current setting')
+    @app_commands.choices(
+        rank=[
+            app_commands.Choice(name='Always ping', value=-1),
+            app_commands.Choice(name='Recruit', value=0),
+            app_commands.Choice(name='Recruiter', value=1),
+            app_commands.Choice(name='Captain', value=2),
+            app_commands.Choice(name='Strategist', value=3),
+            app_commands.Choice(name='Chief', value=4),
+            app_commands.Choice(name='Owner', value=5),
+        ],
+    )
+    @app_commands.describe(rank='Bot will ping unless one of the chosen rank or higher is online')
+    async def rank(self, interaction: Interaction, rank: int | None = None) -> None:
+        if interaction.guild is None:
+            await interaction.response.send_message('This command can only be used in a server.')
+            return
+        current_server = await self.bot.database.servers.get(interaction.guild_id)
+        if current_server is None:
+            await interaction.response.send_message(
+                'An internal error occurred, please try again later.'
+            )
+            return
+        if rank is None:
+            if current_server.rank == -1:
+                await interaction.response.send_message(
+                    'Pings are always on, regardless of online members.'
                 )
-                if current_server.channel is None or not isinstance(channel, TextChannel)
-                else (
-                    f'Currently running in {channel.mention}, {role_msg} if a territory gets'
-                    ' taken.'
-                ),
-                color=0xFFFF00 if current_server.channel is None else 0x00FF00,
+            else:
+                await interaction.response.send_message(
+                    f'Pings are disabled when at least one {RANKS[current_server.rank]} is online.'
+                )
+            return
+        if not interaction.permissions.manage_channels:
+            await interaction.response.send_message(
+                'You don\'t have the required permissions to perform this action!'
             )
-            embed.set_author(
-                name='Eden Territory Tracking',
-                icon_url=(
-                    'https://cdn.discordapp.com/attachments/'
-                    '784114583974445077/802578487252090950/eden100.png'
-                ),
+            return
+        await self.bot.database.servers.update_rank(interaction.guild_id, rank)
+        if rank == -1:
+            await interaction.response.send_message('Ping are now always active.')
+        else:
+            await interaction.response.send_message(
+                f'Pings will be deactivated when at least one {RANKS[rank]} is online.'
             )
-            embed.add_field(
-                inline=False,
-                name=(
-                    f'Ping cooldown: {current_server.ping // 60} minutes'
-                    if current_server.ping > 0
-                    else 'Pings disabled'
-                ),
-                value=f'*Configure with* `{current_server.prefix}tracking ping <minutes>`*.*',
-            )
-            embed.add_field(
-                inline=False,
-                name=(
-                    'Pings regardless of online members'
-                    if current_server.rank == -1
-                    else f'Pings unless a {ranks[current_server.rank]} is online'
-                ),
-                value=(
-                    f'*Configure with* `{current_server.prefix}tracking rank <stars>`*, '
-                    'use -1 as value to ping regardless of online members.*'
-                ),
-            )
-            embed.set_footer(
-                text=f'For more information, run `{current_server.prefix}help tracking`.'
-            )
-            await ctx.send(embed=embed)
 
 
-def setup(bot: Pianobot) -> None:
-    bot.add_cog(Tracking(bot))
+async def setup(bot: Pianobot) -> None:
+    if bot.enable_tracking:
+        bot.tree.add_command(Tracking(bot))

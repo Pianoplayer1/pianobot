@@ -2,13 +2,9 @@ from os import getenv
 
 from pianobot.db import (
     Connection,
-    DiscordMemberRoleTable,
-    DiscordMemberTable,
-    DiscordRoleTable,
     GuildActivityTable,
     GuildXPTable,
     MemberActivityTable,
-    MinecraftMemberTable,
     ServerTable,
     TerritoryTable,
     WorldTable,
@@ -16,7 +12,7 @@ from pianobot.db import (
 
 
 class DBManager:
-    def __init__(self) -> None:
+    def __init__(self):
         self._con_bot = Connection(
             getenv('PG_DB', 'pianobot'),
             getenv('PG_HOST', 'localhost'),
@@ -30,17 +26,8 @@ class DBManager:
         self.territories = TerritoryTable(self._con_bot)
         self.worlds = WorldTable(self._con_bot)
 
-        self._con_website = Connection(
-            getenv('PG_SITE_DB', 'pianosite'),
-            getenv('PG_SITE_HOST', 'localhost'),
-            getenv('PG_SITE_PASS', ''),
-            getenv('PG_SITE_USER', 'root'),
-        )
-        self.discord_member_roles = DiscordMemberRoleTable(self._con_website)
-        self.discord_members = DiscordMemberTable(self._con_website)
-        self.discord_roles = DiscordRoleTable(self._con_website)
-        self.minecraft_members = MinecraftMemberTable(self._con_website)
+    async def connect(self) -> None:
+        await self._con_bot.connect()
 
-    def disconnect(self) -> None:
-        self._con_bot.disconnect()
-        self._con_website.disconnect()
+    async def disconnect(self) -> None:
+        await self._con_bot.disconnect()

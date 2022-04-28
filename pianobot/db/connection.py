@@ -1,7 +1,7 @@
 from logging import getLogger
 from typing import Any
 
-import psycopg2
+import asyncpg
 
 
 class Connection:
@@ -10,32 +10,28 @@ class Connection:
         self._host = host
         self._password = password
         self._user = user
-        self._con = self.connect()
+        self._pool: asyncpg.Pool | None = None
 
-    def connect(self):
-        con = psycopg2.connect(
+    async def connect(self) -> None:
+        self._pool = await asyncpg.create_pool(
             database=self._database,
             host=self._host,
             password=self._password,
             user=self._user,
         )
-        con.autocommit = True
         getLogger('database').debug('Connected to database %s', self._database)
-        return con
 
-    def disconnect(self) -> None:
-        self._con.close()
-        getLogger('database').debug('Disconnected from database %s', self._database)
+    async def execute(self, sql: str, *args: Any) -> None:
+        if self._pool is None:
+            raise AttributeError('Connection not initialized!')
+        await self._pool.execute(sql, *args)
 
-    def query(self, sql: str, *args: Any) -> list[tuple[Any, ...]]:
-        if self._con.closed != 0:
-            self._con = self.connect()
-        cursor = self._con.cursor()
-        cursor.execute(sql, args)
-        self._con.commit()
-        try:
-            rows: list[tuple[Any, ...]] = cursor.fetchall()
-        except psycopg2.ProgrammingError:
-            rows = []
-        cursor.close()
-        return rows
+    async def query(self, sql: str, *args: Any) -> list[asyncpg.Record]:
+        if self._pool is None:
+            raise AttributeError('Connection not initialized!')
+        return await self._pool.fetch(sql, *args)
+
+    async def disconnect(self) -> None:
+        if self._pool is not None:
+            await self._pool.close()
+            getLogger('database').debug('Disconnected from database %s', self._database)

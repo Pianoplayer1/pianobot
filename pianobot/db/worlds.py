@@ -19,12 +19,12 @@ class WorldTable:
     def __init__(self, con: Connection) -> None:
         self._con = con
 
-    def get_all(self) -> list[World]:
-        result = self._con.query('SELECT * FROM worlds')
+    async def get_all(self) -> list[World]:
+        result = await self._con.query('SELECT * FROM worlds')
         return [World(row[0], row[1]) for row in result]
 
-    def add(self, world: str, time: float) -> None:
-        self._con.query('INSERT INTO worlds VALUES (%s, %s)', world, time)
+    async def add(self, world: str, time: float) -> None:
+        await self._con.execute('INSERT INTO worlds VALUES ($1, $2)', world, time)
 
-    def remove(self, world: str) -> None:
-        self._con.query('DELETE FROM worlds WHERE world = %s', world)
+    async def remove(self, world: str) -> None:
+        await self._con.execute('DELETE FROM worlds WHERE world = $1', world)

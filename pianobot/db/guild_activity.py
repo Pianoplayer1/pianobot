@@ -1,7 +1,7 @@
 from datetime import datetime
 from logging import getLogger
 
-from psycopg2.errors import UniqueViolation
+from asyncpg import UniqueViolationError
 
 from pianobot.db import Connection
 from pianobot.utils import get_rounded_time
@@ -11,35 +11,35 @@ class GuildActivityTable:
     def __init__(self, con: Connection) -> None:
         self._con = con
 
-    def get(self, guild: str, interval: str) -> dict[datetime, int]:
+    async def get(self, guild: str, interval: str) -> dict[datetime, int]:
         guild = f'"{guild}"'
-        result = self._con.query(
+        result = await self._con.query(
             f'SELECT time, {guild} FROM "guildActivity" WHERE time > (CURRENT_TIMESTAMP -'
             f' \'{interval}\'::interval) AND {guild} IS NOT NULL ORDER BY time'
         )
         return {} if len(result) == 0 else {row[0]: row[1] for row in result}
 
-    def add(self, data: dict[str, int | None]) -> None:
+    async def add(self, data: dict[str, int | None]) -> None:
         rounded_time = get_rounded_time(minutes=5)
 
         columns = ', '.join(f'"{key}"' for key in data)
-        placeholders = ', '.join('%s' for _ in data)
+        placeholders = ', '.join(f'${i + 2}' for i in range(len(data)))
 
         try:
-            self._con.query(
-                f'INSERT INTO "guildActivity" (time, {columns}) VALUES (%s, {placeholders})',
+            await self._con.execute(
+                f'INSERT INTO "guildActivity" (time, {columns}) VALUES ($1, {placeholders})',
                 rounded_time,
                 *data.values(),
             )
-        except UniqueViolation:
+        except UniqueViolationError:
             getLogger('database').debug('Duplicate guild activity time')
 
-    def cleanup(self) -> None:
-        self._con.query(
+    async def cleanup(self) -> None:
+        await self._con.execute(
             'DELETE FROM "guildActivity" WHERE time < (CURRENT_TIMESTAMP - \'7 DAY\'::interval)'
             ' AND to_char(time, \'MI\') != \'00\''
         )
-        self._con.query(
+        await self._con.execute(
             'DELETE FROM "guildActivity" WHERE time < (CURRENT_TIMESTAMP - \'14 DAY\'::interval)'
             ' AND to_char(time, \'HH24:MI\') != \'00:00\''
         )

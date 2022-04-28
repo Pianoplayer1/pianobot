@@ -11,8 +11,8 @@ class OnGuildRemove(Cog):
     @Cog.listener()
     async def on_guild_remove(self, guild: Guild) -> None:
         self.bot.logger.info(f'Left {guild.name}')
-        self.bot.database.servers.remove(guild.id)
+        await self.bot.database.servers.remove(guild.id)
 
 
-def setup(bot: Pianobot) -> None:
-    bot.add_cog(OnGuildRemove(bot))
+async def setup(bot: Pianobot) -> None:
+    await bot.add_cog(OnGuildRemove(bot))
