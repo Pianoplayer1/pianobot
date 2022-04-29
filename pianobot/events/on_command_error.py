@@ -43,6 +43,8 @@ class OnCommandError(commands.Cog):
             else:
                 await ctx.send(f'`{prefix}{ctx.command}` cannot be used in private messages.')
         elif isinstance(error, commands.CommandNotFound):
+            if ctx.prefix.startswith('<@'):
+                await ctx.send(f'Use `{prefix}help` for a list of things I can do.')
             self.bot.logger.info(error.args[0])
         else:
             getLogger('commands').warning(
