@@ -43,7 +43,7 @@ class Pianobot(Bot):
     async def setup_hook(self) -> None:
         await self.database.connect()
         self.session = ClientSession()
-        self.corkus = Corkus(session=self.session)
+        self.corkus = Corkus()
         await TaskRunner(self).start_tasks()
 
         for folder in ['commands', 'events']:
