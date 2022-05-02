@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from logging import getLogger
 from math import floor, log10
 from typing import TYPE_CHECKING
 
+from corkus.errors import CorkusTimeoutError
 from discord import TextChannel
 
 if TYPE_CHECKING:
@@ -10,7 +12,11 @@ if TYPE_CHECKING:
 
 
 async def guild_xp(bot: Pianobot) -> None:
-    guild = await bot.corkus.guild.get('Eden')
+    try:
+        guild = await bot.corkus.guild.get('Eden')
+    except CorkusTimeoutError:
+        getLogger('tasks').warning('Error when fetching Eden\'s guild xp')
+        return None
     current_xp = {member.username: member.contributed_xp for member in guild.members}
 
     await bot.database.guild_xp.update_columns(list(current_xp.keys()))

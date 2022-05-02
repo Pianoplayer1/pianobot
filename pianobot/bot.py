@@ -59,5 +59,6 @@ class Pianobot(Bot):
     async def close(self):
         await self.corkus.close()
         await self.database.disconnect()
+        await self.session.close()
         self.logger.info('Exited')
         await super().close()

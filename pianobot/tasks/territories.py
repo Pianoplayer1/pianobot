@@ -4,6 +4,7 @@ from logging import getLogger
 from time import time
 from typing import TYPE_CHECKING
 
+from corkus.errors import CorkusTimeoutError
 from discord import TextChannel
 from discord.errors import Forbidden
 
@@ -15,7 +16,11 @@ async def territories(bot: Pianobot) -> None:
     db_terrs = {terr.name: terr for terr in await bot.database.territories.get_all()}
     notify = None
     missing = []
-    wynn_territories = await bot.corkus.territory.list_all()
+    try:
+        wynn_territories = await bot.corkus.territory.list_all()
+    except CorkusTimeoutError:
+        getLogger('tasks').warning('Error when fetching the territory list!')
+        return None
 
     for territory in wynn_territories:
         guild_name = None if territory.guild is None else territory.guild.name
