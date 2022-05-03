@@ -14,8 +14,12 @@ if TYPE_CHECKING:
 
 async def guild_activity(bot: Pianobot) -> None:
     guilds: dict[str, int | None] = {guild: None for guild in bot.tracked_guilds}
+    try:
+        players = await bot.corkus.network.online_players()
+    except CorkusTimeoutError:
+        getLogger('tasks').warning('Error when fetching online player list!')
+        return
 
-    players = await bot.corkus.network.online_players()
     results = await gather(*[fetch(bot.corkus, guild, players) for guild in guilds])
 
     for res in results:
