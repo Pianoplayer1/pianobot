@@ -24,11 +24,6 @@ class LegacySoulpoints(commands.Cog):
         name='soulpoints',
     )
     async def soulpoints(self, ctx: commands.Context) -> None:
-        await ctx.send(
-            '```prolog\nNote: this command has been updated with a slash command version:\n     '
-            ' \'/soulpoints\' is the new way to access soulpoint tables.\n      \'-soulpoints\''
-            ' (the command you just used) will only work for limited time.```'
-        )
         data = await get_soulpoint_data(self.bot)
         columns = {'Server': 10, 'Next Soul Point': 18, 'Uptime': 18}
         await ctx.send(table(columns, data[:20])[0])

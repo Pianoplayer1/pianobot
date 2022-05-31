@@ -18,12 +18,6 @@ class LegacyGraph(commands.Cog):
         usage='<guild> -[days]',
     )
     async def graph(self, ctx: commands.Context, *, input_guild: str) -> None:
-        await ctx.send(
-            '```prolog\nNote: this command has been updated with a slash command version:\n     '
-            ' \'/graph <guild> [days]\' is the new way to access activity graphs.\n      \'-graph'
-            ' <guild> -[interval]\' (the command you just used) will only work for limited'
-            ' time.```'
-        )
         interval = 1
         if '-' in input_guild:
             input_guild, str_interval = input_guild.split(' -')

@@ -24,12 +24,6 @@ class LegacyInactivity(commands.Cog):
         usage='<guild>',
     )
     async def inactivity(self, ctx: commands.Context, *, guild: str) -> None:
-        await ctx.send(
-            '```prolog\nNote: this command has been updated with a slash command version:\n     '
-            ' \'/inactivity <guild>\' is the new way to access inactivity tables.\n     '
-            ' \'-inactivity <guild>\' (the command you just used) will only work for limited'
-            ' time.```'
-        )
         await ctx.trigger_typing()
         guilds = await self.bot.corkus.guild.list_all()
         guilds = [g.name for g in guilds]

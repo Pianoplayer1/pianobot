@@ -22,12 +22,6 @@ class LegacyPlayerActivity(commands.Cog):
         usage='<player> [days]',
     )
     async def pact(self, ctx: commands.Context, player: str, interval: str = '14') -> None:
-        await ctx.send(
-            '```prolog\nNote: this command has been updated with a slash command version:\n     '
-            ' \'/pact <player> [days]\' is the new way to access player activity charts.\n     '
-            ' \'-pAct <player> [interval]\' (the command you just used) will only work for'
-            ' limited time.```'
-        )
         if interval.startswith('-'):
             interval = interval[1:]
         try:

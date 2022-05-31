@@ -21,11 +21,6 @@ class LegacySus(commands.Cog):
         usage='<player>',
     )
     async def sus(self, ctx: commands.Context, player: str) -> None:
-        await ctx.send(
-            '```prolog\nNote: this command has been updated with a slash command version:\n     '
-            ' \'/sus [player]\' is the new way to access these sus ratings.\n      \'-sus'
-            ' [player]\' (the command you just used) will only work for limited time.```'
-        )
         await ctx.trigger_typing()
 
         # Ashcon API
