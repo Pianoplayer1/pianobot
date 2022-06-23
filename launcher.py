@@ -9,7 +9,7 @@ def main() -> None:
     logging.getLogger('discord').setLevel(logging.WARNING)
 
     bot = Pianobot()
-    bot.run(os.getenv('TOKEN') or '')
+    bot.run(os.getenv('TOKEN') or '', log_handler=None)
 
 
 if __name__ == '__main__':

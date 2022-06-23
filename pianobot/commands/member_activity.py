@@ -1,17 +1,16 @@
 from datetime import datetime
 
-from discord.ext import commands
+from discord.ext.commands import Bot, Cog, Context, command
 
 from pianobot import Pianobot
-from pianobot.utils import legacy_paginator
-from pianobot.utils import table
+from pianobot.utils import paginator
 
 
-class MemberActivity(commands.Cog):
+class MemberActivity(Cog):
     def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
-    @commands.command(
+    @command(
         aliases=['mAct'],
         brief='Outputs the member activity times of Eden for a calendar week.',
         help=(
@@ -23,7 +22,7 @@ class MemberActivity(commands.Cog):
         usage='[calendar week] [year]',
     )
     async def member_activity(
-        self, ctx: commands.Context, week: int | None = None, year: int | None = None
+        self, ctx: Context[Bot], week: int | None = None, year: int | None = None
     ) -> None:
         iso_date = datetime.utcnow().isocalendar()
         if week is None:
@@ -35,13 +34,13 @@ class MemberActivity(commands.Cog):
             await ctx.send('No data available for the specified interval!')
             return
 
-        results = []
+        activity_data = []
         guild = await self.bot.corkus.guild.get('Eden')
         for username, time in (await self.bot.database.member_activity.get(date)).items():
             member = next(
                 (member for member in guild.members if member.username == username), None
             )
-            results.append(
+            activity_data.append(
                 (
                     time,
                     (
@@ -55,11 +54,8 @@ class MemberActivity(commands.Cog):
             )
 
         columns = {'Eden Members': 36, 'Rank': 26, 'Time Online': 26}
-        result = [list(res[1]) for res in sorted(results, key=lambda item: item[0])]
-        ascending_table = table(columns, result, 5, 15, True, '(Ascending Order)')
-        result.reverse()
-        descending_table = table(columns, result, 5, 15, True, '(Descending Order)')
-        await legacy_paginator(self.bot, ctx, descending_table, None, ascending_table)
+        results = [list(res[1]) for res in sorted(activity_data, key=lambda item: item[0])]
+        await paginator(ctx, results, columns)
 
 
 async def setup(bot: Pianobot) -> None:

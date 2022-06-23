@@ -1,82 +1,7 @@
-from __future__ import annotations
+from math import ceil
 
-from asyncio import TimeoutError as AsyncioTimeoutError
-from typing import TYPE_CHECKING
-
-from discord import ButtonStyle, Interaction, InteractionMessage, Message, Reaction, User, ui
-from discord.ext.commands import Context
-
-from pianobot.utils.table import table
-
-if TYPE_CHECKING:
-    from pianobot import Pianobot
-
-
-async def legacy_paginator(
-    bot: Pianobot,
-    ctx: Context,
-    normal_contents: list[str],
-    message: Message | None = None,
-    reverse_contents: list[str] | None = None,
-) -> None:
-    contents = normal_contents
-    page = 1
-
-    if message is None:
-        message = await ctx.send(contents[page - 1])
-    else:
-        await message.edit(content=contents[page - 1])
-
-    if len(contents) == 1:
-        return
-
-    await message.add_reaction('⏮')
-    await message.add_reaction('◀')
-    if reverse_contents is not None:
-        await message.add_reaction('🔁')
-    await message.add_reaction('▶')
-    await message.add_reaction('⏭')
-
-    def check(_reaction: Reaction, _user: User) -> bool:
-        return (
-            _user != bot.user
-            and str(_reaction.emoji) in ['⏮', '◀', '🔁', '▶', '⏭']
-            and _reaction.message.id == message.id
-        )
-
-    while True:
-        try:
-            reaction, user = await bot.wait_for('reaction_add', check=check, timeout=300)
-            await message.remove_reaction(reaction, user)
-
-            if str(reaction.emoji) == '⏭' and page < len(contents):
-                page = len(contents)
-                await message.edit(content=f'{contents[page - 1]}')
-            elif str(reaction.emoji) == '▶' and page != len(contents):
-                page += 1
-                await message.edit(content=f'{contents[page - 1]}')
-            elif str(reaction.emoji) == '🔁' and reverse_contents is not None:
-                if contents == normal_contents:
-                    contents = reverse_contents
-                else:
-                    contents = normal_contents
-                await message.edit(content=f'{contents[page - 1]}')
-            elif str(reaction.emoji) == '◀' and page > 1:
-                page -= 1
-                await message.edit(content=f'{contents[page - 1]}')
-            elif str(reaction.emoji) == '⏮' and page > 1:
-                page = 1
-                await message.edit(content=f'{contents[page - 1]}')
-
-        except AsyncioTimeoutError:
-            await message.remove_reaction('⏭', bot.user)
-            await message.remove_reaction('▶', bot.user)
-            if reverse_contents is not None:
-                await message.remove_reaction('🔁', bot.user)
-            await message.remove_reaction('◀', bot.user)
-            await message.remove_reaction('⏮', bot.user)
-            await message.edit(content=f'{contents[page - 1][:-3] + " (locked)```"}')
-            break
+from discord import ButtonStyle, Interaction, Message, ui
+from discord.ext.commands import Bot, Context
 
 
 class Buttons(ui.View):
@@ -87,11 +12,11 @@ class Buttons(ui.View):
         self.normal_pages = normal_pages
         self.reversed_pages = reversed_pages
         self.max_page = len(self.normal_pages) - 1
-        self.message: InteractionMessage = None
+        self.message: Message | None = None
         if reversed_pages is None:
             self.remove_item(self.revert)
 
-    async def handle_click(self, interaction: Interaction):
+    async def handle_click(self, interaction: Interaction) -> None:
         self.current_page = min(max(self.current_page, 0), self.max_page)
         self.first_page.disabled = self.current_page == 0
         self.previous_page.disabled = self.current_page == 0
@@ -104,70 +29,127 @@ class Buttons(ui.View):
 
     async def on_timeout(self) -> None:
         content = (
-            self.message.content[:-3] + ' (Locked)```'
+            self.current_pages[self.current_page][:-3] + ' (Locked)```'
             if self.reversed_pages is None
-            else self.message.content[:-4] + ' - Locked)```'
+            else self.current_pages[self.current_page][:-4] + ' - Locked)```'
         )
-        await self.message.edit(content=content, view=None)
+        if self.message is not None:
+            await self.message.edit(content=content, view=None)
 
     @ui.button(disabled=True, emoji='⏮', style=ButtonStyle.gray)
-    async def first_page(self, interaction: Interaction, _: ui.Button) -> None:
+    async def first_page(self, interaction: Interaction, _: ui.Button[ui.View]) -> None:
         self.current_page = 0
         await self.handle_click(interaction)
 
     @ui.button(disabled=True, emoji='◀', style=ButtonStyle.gray)
-    async def previous_page(self, interaction: Interaction, _: ui.Button) -> None:
+    async def previous_page(self, interaction: Interaction, _: ui.Button[ui.View]) -> None:
         self.current_page -= 1
         await self.handle_click(interaction)
 
     @ui.button(emoji='🔁', style=ButtonStyle.gray)
-    async def revert(self, interaction: Interaction, _: ui.Button) -> None:
+    async def revert(self, interaction: Interaction, _: ui.Button[ui.View]) -> None:
         self.current_pages = (
-            self.reversed_pages if self.current_pages == self.normal_pages else self.normal_pages
+            self.reversed_pages
+            if self.current_pages == self.normal_pages and self.reversed_pages is not None
+            else self.normal_pages
         )
         await self.handle_click(interaction)
 
     @ui.button(emoji='▶', style=ButtonStyle.gray)
-    async def next_page(self, interaction: Interaction, _: ui.Button) -> None:
+    async def next_page(self, interaction: Interaction, _: ui.Button[ui.View]) -> None:
         self.current_page += 1
         await self.handle_click(interaction)
 
     @ui.button(emoji='⏭', style=ButtonStyle.gray)
-    async def last_page(self, interaction: Interaction, _: ui.Button) -> None:
+    async def last_page(self, interaction: Interaction, _: ui.Button[ui.View]) -> None:
         self.current_page = len(self.normal_pages) - 1
         await self.handle_click(interaction)
 
 
 async def paginator(
-    interaction: Interaction,
+    ctx: Context[Bot],
     data: list[list[str]],
     columns: dict[str, int],
     *,
-    add_reverted_contents=False,
-    rows_per_page: int = 15,
-    separator_frequency: int = 5,
+    revert_option: bool = True,
+    page_rows: int = 15,
+    separator_rows: int = 5,
     enum: bool = True,
+    message: Message | None = None,
 ) -> None:
-    if add_reverted_contents:
-        ascending_data = table(
-            columns, data, separator_frequency, rows_per_page, enum, '(Ascending Order)'
-        )
+    if revert_option:
+        ascending_data = table(columns, data, separator_rows, page_rows, enum, '(Ascending Order)')
         data.reverse()
         descending_data = table(
-            columns, data, separator_frequency, rows_per_page, enum, '(Descending Order)'
+            columns, data, separator_rows, page_rows, enum, '(Descending Order)'
         )
         initial_data = descending_data
         view = Buttons(descending_data, ascending_data) if len(descending_data) > 1 else None
     else:
-        initial_data = table(columns, data, separator_frequency, rows_per_page, enum)
+        initial_data = table(columns, data, separator_rows, page_rows, enum)
         view = Buttons(initial_data) if len(initial_data) > 1 else None
 
-    if interaction.response.is_done():
-        await (await interaction.original_message()).edit(content=initial_data[0], view=view)
+    if message is None:
+        message = await ctx.send(initial_data[0], view=view)
     else:
-        if view is None:
-            await interaction.response.send_message(initial_data[0])
-        else:
-            await interaction.response.send_message(initial_data[0], view=view)
+        await message.edit(content=initial_data[0], view=view)
+
     if view is not None:
-        view.message = await interaction.original_message()
+        view.message = message
+
+
+def table(
+    columns: dict[str, int],
+    raw_data: list[list[str]],
+    seperator: int = 0,
+    page_len: int = 0,
+    enum: bool = False,
+    label: str | None = None,
+    start_text: str | None = None,
+) -> list[str]:
+    if enum:
+        columns[list(columns.keys())[0]] -= 5
+    message = []
+    count = 0
+    page_num = 1 if page_len == 0 else ceil(len(raw_data) / page_len)
+    for page in range(page_num):
+        try:
+            data = raw_data[page * page_len : (page + 1) * page_len]
+        except IndexError:
+            data = raw_data[page * page_len :]
+        if len(data) == 0:
+            data = raw_data[page * page_len :]
+        message.append((start_text + '\n' if start_text else '') + '```ml\n│')
+
+        if enum:
+            message[page] += '     '
+        for column in columns:
+            message[page] += f' {column.ljust(columns[column] - 1)}│'
+
+        for row in data:
+            if count == 0 or seperator != 0 and (count - page * page_len) % seperator == 0:
+                message[page] += '\n├'
+                if enum:
+                    message[page] += '─────'
+                for pos, column in enumerate(columns):
+                    message[page] += '─' * (columns[column]) + (
+                        '┼' if pos != len(columns) - 1 else '┤'
+                    )
+            count += 1
+
+            message[page] += '\n│'
+            if enum:
+                message[page] += f'{count}.'.rjust(5)
+            for i in range(len(columns)):
+                try:
+                    message[page] += f' {str(row[i]).ljust(list(columns.values())[i] - 1)}│'
+                except IndexError:
+                    message[page] += ' ' * (list(columns.values())[i]) + '│'
+
+        if page_num > 1:
+            message[page] += f'\n\nPage {page + 1} / {page_num}'
+            if label is not None:
+                message[page] += f' {label}'
+        message[page] += '```'
+
+    return message

@@ -1,15 +1,22 @@
-from discord.ext import commands
+from discord.ext.commands import command, Cog, Context, Bot, guild_only
+from discord import GroupChannel, User
 
 from pianobot import Pianobot
 
 
-class Sync(commands.Cog):
+class Sync(Cog):
     def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def sync(self, ctx: commands.Context, sync_globally: bool = False) -> None:
+    @command(hidden=True)
+    @guild_only()
+    async def sync(self, ctx: Context[Bot], sync_globally: bool = False) -> None:
+        if (
+            isinstance(ctx.channel, GroupChannel)
+            or isinstance(ctx.author, User)
+            or ctx.guild is None
+        ):
+            return
         if ctx.channel.permissions_for(ctx.author).manage_guild:
             if sync_globally:
                 await self.bot.tree.sync()
@@ -19,9 +26,15 @@ class Sync(commands.Cog):
                 await self.bot.tree.sync(guild=ctx.guild)
                 await ctx.send('Slash commands have been synchronized on this server')
 
-    @commands.command(hidden=True)
-    @commands.guild_only()
-    async def unsync(self, ctx: commands.Context, unsync_globally: bool = False) -> None:
+    @command(hidden=True)
+    @guild_only()
+    async def unsync(self, ctx: Context[Bot], unsync_globally: bool = False) -> None:
+        if (
+            isinstance(ctx.channel, GroupChannel)
+            or isinstance(ctx.author, User)
+            or ctx.guild is None
+        )
+            return
         if ctx.channel.permissions_for(ctx.author).manage_guild:
             self.bot.tree.clear_commands(guild=None)
             if unsync_globally:

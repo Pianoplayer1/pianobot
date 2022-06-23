@@ -1,13 +1,14 @@
-from discord.ext import commands
+from discord import GroupChannel, User
+from discord.ext.commands import Bot, Cog, Context, command, guild_only
 
 from pianobot import Pianobot
 
 
-class Prefix(commands.Cog):
+class Prefix(Cog):
     def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
-    @commands.command(
+    @command(
         aliases=['pre'],
         brief='Updates the bot prefix for this server.',
         description='guild_only',
@@ -19,9 +20,13 @@ class Prefix(commands.Cog):
         name='prefix',
         usage='<new>',
     )
-    @commands.guild_only()
-    async def prefix(self, ctx: commands.Context, new: str) -> None:
-        if ctx.guild is None:
+    @guild_only()
+    async def prefix(self, ctx: Context[Bot], new: str) -> None:
+        if (
+            ctx.guild is None
+            or isinstance(ctx.author, User)
+            or isinstance(ctx.channel, GroupChannel)
+        ):
             return
         if len(new) > 3:
             await ctx.send('A prefix cannot be longer than 3 characters!')

@@ -1,5 +1,5 @@
-aiohttp==3.7.4
+aiohttp==3.7.4.post0
 asyncpg==0.25.0
-corkus.py==1.2.1
-git+https://github.com/Rapptz/discord.py@a14b43f2fda863ed6555374eb872bf014bdd1adf#egg=discord.py[voice]
-matplotlib==3.5.1
+corkus.py==2.0.0
+git+https://github.com/Rapptz/discord.py@1be36c9c3ede72eaa2262dfa0e62cbd8b8929e66#egg=discord.py[voice]
+matplotlib==3.5.2

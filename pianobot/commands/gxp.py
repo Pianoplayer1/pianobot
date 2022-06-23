@@ -1,19 +1,18 @@
 import math
 from datetime import datetime, timedelta
 
-from discord.ext import commands
+from discord.ext.commands import Bot, Cog, Context, command
 from discord.utils import format_dt
 
 from pianobot import Pianobot
-from pianobot.utils import legacy_paginator
-from pianobot.utils import table
+from pianobot.utils import paginator
 
 
-class GXP(commands.Cog):
+class GXP(Cog):
     def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
-    @commands.command(
+    @command(
         aliases=['guildXP', 'xp'],
         brief='Outputs Eden\'s guild experience contributions in a set interval.',
         help=(
@@ -26,7 +25,7 @@ class GXP(commands.Cog):
         name='gxp',
         usage='["final" | custom interval]',
     )
-    async def gxp(self, ctx: commands.Context, unit: str = '', interval: int = 1) -> None:
+    async def gxp(self, ctx: Context[Bot], unit: str = '', interval: int = 1) -> None:
         first_weekday = datetime.combine(datetime.utcnow().date(), datetime.min.time())
         first_weekday = first_weekday - timedelta(days=first_weekday.weekday())
 
@@ -61,8 +60,7 @@ class GXP(commands.Cog):
             await ctx.send('No data could be found. Try again later!')
             return
 
-        time = f'{format_dt(oldest_data.time)} - {format_dt(newest_data.time)}'
-        differences = [
+        results = [
             [name, display(xp)]
             for name, xp in sorted(
                 [(m, newest_data.data[m] - xp) for m, xp in oldest_data.data.items()],
@@ -70,11 +68,9 @@ class GXP(commands.Cog):
             )
         ]
 
-        table_cols = {'Eden Members': 36, 'Gained Guild XP': 30}
-        ascending_table = table(table_cols, differences, 5, 15, True, '(Ascending Order)', time)
-        differences.reverse()
-        descending_table = table(table_cols, differences, 5, 15, True, '(Descending Order)', time)
-        await legacy_paginator(self.bot, ctx, descending_table, None, ascending_table)
+        await ctx.send(f'{format_dt(oldest_data.time)} - {format_dt(newest_data.time)}')
+        columns = {'Eden Members': 36, 'Gained Guild XP': 30}
+        await paginator(ctx, results, columns)
 
 
 def display(num: int | float) -> str:

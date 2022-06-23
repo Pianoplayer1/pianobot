@@ -19,12 +19,13 @@ class Territories(app_commands.Group):
                 'Territory': len(max([terr.name for terr in db_terrs], key=len)) + 8,
                 'Guild': len(max([terr.name for terr in db_terrs], key=len)) + 8,
             },
-            separator_frequency=10,
-            rows_per_page=20,
+            revert_option=False,
+            page_rows=20,
+            separator_rows=10,
             enum=True,
         )
 
-    @app_commands.command(description='Edit territories to the territory list')
+    @app_commands.command(description='Edit territories of the territory list')
     @app_commands.describe(territories='Comma-separated list of Wynncraft territories')
     async def add(self, interaction: Interaction, territories: str) -> None:
         if not interaction.permissions.manage_guild:

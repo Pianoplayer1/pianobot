@@ -1,15 +1,15 @@
 from discord import Embed
-from discord.ext import commands
+from discord.ext.commands import Bot, Cog, Context, command
 
 from pianobot import Pianobot
 from pianobot.utils import get_prefix
 
 
-class Help(commands.Cog):
+class Help(Cog):
     def __init__(self, bot: Pianobot) -> None:
         self.bot = bot
 
-    @commands.command(
+    @command(
         aliases=['info'],
         brief='Shows this page; use help [command] for detailed description about a command.',
         help=(
@@ -20,7 +20,7 @@ class Help(commands.Cog):
         name='help',
         usage='[command]',
     )
-    async def help(self, ctx: commands.Context, command: str | None = None) -> None:
+    async def help(self, ctx: Context[Bot], specified_command: str | None = None) -> None:
         help_text = (
             'I am a utility bot for various different Wynncraft related things.\n\nList of'
             ' commands:\n```'
@@ -36,10 +36,12 @@ class Help(commands.Cog):
         for cmd in visible_commands:
             visible_commands[cmd].extend(map(str.lower, cmd.aliases))
 
-        if command:
+        if specified_command:
             try:
                 cmd = next(
-                    cmd for cmd, aliases in visible_commands.items() if command.lower() in aliases
+                    cmd
+                    for cmd, aliases in visible_commands.items()
+                    if specified_command.lower() in aliases
                 )
                 usage = ' ' + cmd.usage if cmd.usage else ''
                 aliases = '\n'.join([f'`{prefix}{alias}`' for alias in cmd.aliases])

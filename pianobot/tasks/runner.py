@@ -21,19 +21,22 @@ class TaskRunner:
         self.bot = bot
         self.logger = getLogger('tasks')
 
-    async def start_tasks(self):
+    async def start_tasks(self) -> None:
         self._loop_30s.start()
         self._loop_1m.start()
         self._loop_5m.start()
 
-    async def _run_task(self, task: Callable[[Pianobot], Coroutine[Any, Any, None]], name: str):
+    async def _run_task(
+        self, task: Callable[[Pianobot], Coroutine[Any, Any, None]], name: str
+    ) -> None:
         start = perf_counter()
         await task(self.bot)
         self.logger.debug('%s task finished in %s seconds', name, perf_counter() - start)
 
     @loop(seconds=30)
     async def _loop_30s(self) -> None:
-        await self._run_task(territories, 'Territory')
+        if self.bot.enable_tracking is True:
+            await self._run_task(territories, 'Territory')
         await self._run_task(worlds, 'World')
 
     @loop(seconds=60)

@@ -1,4 +1,4 @@
-from logging import getLogger
+from logging import Logger, getLogger
 from os import listdir
 
 from aiohttp import ClientSession
@@ -13,6 +13,12 @@ from pianobot.utils import get_prefix
 
 
 class Pianobot(Bot):
+    corkus: Corkus
+    database: DBManager
+    enable_tracking: bool
+    logger: Logger
+    session: ClientSession
+
     def __init__(self) -> None:
         intents = Intents.default()
         intents.members = True
@@ -30,10 +36,8 @@ class Pianobot(Bot):
         )
 
         self.logger = getLogger('bot')
-        self.corkus: Corkus = None
-        self.database = DBManager()
         self.enable_tracking = False
-        self.session: ClientSession = None
+        self.database = DBManager()
 
         with open('tracked_guilds.txt', 'r', encoding='UTF-8') as file:
             self.tracked_guilds: dict[str, str] = {
@@ -41,9 +45,9 @@ class Pianobot(Bot):
             }
 
     async def setup_hook(self) -> None:
+        self.corkus = Corkus()
         await self.database.connect()
         self.session = ClientSession()
-        self.corkus = Corkus()
         await TaskRunner(self).start_tasks()
 
         for folder in ['commands', 'events']:
@@ -53,12 +57,14 @@ class Pianobot(Bot):
                 except ExtensionFailed as exc:
                     self.logger.warning('Skipped %s.%s: %s', folder, extension, exc.__cause__)
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         self.logger.info('Booted up')
 
-    async def close(self):
-        await self.corkus.close()
+    async def close(self) -> None:
+        if self.corkus is not None:
+            await self.corkus.close()
         await self.database.disconnect()
-        await self.session.close()
+        if self.session is not None:
+            await self.session.close()
         self.logger.info('Exited')
         await super().close()

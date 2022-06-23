@@ -12,7 +12,7 @@ from pianobot.db import (
 
 
 class DBManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self._con_bot = Connection(
             getenv('PG_DB', 'pianobot'),
             getenv('PG_HOST', 'localhost'),
