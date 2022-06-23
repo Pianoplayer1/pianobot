@@ -33,7 +33,7 @@ class Sync(Cog):
             isinstance(ctx.channel, GroupChannel)
             or isinstance(ctx.author, User)
             or ctx.guild is None
-        )
+        ):
             return
         if ctx.channel.permissions_for(ctx.author).manage_guild:
             self.bot.tree.clear_commands(guild=None)
