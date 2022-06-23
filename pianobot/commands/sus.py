@@ -21,73 +21,76 @@ class Sus(Cog):
         usage='<player>',
     )
     async def sus(self, ctx: Context[Bot], player: str) -> None:
-        try:
-            player_data = await self.bot.corkus.player.get(player)
-        except BadRequest:
-            await ctx.send('Not a valid Wynncraft player!')
-            return
+        async with ctx.typing():
+            try:
+                player_data = await self.bot.corkus.player.get(player)
+            except BadRequest:
+                await ctx.send('Not a valid Wynncraft player!')
+                return
 
-        uuid, ashcon_date = await ashcon(self.bot.session, player_data.username)
-        hypixel_date = await hypixel(self.bot.session, uuid)
+            uuid, ashcon_date = await ashcon(self.bot.session, player_data.username)
+            hypixel_date = await hypixel(self.bot.session, uuid)
 
-        first_wynncraft_login = player_data.join_date.replace(tzinfo=None)
-        wynncraft_playtime = floor(player_data.playtime.raw * 4.7 / 60)
-        wynncraft_rank = player_data.tag.value
-        wynncraft_level = 0
-        wynncraft_quests = 0
-        for player_class in player_data.classes:
-            wynncraft_quests += len(player_class.quests)
-            wynncraft_level += player_class.combined_level
+            first_wynncraft_login = player_data.join_date.replace(tzinfo=None)
+            wynncraft_playtime = floor(player_data.playtime.raw * 4.7 / 60)
+            wynncraft_rank = player_data.tag.value
+            wynncraft_level = 0
+            wynncraft_quests = 0
+            for player_class in player_data.classes:
+                wynncraft_quests += len(player_class.quests)
+                wynncraft_level += player_class.combined_level
 
-        oldest_date = min(
-            date
-            for date in [
-                hypixel_date,
-                first_wynncraft_login,
-                ashcon_date,
-            ]
-            if date is not None
-        )
-
-        embed_fields = [
-            'Wynncraft Join Date',
-            'Wynncraft Playtime',
-            'Wynncraft Level',
-            'Wynncraft Quests',
-            'Wynncraft Rank',
-            'Minecraft Join Date',
-        ]
-        embed_values = [
-            first_wynncraft_login.strftime('%B %d, %Y'),
-            f'{wynncraft_playtime} hours',
-            f'{wynncraft_level} (all classes)',
-            f'{wynncraft_quests} (all classes)',
-            wynncraft_rank.capitalize(),
-            f'~{oldest_date.strftime("%B %d, %Y")}',
-        ]
-        scores = [
-            min(int((datetime.utcnow() - first_wynncraft_login).days / 2), 100),
-            min(wynncraft_playtime, 100),
-            min(wynncraft_level / 10, 100),
-            min(wynncraft_quests / 2, 100),
-            50 if wynncraft_rank == 'PLAYER' else (80 if wynncraft_rank == 'VIP' else 100),
-            min(int((datetime.utcnow() - oldest_date).days / 10), 100),
-        ]
-        total_score = round(100 - sum(scores) / len(scores), 2)
-
-        embed = Embed(
-            color=0x00FF00 if total_score <= 40 else (0xFF0000 if total_score <= 20 else 0xFFFF00),
-            description='The rating is based on following components:',
-            title=f'Suspiciousness of {player_data.username}: {total_score}%',
-        )
-        embed.set_thumbnail(
-            url=f'https://mc-heads.net/avatar/{player_data.uuid.string(dashed=False)}',
-        )
-        for field, category, score in zip(embed_fields, embed_values, scores):
-            embed.add_field(
-                inline=True, name=field, value=f'{category}\n{round(100 - score, 2)}% sus'
+            oldest_date = min(
+                date
+                for date in [
+                    hypixel_date,
+                    first_wynncraft_login,
+                    ashcon_date,
+                ]
+                if date is not None
             )
-        await ctx.send(embed=embed)
+
+            embed_fields = [
+                'Wynncraft Join Date',
+                'Wynncraft Playtime',
+                'Wynncraft Level',
+                'Wynncraft Quests',
+                'Wynncraft Rank',
+                'Minecraft Join Date',
+            ]
+            embed_values = [
+                first_wynncraft_login.strftime('%B %d, %Y'),
+                f'{wynncraft_playtime} hours',
+                f'{wynncraft_level} (all classes)',
+                f'{wynncraft_quests} (all classes)',
+                wynncraft_rank.capitalize(),
+                f'~{oldest_date.strftime("%B %d, %Y")}',
+            ]
+            scores = [
+                min(int((datetime.utcnow() - first_wynncraft_login).days / 2), 100),
+                min(wynncraft_playtime, 100),
+                min(wynncraft_level / 10, 100),
+                min(wynncraft_quests / 2, 100),
+                50 if wynncraft_rank == 'PLAYER' else (80 if wynncraft_rank == 'VIP' else 100),
+                min(int((datetime.utcnow() - oldest_date).days / 10), 100),
+            ]
+            total_score = round(100 - sum(scores) / len(scores), 2)
+
+            embed = Embed(
+                color=0x00FF00
+                if total_score <= 40
+                else (0xFF0000 if total_score <= 20 else 0xFFFF00),
+                description='The rating is based on following components:',
+                title=f'Suspiciousness of {player_data.username}: {total_score}%',
+            )
+            embed.set_thumbnail(
+                url=f'https://mc-heads.net/avatar/{player_data.uuid.string(dashed=False)}',
+            )
+            for field, category, score in zip(embed_fields, embed_values, scores):
+                embed.add_field(
+                    inline=True, name=field, value=f'{category}\n{round(100 - score, 2)}% sus'
+                )
+            await ctx.send(embed=embed)
 
 
 async def ashcon(session: ClientSession, player: str) -> tuple[str, datetime | None]:

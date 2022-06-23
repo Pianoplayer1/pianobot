@@ -24,36 +24,38 @@ class Inactivity(Cog):
         usage='<guild>',
     )
     async def inactivity(self, ctx: Context[Bot], *, guild: str) -> None:
-        guilds = [g.name for g in await self.bot.corkus.guild.list_all()]
-        if guild in guilds:
-            await self.inactivity_for(guild, ctx)
-            return
+        async with ctx.typing():
+            guilds = [g.name for g in await self.bot.corkus.guild.list_all()]
+            if guild in guilds:
+                await self.inactivity_for(guild, ctx)
+                return
 
-        full_matches = []
-        partial_matches = []
-        for guild_name in guilds:
-            if guild.lower() == guild_name.lower():
-                full_matches.append(guild_name)
-            elif guild.lower() in guild_name.lower():
-                partial_matches.append(guild_name)
+            full_matches = []
+            partial_matches = []
+            for guild_name in guilds:
+                if guild.lower() == guild_name.lower():
+                    full_matches.append(guild_name)
+                elif guild.lower() in guild_name.lower():
+                    partial_matches.append(guild_name)
 
-        matches = full_matches or partial_matches
-        if len(matches) == 0:
-            await ctx.send(
-                f'No guild names include `{guild}`. Please try again with a correct guild name.'
-            )
-        elif len(matches) == 1:
-            await self.inactivity_for(matches[0], ctx)
-        elif len(matches) <= 5:
-            await ctx.send(
-                f'Several guild names include `{guild}`, please select the one you meant:',
-                view=SelectMenu(matches, self, ctx),
-            )
-        else:
-            await ctx.send(
-                f'{len(matches)} guild names include `{guild}`. Please try again with a more'
-                ' precise name.'
-            )
+            matches = full_matches or partial_matches
+            if len(matches) == 0:
+                await ctx.send(
+                    f'No guild names include `{guild}`. Please try again with a correct guild'
+                    ' name.'
+                )
+            elif len(matches) == 1:
+                await self.inactivity_for(matches[0], ctx)
+            elif len(matches) <= 5:
+                await ctx.send(
+                    f'Several guild names include `{guild}`, please select the one you meant:',
+                    view=SelectMenu(matches, self, ctx),
+                )
+            else:
+                await ctx.send(
+                    f'{len(matches)} guild names include `{guild}`. Please try again with a more'
+                    ' precise name.'
+                )
 
     async def inactivity_for(
         self, guild: str, ctx: Context[Bot], message: Message | None = None
