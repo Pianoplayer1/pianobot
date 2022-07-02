@@ -28,8 +28,8 @@ class Sus(Cog):
                 await ctx.send('Not a valid Wynncraft player!')
                 return
 
-            uuid, ashcon_date = await ashcon(self.bot.session, player_data.username)
-            hypixel_date = await hypixel(self.bot.session, uuid)
+            ashcon_date = await ashcon(self.bot.session, player_data.username)
+            hypixel_date = await hypixel(self.bot.session, player_data.uuid.string())
 
             first_wynncraft_login = player_data.join_date.replace(tzinfo=None)
             wynncraft_playtime = floor(player_data.playtime.raw * 4.7 / 60)
@@ -93,9 +93,8 @@ class Sus(Cog):
             await ctx.send(embed=embed)
 
 
-async def ashcon(session: ClientSession, player: str) -> tuple[str, datetime | None]:
+async def ashcon(session: ClientSession, player: str) -> datetime | None:
     response = await (await session.get(f'https://api.ashcon.app/mojang/v2/user/{player}')).json()
-    uuid = response['uuid']
     first_name_change = (
         datetime.strptime(response['username_history'][1]['changed_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
         if len(response['username_history']) > 1
@@ -104,7 +103,7 @@ async def ashcon(session: ClientSession, player: str) -> tuple[str, datetime | N
     created_at = (
         datetime.strptime(response['created_at'], '%Y-%m-%d') if response['created_at'] else None
     )
-    return uuid, min(
+    return min(
         (date for date in (first_name_change, created_at) if date is not None), default=None
     )
 
