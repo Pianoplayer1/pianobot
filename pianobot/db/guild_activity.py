@@ -19,6 +19,24 @@ class GuildActivityTable:
         )
         return {} if len(result) == 0 else {row[0]: row[1] for row in result}
 
+    async def update_columns(self, guilds: list[str]) -> None:
+        result = await self._con.query(
+            'SELECT column_name FROM information_schema.columns WHERE table_name ='
+            ' \'guildActivity\''
+        )
+        current_guilds = [] if len(result) <= 1 else [column[0] for column in result[1:]]
+        to_add = set(guilds).difference(current_guilds)
+        add_string = ', '.join(
+            f'ADD COLUMN "{name}" INTEGER NOT NULL DEFAULT 0' for name in to_add
+        )
+        to_remove = set(current_guilds).difference(guilds)
+        remove_string = ', '.join([f'DROP COLUMN IF EXISTS "{name}"' for name in to_remove])
+
+        if add_string and remove_string:
+            remove_string = ', ' + remove_string
+        if add_string or remove_string:
+            await self._con.execute(f'ALTER TABLE "guildActivity" {add_string}{remove_string};')
+
     async def add(self, data: dict[str, int | None]) -> None:
         rounded_time = get_rounded_time(minutes=5)
 

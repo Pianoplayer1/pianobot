@@ -52,3 +52,4 @@ Paladins United:PUN
 Achte Shadow:ASh
 SICA Team:FEU
 Gang of Fools:FOOL
+Lumina:Lumi

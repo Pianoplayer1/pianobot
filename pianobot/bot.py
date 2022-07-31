@@ -47,6 +47,7 @@ class Pianobot(Bot):
     async def setup_hook(self) -> None:
         self.corkus = Corkus()
         await self.database.connect()
+        await self.database.guild_activity.update_columns(list(self.tracked_guilds.keys()))
         self.session = ClientSession()
         await TaskRunner(self).start_tasks()
 
