@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from math import floor
 
 from aiohttp import ClientSession
@@ -28,10 +28,10 @@ class Sus(Cog):
                 await ctx.send('Not a valid Wynncraft player!')
                 return
 
-            ashcon_date = await ashcon(self.bot.session, player_data.username)
-            hypixel_date = await hypixel(self.bot.session, player_data.uuid.string())
+            first_name_change = await mojang_api(self.bot.session, player_data.uuid.string())
+            first_hypixel_login = await hypixel_api(self.bot.session, player_data.uuid.string())
 
-            first_wynncraft_login = player_data.join_date.replace(tzinfo=None)
+            first_wynncraft_login = player_data.join_date
             wynncraft_playtime = floor(player_data.playtime.raw * 4.7 / 60)
             wynncraft_rank = player_data.tag.value
             wynncraft_level = 0
@@ -43,9 +43,9 @@ class Sus(Cog):
             oldest_date = min(
                 date
                 for date in [
-                    hypixel_date,
+                    first_name_change,
+                    first_hypixel_login,
                     first_wynncraft_login,
-                    ashcon_date,
                 ]
                 if date is not None
             )
@@ -67,48 +67,42 @@ class Sus(Cog):
                 f'~{oldest_date.strftime("%B %d, %Y")}',
             ]
             scores = [
-                min(int((datetime.utcnow() - first_wynncraft_login).days / 2), 100),
+                min(int((datetime.now(timezone.utc) - first_wynncraft_login).days / 2), 100),
                 min(wynncraft_playtime, 100),
                 min(wynncraft_level / 10, 100),
                 min(wynncraft_quests / 2, 100),
                 50 if wynncraft_rank == 'PLAYER' else (80 if wynncraft_rank == 'VIP' else 100),
-                min(int((datetime.utcnow() - oldest_date).days / 10), 100),
+                min(int((datetime.now(timezone.utc) - oldest_date).days / 10), 100),
             ]
             total_score = round(100 - sum(scores) / len(scores), 2)
 
             embed = Embed(
+                title=f'Suspiciousness of {player_data.username}: {total_score}%',
+                description='The rating is based on following components:',
                 color=0x00FF00
                 if total_score <= 40
                 else (0xFF0000 if total_score <= 20 else 0xFFFF00),
-                description='The rating is based on following components:',
-                title=f'Suspiciousness of {player_data.username}: {total_score}%',
             )
             embed.set_thumbnail(
-                url=f'https://mc-heads.net/avatar/{player_data.uuid.string(dashed=False)}',
+                url=f'https://mc-heads.net/avatar/{player_data.uuid.string(dashed=False)}'
             )
             for field, category, score in zip(embed_fields, embed_values, scores):
-                embed.add_field(
-                    inline=True, name=field, value=f'{category}\n{round(100 - score, 2)}% sus'
-                )
+                embed.add_field(name=field, value=f'{category}\n{round(100 - score, 2)}% sus')
             await ctx.send(embed=embed)
 
 
-async def ashcon(session: ClientSession, player: str) -> datetime | None:
-    response = await (await session.get(f'https://api.ashcon.app/mojang/v2/user/{player}')).json()
-    first_name_change = (
-        datetime.strptime(response['username_history'][1]['changed_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
-        if len(response['username_history']) > 1
+async def mojang_api(session: ClientSession, uuid: str) -> datetime | None:
+    response = await (
+        await session.get(f'https://api.mojang.com/user/profiles/{uuid}/names')
+    ).json()
+    return (
+        datetime.fromtimestamp(response[1]['changedToAt'] / 1000, timezone.utc)
+        if len(response) > 1
         else None
     )
-    created_at = (
-        datetime.strptime(response['created_at'], '%Y-%m-%d') if response['created_at'] else None
-    )
-    return min(
-        (date for date in (first_name_change, created_at) if date is not None), default=None
-    )
 
 
-async def hypixel(session: ClientSession, uuid: str) -> datetime | None:
+async def hypixel_api(session: ClientSession, uuid: str) -> datetime | None:
     response = await (
         await session.get(
             'https://api.hypixel.net/player',
@@ -116,7 +110,7 @@ async def hypixel(session: ClientSession, uuid: str) -> datetime | None:
         )
     ).json()
     return (
-        datetime.utcfromtimestamp(response['player']['firstLogin'] / 1000)
+        datetime.fromtimestamp(response['player']['firstLogin'] / 1000, timezone.utc)
         if response['player'] and response['player']['firstLogin']
         else None
     )
