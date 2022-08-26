@@ -33,13 +33,13 @@ class GuildXPTable:
 
     async def get(self, time: datetime) -> GuildXP | None:
         return await self._bind(
-            await self._con.query('SELECT * FROM "guildXP" WHERE time =$1', time)
+            await self._con.query('SELECT * FROM guild_xp WHERE time =$1', time)
         )
 
     async def get_first(self, interval: str) -> GuildXP | None:
         return await self._bind(
             await self._con.query(
-                'SELECT * FROM "guildXP" WHERE time > (CURRENT_TIMESTAMP -'
+                'SELECT * FROM guild_xp WHERE time > (CURRENT_TIMESTAMP -'
                 f' \'{interval}\'::interval) ORDER BY time LIMIT 1'
             )
         )
@@ -53,9 +53,7 @@ class GuildXPTable:
         return None
 
     async def get_last(self, amount: int = 1) -> list[GuildXP]:
-        result = await self._con.query(
-            f'SELECT * FROM "guildXP" ORDER BY time DESC LIMIT {amount}'
-        )
+        result = await self._con.query(f'SELECT * FROM guild_xp ORDER BY time DESC LIMIT {amount}')
         members = await self.get_members()
         return [GuildXP(row[0], dict(zip(members, row[1:]))) for row in result]
 
@@ -63,15 +61,10 @@ class GuildXPTable:
         columns = await self.get_members()
         to_add = set(names)
         to_add.difference_update(columns)
-        add_string = ', '.join(f'ADD COLUMN "{name}" BIGINT DEFAULT 0 NOT NULL' for name in to_add)
-        to_remove = set(columns)
-        to_remove.difference_update(names)
-        remove_string = ', '.join([f'DROP COLUMN IF EXISTS "{name}"' for name in to_remove])
+        add_string = ', '.join(f'ADD COLUMN "{name}" BIGINT' for name in to_add)
 
-        if add_string and remove_string:
-            remove_string = ', ' + remove_string
-        if add_string or remove_string:
-            await self._con.execute(f'ALTER TABLE "guildXP" {add_string}{remove_string};')
+        if add_string:
+            await self._con.execute(f'ALTER TABLE guild_xp {add_string};')
 
     async def add(self, data: dict[str, int]) -> None:
         rounded_time = get_rounded_time(minutes=5)
@@ -81,7 +74,7 @@ class GuildXPTable:
 
         try:
             await self._con.execute(
-                f'INSERT INTO "guildXP"(time, {columns}) VALUES ($1, {placeholders})',
+                f'INSERT INTO guild_xp (time, {columns}) VALUES ($1, {placeholders})',
                 rounded_time,
                 *data.values(),
             )
@@ -90,10 +83,10 @@ class GuildXPTable:
 
     async def cleanup(self) -> None:
         await self._con.execute(
-            'DELETE FROM "guildXP" WHERE time < (CURRENT_TIMESTAMP - \'7 DAY\'::interval) AND'
+            'DELETE FROM guild_xp WHERE time < (CURRENT_TIMESTAMP - \'7 DAY\'::interval) AND'
             ' to_char(time, \'MI\') != \'00\''
         )
         await self._con.execute(
-            'DELETE FROM "guildXP" WHERE time < (CURRENT_TIMESTAMP - \'14 DAY\'::interval) AND'
+            'DELETE FROM guild_xp WHERE time < (CURRENT_TIMESTAMP - \'14 DAY\'::interval) AND'
             ' to_char(time, \'HH24:MI\') != \'00:00\''
         )
