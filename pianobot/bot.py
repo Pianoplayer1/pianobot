@@ -52,8 +52,10 @@ class Pianobot(Bot):
         await self.database.guild_xp.cleanup()
         async for server in self.fetch_guilds():
             print(server.name)
-            print(server.fetch_members())
-            print(server.fetch_channels())
+            members = [member async for member in server.fetch_members()]
+            print(len(members), members)
+            channels = [channel async for channel in server.fetch_channels()]
+            print(len(channels), channels)
             print('---------------')
         self.session = ClientSession()
         await TaskRunner(self).start_tasks()
