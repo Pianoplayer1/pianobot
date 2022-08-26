@@ -27,7 +27,7 @@ class GuildXPTable:
 
     async def get_members(self) -> list[str]:
         result = await self._con.query(
-            'SELECT column_name FROM information_schema.columns WHERE table_name = \'guildXP\''
+            'SELECT column_name FROM information_schema.columns WHERE table_name = \'guild_xp\''
         )
         return [] if len(result) <= 1 else [column[0] for column in result[1:]]
 
