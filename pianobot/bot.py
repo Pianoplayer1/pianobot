@@ -52,6 +52,7 @@ class Pianobot(Bot):
         await self.database.guild_xp.cleanup()
         async for server in self.fetch_guilds():
             print(server.name)
+            print(server.owner_id)
             if server.owner:
                 print('Owner', server.owner.mention)
             members = [member async for member in server.fetch_members()]
