@@ -53,7 +53,7 @@ class Pianobot(Bot):
         async for server in self.fetch_guilds():
             print(server.name)
             members = [member async for member in server.fetch_members()]
-            print(len(members), members)
+            print(len(members))
             channels = await server.fetch_channels()
             print(len(channels), channels)
             print('---------------')
