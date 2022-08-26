@@ -4,7 +4,7 @@ from corkus.objects.player import Player
 
 
 def get_rounded_time(minutes: int) -> datetime:
-    time = datetime.utcnow()
+    time = datetime.now(timezone.utc)
     interval = minutes * 60
     seconds = (time.replace(tzinfo=None) - time.min).seconds
     difference = (seconds + interval / 2) // interval * interval - seconds
