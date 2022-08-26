@@ -50,7 +50,7 @@ class OnCommandError(Cog):
             getLogger('commands').warning(
                 'Ignoring exception in command %s:\n%s',
                 ctx.command,
-                "".join(
+                ''.join(
                     TracebackException(
                         type(error), error, error.__traceback__, compact=True
                     ).format()
