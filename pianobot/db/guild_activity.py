@@ -14,7 +14,7 @@ class GuildActivityTable:
     async def get(self, guild: str, interval: str) -> dict[datetime, int]:
         guild = f'"{guild}"'
         result = await self._con.query(
-            f'SELECT time, {guild} FROM "guildActivity" WHERE time > (CURRENT_TIMESTAMP -'
+            f'SELECT time, {guild} FROM guild_activity WHERE time > (CURRENT_TIMESTAMP -'
             f' \'{interval}\'::interval) AND {guild} IS NOT NULL ORDER BY time'
         )
         return {} if len(result) == 0 else {row[0]: row[1] for row in result}
@@ -22,20 +22,18 @@ class GuildActivityTable:
     async def update_columns(self, guilds: list[str]) -> None:
         result = await self._con.query(
             'SELECT column_name FROM information_schema.columns WHERE table_name ='
-            ' \'guildActivity\''
+            ' \'guild_activity\''
         )
         current_guilds = [] if len(result) <= 1 else [column[0] for column in result[1:]]
         to_add = set(guilds).difference(current_guilds)
-        add_string = ', '.join(
-            f'ADD COLUMN "{name}" INTEGER NOT NULL DEFAULT 0' for name in to_add
-        )
+        add_string = ', '.join(f'ADD COLUMN "{name}" INTEGER' for name in to_add)
         to_remove = set(current_guilds).difference(guilds)
         remove_string = ', '.join([f'DROP COLUMN IF EXISTS "{name}"' for name in to_remove])
 
         if add_string and remove_string:
             remove_string = ', ' + remove_string
         if add_string or remove_string:
-            await self._con.execute(f'ALTER TABLE "guildActivity" {add_string}{remove_string};')
+            await self._con.execute(f'ALTER TABLE guild_activity {add_string}{remove_string};')
 
     async def add(self, data: dict[str, int | None]) -> None:
         rounded_time = get_rounded_time(minutes=5)
@@ -45,7 +43,7 @@ class GuildActivityTable:
 
         try:
             await self._con.execute(
-                f'INSERT INTO "guildActivity" (time, {columns}) VALUES ($1, {placeholders})',
+                f'INSERT INTO guild_activity (time, {columns}) VALUES ($1, {placeholders})',
                 rounded_time,
                 *data.values(),
             )
@@ -54,10 +52,10 @@ class GuildActivityTable:
 
     async def cleanup(self) -> None:
         await self._con.execute(
-            'DELETE FROM "guildActivity" WHERE time < (CURRENT_TIMESTAMP - \'7 DAY\'::interval)'
+            'DELETE FROM guild_activity WHERE time < (CURRENT_TIMESTAMP - \'7 DAY\'::interval)'
             ' AND to_char(time, \'MI\') != \'00\''
         )
         await self._con.execute(
-            'DELETE FROM "guildActivity" WHERE time < (CURRENT_TIMESTAMP - \'14 DAY\'::interval)'
+            'DELETE FROM guild_activity WHERE time < (CURRENT_TIMESTAMP - \'14 DAY\'::interval)'
             ' AND to_char(time, \'HH24:MI\') != \'00:00\''
         )
