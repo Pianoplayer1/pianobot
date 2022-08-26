@@ -50,7 +50,7 @@ class Pianobot(Bot):
         await self.database.guild_activity.update_columns(list(self.tracked_guilds.keys()))
         await self.database.guild_activity.cleanup()
         await self.database.guild_xp.cleanup()
-        for server in self.guilds:
+        async for server in self.fetch_guilds():
             print(server.name)
             print(server.members)
             print(server.channels)
