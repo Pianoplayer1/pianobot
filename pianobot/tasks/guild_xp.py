@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from os import getenv
 from logging import getLogger
 from math import floor, log10
 from typing import TYPE_CHECKING
@@ -15,8 +16,8 @@ async def guild_xp(bot: Pianobot) -> None:
     try:
         guild = await bot.corkus.guild.get('Eden')
     except CorkusTimeoutError:
-        getLogger('tasks').warning('Error when fetching Eden\'s guild xp')
-        return None
+        getLogger('tasks.guild_xp').warning('Error when fetching guild data of `Eden`')
+        return
     current_xp = {member.username: member.contributed_xp for member in guild.members}
 
     await bot.database.guild_xp.update_columns(list(current_xp.keys()))
@@ -37,11 +38,12 @@ async def guild_xp(bot: Pianobot) -> None:
     for pos, (name, gxp) in enumerate(sorted(xp_diff, key=lambda item: item[1], reverse=True)):
         msg += f'\n**#{pos + 1} {name}** — `{format(gxp)} XP | {format(gxp / 5)} XP/min`'
     msg += f'\n**Total: ** `{display(sum([item[1] for item in xp_diff]))} XP`'
-    channel = await bot.fetch_channel(920757651380506644)
-    if channel is not None and isinstance(channel, TextChannel):
-        await channel.send(msg)
 
-    await bot.database.guild_xp.cleanup()
+    channel = bot.get_channel(int(getenv('XP_CHANNEL', 0)))
+    if isinstance(channel, TextChannel):
+        await channel.send(msg)
+    elif getenv('XP_CHANNEL') is not None:
+        getLogger('tasks.guild_xp').warning('Channel %s not found', getenv('XP_CHANNEL'))
 
 
 def display(num: float) -> str:

@@ -17,18 +17,14 @@ async def guild_activity(bot: Pianobot) -> None:
     try:
         players = await bot.corkus.network.online_players()
     except CorkusTimeoutError:
-        getLogger('tasks').warning('Error when fetching online player list!')
+        getLogger('tasks.guild_activity').warning('Error when fetching list of online players')
         return
 
-    results = await gather(*[fetch(bot.corkus, guild, players) for guild in guilds])
-
-    for res in results:
-        if res is not None:
-            guilds.update(res)
+    for result in await gather(*[fetch(bot.corkus, guild, players) for guild in guilds]):
+        if result is not None:
+            guilds.update(result)
 
     await bot.database.guild_activity.add(guilds)
-
-    await bot.database.guild_activity.cleanup()
 
 
 async def fetch(corkus: Corkus, name: str, players: OnlinePlayers) -> dict[str, int] | None:
@@ -36,5 +32,5 @@ async def fetch(corkus: Corkus, name: str, players: OnlinePlayers) -> dict[str, 
         guild = await corkus.guild.get(name)
         return {guild.name: sum(players.is_player_online(m.username) for m in guild.members)}
     except CorkusTimeoutError:
-        getLogger('tasks').warning('Error when fetching %s\'s activity!', name)
+        getLogger('tasks.guild_activity').warning('Error when fetching guild data of `%s`', name)
         return None

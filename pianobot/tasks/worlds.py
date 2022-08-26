@@ -15,7 +15,7 @@ async def worlds(bot: Pianobot) -> None:
     try:
         online_players = await bot.corkus.network.online_players()
     except CorkusTimeoutError:
-        getLogger('tasks').warning('Error when fetching online player list')
+        getLogger('tasks.worlds').warning('Error when fetching list of online players')
         return
 
     for server in online_players.servers:

@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 
 from corkus.errors import CorkusTimeoutError
 from discord import TextChannel
-from discord.errors import Forbidden
 
 if TYPE_CHECKING:
     from pianobot import Pianobot
@@ -19,8 +18,8 @@ async def territories(bot: Pianobot) -> None:
     try:
         wynn_territories = await bot.corkus.territory.list_all()
     except CorkusTimeoutError:
-        getLogger('tasks').warning('Error when fetching the territory list!')
-        return None
+        getLogger('tasks.territories').warning('Error when fetching list of territories')
+        return
 
     for territory in wynn_territories:
         guild_name = None if territory.guild is None else territory.guild.name
@@ -34,14 +33,11 @@ async def territories(bot: Pianobot) -> None:
                 notify = territory
     if len(missing) == 0 and any(terr.guild != 'Eden' for terr in db_terrs.values()):
         for server in await bot.database.servers.get_all():
-            try:
-                channel = await bot.fetch_channel(server.channel)
-                if channel is None or not isinstance(channel, TextChannel):
-                    raise AttributeError
+            channel = bot.get_channel(server.channel)
+            if isinstance(channel, TextChannel):
                 await channel.send('Fully reclaimed!')
-            except (AttributeError, Forbidden):
-                if server.channel != 0:
-                    getLogger('tasks.territories').warning('Channel %s not found', server.channel)
+            elif server.channel != 0:
+                getLogger('tasks.territories').warning('Channel %s not found', server.channel)
     if notify is None:
         return
 
@@ -70,11 +66,8 @@ async def territories(bot: Pianobot) -> None:
         ):
             temp_msg = f'<@&{server.role}>\n{msg}'
             await bot.database.servers.update_time(server.server_id, time())
-        try:
-            channel = await bot.fetch_channel(server.channel)
-            if channel is None or not isinstance(channel, TextChannel):
-                raise AttributeError
+        channel = bot.get_channel(server.channel)
+        if isinstance(channel, TextChannel):
             await channel.send(temp_msg)
-        except (AttributeError, Forbidden):
-            if server.channel != 0:
-                getLogger('tasks.territories').warning('Channel %s not found', server.channel)
+        elif server.channel != 0:
+            getLogger('tasks.territories').warning('Channel %s not found', server.channel)
