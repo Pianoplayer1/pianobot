@@ -54,7 +54,10 @@ class Pianobot(Bot):
             print(server.name)
             members = [member async for member in server.fetch_members()]
             print(len(members))
-            channels = [[channel.name, channel.type] for channel in await server.fetch_channels()]
+            channels = [
+                f'{channel.name} ({channel.type.name})'
+                for channel in await server.fetch_channels()
+            ]
             print(len(channels), channels)
             print('---------------')
         self.session = ClientSession()
