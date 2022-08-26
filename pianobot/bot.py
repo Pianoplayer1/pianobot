@@ -48,6 +48,13 @@ class Pianobot(Bot):
         self.corkus = Corkus()
         await self.database.connect()
         await self.database.guild_activity.update_columns(list(self.tracked_guilds.keys()))
+        await self.database.guild_activity.cleanup()
+        await self.database.guild_xp.cleanup()
+        for server in self.guilds:
+            print(server.name)
+            print(server.members)
+            print(server.channels)
+            print('---------------')
         self.session = ClientSession()
         await TaskRunner(self).start_tasks()
 
