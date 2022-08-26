@@ -34,7 +34,7 @@ class MemberActivityTable:
         date = f'"{iso_date.year}-{iso_date.week}"'
         if date[1:-1] not in await self.get_weeks():
             await self._con.execute(
-                f'ALTER TABLE member_activity ADD COLUMN {date} INTEGER DEFAULT 0'
+                f'ALTER TABLE member_activity ADD COLUMN {date} INTEGER NOT NULL DEFAULT 0'
             )
         for name in set(names).difference(await self.get_usernames()):
             await self._con.execute('INSERT INTO member_activity(username) VALUES ($1)', name)
