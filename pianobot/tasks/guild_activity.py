@@ -13,6 +13,7 @@ async def guild_activity(bot: Pianobot) -> None:
     for guild_name, online_members in await gather(*[fetch(bot, guild) for guild in guilds]):
         guilds[guild_name] = online_members
 
+    print(guilds)
     await bot.database.guild_activity.add(guilds)
 
 
