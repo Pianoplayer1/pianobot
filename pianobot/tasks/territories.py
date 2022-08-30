@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from logging import getLogger
-from time import time
 from typing import TYPE_CHECKING
 
 from corkus.errors import CorkusTimeoutError
@@ -33,11 +33,14 @@ async def territories(bot: Pianobot) -> None:
                 notify = territory
     if len(missing) == 0 and any(terr.guild != 'Eden' for terr in db_terrs.values()):
         for server in await bot.database.servers.get_all():
-            channel = bot.get_channel(server.channel)
-            if isinstance(channel, TextChannel):
-                await channel.send('Fully reclaimed!')
-            elif server.channel != 0:
-                getLogger('tasks.territories').warning('Channel %s not found', server.channel)
+            if server.territory_log_channel is not None:
+                channel = bot.get_channel(server.territory_log_channel)
+                if isinstance(channel, TextChannel):
+                    await channel.send('Fully reclaimed!')
+                else:
+                    getLogger('tasks.territories').warning(
+                        'Channel %s not found', server.territory_log_channel
+                    )
     if notify is None:
         return
 
@@ -57,17 +60,25 @@ async def territories(bot: Pianobot) -> None:
     )
 
     for server in await bot.database.servers.get_all():
+        if server.territory_log_channel is None:
+            continue
         temp_msg = msg
         if (
-            server.role != 0
-            and server.ping != 0
-            and time() >= (server.time + server.ping)
-            and (6 if server.rank == -1 else server.rank) > highest_rank
+            server.ping_interval is not None
+            and server.ping_role is not None
+            and datetime.now(timezone.utc)
+            >= (server.last_ping or datetime.min.replace(tzinfo=timezone.utc))
+            + timedelta(minutes=server.ping_interval)
+            and (6 if server.ping_rank is None else server.ping_rank) > highest_rank
         ):
-            temp_msg = f'<@&{server.role}>\n{msg}'
-            await bot.database.servers.update_time(server.server_id, time())
-        channel = bot.get_channel(server.channel)
+            temp_msg = f'<@&{server.ping_role}>\n{msg}'
+            await bot.database.servers.update_last_ping(
+                server.server_id, datetime.now(timezone.utc)
+            )
+        channel = bot.get_channel(server.territory_log_channel)
         if isinstance(channel, TextChannel):
             await channel.send(temp_msg)
-        elif server.channel != 0:
-            getLogger('tasks.territories').warning('Channel %s not found', server.channel)
+        else:
+            getLogger('tasks.territories').warning(
+                'Channel %s not found', server.territory_log_channel
+            )
