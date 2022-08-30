@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from os import getenv
 from logging import getLogger
 from math import floor, log10
+from os import getenv
 from typing import TYPE_CHECKING
 
 from corkus.errors import CorkusTimeoutError
@@ -26,11 +26,11 @@ async def guild_xp(bot: Pianobot) -> None:
     data = await bot.database.guild_xp.get_last(2)
     new = data[0]
     old = data[1]
-    xp_diff = [
-        (name, xp - old.data.get(name, 0))
-        for name, xp in new.data.items()
-        if xp - old.data.get(name, 0) > 0
-    ]
+    xp_diff = []
+    for name, new_xp in new.data.items():
+        old_xp = old.data.get(name, None)
+        if new_xp is not None and old_xp is not None:
+            xp_diff.append((name, new_xp - old_xp))
     if len(xp_diff) == 0:
         return
 

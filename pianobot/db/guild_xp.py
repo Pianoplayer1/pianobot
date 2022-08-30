@@ -8,7 +8,7 @@ from pianobot.utils import get_rounded_time
 
 
 class GuildXP:
-    def __init__(self, time: datetime, data: dict[str, int]) -> None:
+    def __init__(self, time: datetime, data: dict[str, int | None]) -> None:
         self._time = time
         self._data = data
 
@@ -17,7 +17,7 @@ class GuildXP:
         return self._time
 
     @property
-    def data(self) -> dict[str, int]:
+    def data(self) -> dict[str, int | None]:
         return self._data
 
 
