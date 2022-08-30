@@ -10,7 +10,7 @@ class Connection:
         self._host = host
         self._password = password
         self._user = user
-        self._pool: Pool | None = None
+        self._pool: Pool[Record] | None = None
 
     async def connect(self) -> None:
         self._pool = await create_pool(
