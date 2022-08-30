@@ -29,4 +29,4 @@ class WorldTable:
         await self._con.execute('INSERT INTO worlds (name) VALUES ($1)', name)
 
     async def remove(self, name: str) -> None:
-        await self._con.execute('DELETE FROM worlds WHERE world = $1', name)
+        await self._con.execute('DELETE FROM worlds WHERE name = $1', name)
