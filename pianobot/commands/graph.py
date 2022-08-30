@@ -53,7 +53,7 @@ class LegacyGraph(Cog):
 
 
 async def generate_graph(bot: Pianobot, guild: str, days: int) -> None:
-    data = await bot.database.guild_activity.get(guild, f'{days} day')
+    data = await bot.database.guild_activity.get(guild, days)
     plot, axes = pyplot.subplots()
     axes.plot(data.keys(), data.values())
     axes.xaxis.set_major_formatter(dates.DateFormatter('%b %d, %H:%M'))
