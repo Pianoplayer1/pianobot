@@ -1,5 +1,5 @@
-from discord.ext.commands import command, Cog, Context, Bot, guild_only
-from discord import GroupChannel, User
+from discord import GroupChannel, Object, User
+from discord.ext.commands import Bot, Cog, Context, command, guild_only
 
 from pianobot import Pianobot
 
@@ -22,8 +22,8 @@ class Sync(Cog):
                 await self.bot.tree.sync()
                 await ctx.send('Slash commands have been synchronized globally')
             else:
-                self.bot.tree.copy_global_to(guild=ctx.guild)
-                await self.bot.tree.sync(guild=ctx.guild)
+                self.bot.tree.copy_global_to(guild=Object(ctx.guild.id))
+                await self.bot.tree.sync(guild=Object(ctx.guild.id))
                 await ctx.send('Slash commands have been synchronized on this server')
 
     @command(hidden=True)
@@ -41,8 +41,8 @@ class Sync(Cog):
                 await self.bot.tree.sync()
                 await ctx.send('Slash commands have been removed globally')
             else:
-                self.bot.tree.copy_global_to(guild=ctx.guild)
-                await self.bot.tree.sync(guild=ctx.guild)
+                self.bot.tree.copy_global_to(guild=Object(ctx.guild.id))
+                await self.bot.tree.sync(guild=Object(ctx.guild.id))
                 await ctx.send('Slash commands have been removed from this server')
 
 
