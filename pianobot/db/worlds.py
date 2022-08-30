@@ -1,18 +1,20 @@
+from datetime import datetime
+
 from pianobot.db import Connection
 
 
 class World:
-    def __init__(self, world: str, time: int) -> None:
-        self._world = world
-        self._time = time
+    def __init__(self, name: str, started_at: datetime) -> None:
+        self._name = name
+        self._started_at = started_at
 
     @property
-    def world(self) -> str:
-        return self._world
+    def name(self) -> str:
+        return self._name
 
     @property
-    def time(self) -> int:
-        return self._time
+    def started_at(self) -> datetime:
+        return self._started_at
 
 
 class WorldTable:
@@ -23,8 +25,8 @@ class WorldTable:
         result = await self._con.query('SELECT * FROM worlds')
         return [World(row[0], row[1]) for row in result]
 
-    async def add(self, world: str, time: float) -> None:
-        await self._con.execute('INSERT INTO worlds VALUES ($1, $2)', world, time)
+    async def add(self, name: str) -> None:
+        await self._con.execute('INSERT INTO worlds (name) VALUES ($1)', name)
 
-    async def remove(self, world: str) -> None:
-        await self._con.execute('DELETE FROM worlds WHERE world = $1', world)
+    async def remove(self, name: str) -> None:
+        await self._con.execute('DELETE FROM worlds WHERE world = $1', name)

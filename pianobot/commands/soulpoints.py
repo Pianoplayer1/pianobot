@@ -1,5 +1,5 @@
+from datetime import datetime, timezone
 from math import floor
-from time import time
 
 from discord.ext.commands import Bot, Cog, Context, command
 
@@ -23,15 +23,18 @@ class Soulpoints(Cog):
         name='soulpoints',
     )
     async def soulpoints(self, ctx: Context[Bot]) -> None:
-        worlds = [(world.world, world.time) for world in await self.bot.database.worlds.get_all()]
-        now = time()
-        worlds = sorted(worlds, key=lambda item: (now - item[1]) % 1200, reverse=True)
+        now = datetime.now(timezone.utc)
+        worlds = [
+            (world.name, (now - world.started_at).seconds)
+            for world in await self.bot.database.worlds.get_all()
+        ]
+        worlds = sorted(worlds, key=lambda item: item[1] % 1200, reverse=True)
         data = [
             [
                 server,
-                f'{floor(20 - ((now - uptime) / 60) % 20):02}:'
-                f'{floor((1200 - (now - uptime) % 1200) % 60):02} minutes',
-                f'{floor((now - uptime) / 3600):02}:{floor((now - uptime) % 3600 / 60):02} hours',
+                f'{floor(20 - (uptime / 60) % 20):02}:'
+                f'{floor((1200 - uptime % 1200) % 60):02} minutes',
+                f'{floor(uptime / 3600):02}:{floor(uptime % 3600 / 60):02} hours',
             ]
             for server, uptime in worlds
         ]
