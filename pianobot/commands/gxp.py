@@ -1,5 +1,5 @@
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from discord.ext.commands import Bot, Cog, Context, command
 from discord.utils import format_dt
@@ -26,8 +26,8 @@ class GXP(Cog):
         usage='["final" | custom interval]',
     )
     async def gxp(self, ctx: Context[Bot], unit: str = '', interval: int = 1) -> None:
-        first_weekday = datetime.combine(datetime.utcnow().date(), datetime.min.time())
-        first_weekday = first_weekday - timedelta(days=first_weekday.weekday())
+        current_day = datetime.combine(datetime.utcnow(), datetime.min.time(), timezone.utc)
+        first_weekday = current_day - timedelta(days=current_day.weekday())
 
         if unit == '':
             oldest_data = await self.bot.database.guild_xp.get(first_weekday)
@@ -60,13 +60,12 @@ class GXP(Cog):
             await ctx.send('No data could be found. Try again later!')
             return
 
-        results = [
-            [name, display(xp)]
-            for name, xp in sorted(
-                [(m, newest_data.data[m] - xp) for m, xp in oldest_data.data.items()],
-                key=lambda item: item[1],
-            )
-        ]
+        xp_diff = []
+        for name, new_xp in newest_data.data.items():
+            old_xp = oldest_data.data.get(name, None)
+            if new_xp is not None and old_xp is not None:
+                xp_diff.append((name, new_xp - old_xp))
+        results = [[name, display(xp)] for name, xp in sorted(xp_diff, key=lambda item: item[1])]
 
         await ctx.send(f'{format_dt(oldest_data.time)} - {format_dt(newest_data.time)}')
         columns = {'Eden Members': 36, 'Gained Guild XP': 30}

@@ -1,7 +1,4 @@
 from datetime import datetime
-from logging import getLogger
-
-from asyncpg import UniqueViolationError
 
 from pianobot.db import Connection
 from pianobot.utils import get_rounded_time
@@ -11,13 +8,12 @@ class GuildActivityTable:
     def __init__(self, con: Connection) -> None:
         self._con = con
 
-    async def get(self, guild: str, interval: str) -> dict[datetime, int]:
-        guild = f'"{guild}"'
+    async def get(self, guild: str, days: int) -> dict[datetime, int]:
         result = await self._con.query(
-            f'SELECT time, {guild} FROM guild_activity WHERE time > (CURRENT_TIMESTAMP -'
-            f' \'{interval}\'::interval) AND {guild} IS NOT NULL ORDER BY time'
+            f'SELECT time, "{guild}" FROM guild_activity WHERE time > (CURRENT_TIMESTAMP -'
+            f' \'{days} day\'::interval) AND "{guild}" IS NOT NULL ORDER BY time'
         )
-        return {} if len(result) == 0 else {row[0]: row[1] for row in result}
+        return {row[0]: row[1] for row in result}
 
     async def update_columns(self, guilds: list[str]) -> None:
         result = await self._con.query(
@@ -41,14 +37,12 @@ class GuildActivityTable:
         columns = ', '.join(f'"{key}"' for key in data)
         placeholders = ', '.join(f'${i + 2}' for i in range(len(data)))
 
-        try:
-            await self._con.execute(
-                f'INSERT INTO guild_activity (time, {columns}) VALUES ($1, {placeholders})',
-                rounded_time,
-                *data.values(),
-            )
-        except UniqueViolationError:
-            getLogger('database').debug('Duplicate guild activity time')
+        await self._con.execute(
+            f'INSERT INTO guild_activity (time, {columns}) VALUES ($1, {placeholders}) ON'
+            ' CONFLICT(time) DO NOTHING;',
+            rounded_time,
+            *data.values(),
+        )
 
     async def cleanup(self) -> None:
         await self._con.execute(

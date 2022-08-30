@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from discord.ext.commands import Bot, Cog, Context, command
 
@@ -24,7 +24,7 @@ class MemberActivity(Cog):
     async def member_activity(
         self, ctx: Context[Bot], week: int | None = None, year: int | None = None
     ) -> None:
-        iso_date = datetime.utcnow().isocalendar()
+        iso_date = datetime.now(timezone.utc).isocalendar()
         if week is None:
             week = iso_date.week
         if year is None:

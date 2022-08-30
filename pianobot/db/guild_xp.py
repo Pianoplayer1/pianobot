@@ -1,7 +1,6 @@
 from datetime import datetime
-from logging import getLogger
 
-from asyncpg import Record, UniqueViolationError
+from asyncpg import Record
 
 from pianobot.db import Connection
 from pianobot.utils import get_rounded_time
@@ -46,7 +45,7 @@ class GuildXPTable:
 
     async def _bind(self, result: list[Record]) -> GuildXP | None:
         members = await self.get_members()
-        if len(result) > 0:
+        if result:
             row = result[0]
             data = {members[i]: row[i + 1] for i in range(len(members))}
             return GuildXP(row[0], data)
@@ -59,11 +58,9 @@ class GuildXPTable:
 
     async def update_columns(self, names: list[str]) -> None:
         columns = await self.get_members()
-        to_add = set(names)
-        to_add.difference_update(columns)
-        add_string = ', '.join(f'ADD COLUMN "{name}" BIGINT' for name in to_add)
-
-        if add_string:
+        new_members = set(names).difference(columns)
+        if new_members:
+            add_string = ', '.join(f'ADD COLUMN "{name}" BIGINT' for name in new_members)
             await self._con.execute(f'ALTER TABLE guild_xp {add_string};')
 
     async def add(self, data: dict[str, int]) -> None:
@@ -72,14 +69,12 @@ class GuildXPTable:
         columns = ', '.join(f'"{key}"' for key in data)
         placeholders = ', '.join(f'${i + 2}' for i in range(len(data)))
 
-        try:
-            await self._con.execute(
-                f'INSERT INTO guild_xp (time, {columns}) VALUES ($1, {placeholders})',
-                rounded_time,
-                *data.values(),
-            )
-        except UniqueViolationError:
-            getLogger('database').debug('Duplicate guild xp time')
+        await self._con.execute(
+            f'INSERT INTO guild_xp (time, {columns}) VALUES ($1, {placeholders}) ON CONFLICT(time)'
+            ' DO NOTHING;',
+            rounded_time,
+            *data.values(),
+        )
 
     async def cleanup(self) -> None:
         await self._con.execute(
