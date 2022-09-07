@@ -21,4 +21,4 @@ async def fetch(bot: Pianobot, name: str) -> tuple[str, int | None]:
     if response.status != 200:
         return name, None
     guild = await response.json()
-    return name, guild['online_members']
+    return name, guild['onlineMembers']
