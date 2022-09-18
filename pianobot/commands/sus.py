@@ -28,7 +28,6 @@ class Sus(Cog):
                 await ctx.send('Not a valid Wynncraft player!')
                 return
 
-            first_name_change = await mojang_api(self.bot.session, player_data.uuid.string())
             first_hypixel_login = await hypixel_api(self.bot.session, player_data.uuid.string())
 
             first_wynncraft_login = player_data.join_date
@@ -43,7 +42,6 @@ class Sus(Cog):
             oldest_date = min(
                 date
                 for date in [
-                    first_name_change,
                     first_hypixel_login,
                     first_wynncraft_login,
                 ]
@@ -89,17 +87,6 @@ class Sus(Cog):
             for field, category, score in zip(embed_fields, embed_values, scores):
                 embed.add_field(name=field, value=f'{category}\n{round(100 - score, 2)}% sus')
             await ctx.send(embed=embed)
-
-
-async def mojang_api(session: ClientSession, uuid: str) -> datetime | None:
-    response = await (
-        await session.get(f'https://api.mojang.com/user/profiles/{uuid}/names')
-    ).json()
-    return (
-        datetime.fromtimestamp(response[1]['changedToAt'] / 1000, timezone.utc)
-        if len(response) > 1
-        else None
-    )
 
 
 async def hypixel_api(session: ClientSession, uuid: str) -> datetime | None:
