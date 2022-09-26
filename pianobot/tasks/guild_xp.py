@@ -36,7 +36,7 @@ async def guild_xp(bot: Pianobot) -> None:
 
     msg = '--------------------------------------------------------------------------------'
     for pos, (name, gxp) in enumerate(sorted(xp_diff, key=lambda item: item[1], reverse=True)):
-        msg += f'\n**#{pos + 1} {name}** — `{format(gxp)} XP | {format(gxp / 5)} XP/min`'
+        msg += f'\n**#{pos + 1} {name}** — `{display(gxp)} XP | {display(gxp / 5)} XP/min`'
     msg += f'\n**Total: ** `{display(sum([item[1] for item in xp_diff]))} XP`'
 
     channel = bot.get_channel(int(getenv('XP_CHANNEL', 0)))
