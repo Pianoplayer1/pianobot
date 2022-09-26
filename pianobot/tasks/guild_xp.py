@@ -29,7 +29,7 @@ async def guild_xp(bot: Pianobot) -> None:
     xp_diff = []
     for name, new_xp in new.data.items():
         old_xp = old.data.get(name, None)
-        if new_xp is not None and old_xp is not None:
+        if new_xp is not None and old_xp is not None and new_xp - old_xp > 0:
             xp_diff.append((name, new_xp - old_xp))
     if len(xp_diff) == 0:
         return
