@@ -26,14 +26,6 @@ async def guild_xp(bot: Pianobot) -> None:
     data = await bot.database.guild_xp.get_last(2)
     new = data[0]
     old = data[1]
-
-    players_old = set(old.data.keys())
-    players_new = set(new.data.keys())
-    for new_player in players_new.difference(players_old):
-        bot.logger.info(f'{new_player} has joined Eden!')
-    for left_player in players_old.difference(players_new):
-        bot.logger.info(f'{left_player} has left Eden!')
-
     xp_diff = []
     for name, new_xp in new.data.items():
         old_xp = old.data.get(name, None)

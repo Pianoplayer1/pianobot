@@ -9,6 +9,7 @@ from discord.ext.tasks import loop
 from pianobot.tasks.guild_activity import guild_activity
 from pianobot.tasks.guild_xp import guild_xp
 from pianobot.tasks.member_activity import member_activity
+from pianobot.tasks.members import members
 from pianobot.tasks.territories import territories
 from pianobot.tasks.worlds import worlds
 
@@ -47,3 +48,4 @@ class TaskRunner:
     async def _loop_5m(self) -> None:
         await self._run_task(guild_activity, 'Guild Activity')
         await self._run_task(guild_xp, 'Guild XP')
+        await self._run_task(members, 'Member')
