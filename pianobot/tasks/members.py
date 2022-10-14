@@ -72,7 +72,7 @@ async def members(bot: Pianobot) -> None:
                     color=0x88FFFF,
                     uuid=corkus_member.uuid.hex,
                 )
-            if corkus_member.rank.name != saved_member.rank:
+            if corkus_member.rank.name.capitalize() != saved_member.rank:
                 new_rank = corkus_member.rank.name.capitalize()
                 await bot.database.members.update_rank(corkus_member.uuid, new_rank)
                 is_promotion = RANKS.index(new_rank) > RANKS.index(saved_member.rank)
