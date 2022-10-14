@@ -53,7 +53,6 @@ class Pianobot(Bot):
         await self.database.guild_activity.cleanup()
         await self.database.guild_xp.cleanup()
         self.session = ClientSession()
-        await TaskRunner(self).start_tasks()
 
         for folder in ['commands', 'events']:
             for extension in [f[:-3] for f in listdir(f'pianobot/{folder}') if f.endswith('.py')]:
@@ -62,6 +61,7 @@ class Pianobot(Bot):
                 except ExtensionFailed as exc:
                     self.logger.warning('Skipped %s.%s: %s', folder, extension, exc.__cause__)
 
+    async def on_ready(self) -> None:
         self.member_update_channel = None
         member_update_channel = self.get_channel(int(getenv('MEMBER_CHANNEL', 0)))
         if isinstance(member_update_channel, TextChannel):
@@ -76,8 +76,9 @@ class Pianobot(Bot):
         elif getenv('XP_CHANNEL') is not None:
             self.logger.warning('XP tracking channel %s not found', getenv('XP_CHANNEL'))
 
-    async def on_ready(self) -> None:
         self.logger.info('Booted up')
+
+        await TaskRunner(self).start_tasks()
 
     async def close(self) -> None:
         if self.corkus is not None:
