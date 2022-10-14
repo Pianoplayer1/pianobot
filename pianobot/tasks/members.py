@@ -43,7 +43,7 @@ async def members(bot: Pianobot) -> None:
                 player = await corkus_member.fetch_player()
                 embed_content += (
                     f'First join: {format_dt(player.join_date)}\n'
-                    f'Playtime: {round(player.playtime * 4.7 / 60)} hours\n'
+                    f'Playtime: {player.playtime.hours(4.7)} hours\n'
                     f'Total level: {player.combined_level}'
                 )
             except CorkusTimeoutError:
