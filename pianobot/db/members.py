@@ -49,7 +49,7 @@ class MemberTable:
         self, uuid: UUID, joined_at: datetime, name: str, rank: str, contributed_xp: int
     ) -> None:
         await self._con.execute(
-            f'INSERT INTO members (uuid, name, join_date, rank, contributed_xp)'
+            f'INSERT INTO members (uuid, join_date, name, rank, contributed_xp)'
             f' VALUES ($1, $2, $3, $4, $5)',
             uuid,
             joined_at,
