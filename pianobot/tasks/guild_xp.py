@@ -2,11 +2,9 @@ from __future__ import annotations
 
 from logging import getLogger
 from math import floor, log10
-from os import getenv
 from typing import TYPE_CHECKING
 
 from corkus.errors import CorkusTimeoutError
-from discord import TextChannel
 
 if TYPE_CHECKING:
     from pianobot import Pianobot
@@ -39,11 +37,8 @@ async def guild_xp(bot: Pianobot) -> None:
         msg += f'\n**#{pos + 1} {name}** — `{display(gxp)} XP | {display(gxp / 5)} XP/min`'
     msg += f'\n**Total: ** `{display(sum([item[1] for item in xp_diff]))} XP`'
 
-    channel = bot.get_channel(int(getenv('XP_CHANNEL', 0)))
-    if isinstance(channel, TextChannel):
-        await channel.send(msg)
-    elif getenv('XP_CHANNEL') is not None:
-        getLogger('tasks.guild_xp').warning('Channel %s not found', getenv('XP_CHANNEL'))
+    if bot.xp_tracking_channel is not None:
+        await bot.xp_tracking_channel.send(msg)
 
 
 def display(num: float) -> str:

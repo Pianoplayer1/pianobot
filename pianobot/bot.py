@@ -1,9 +1,9 @@
 from logging import Logger, getLogger
-from os import listdir
+from os import getenv, listdir
 
 from aiohttp import ClientSession
 from corkus import Corkus
-from discord import Intents, Message
+from discord import Intents, Message, TextChannel
 from discord.ext.commands import Bot, when_mentioned_or
 from discord.ext.commands.errors import ExtensionFailed
 
@@ -18,6 +18,8 @@ class Pianobot(Bot):
     enable_tracking: bool
     logger: Logger
     session: ClientSession
+    member_update_channel: TextChannel | None
+    xp_tracking_channel: TextChannel | None
 
     def __init__(self) -> None:
         intents = Intents.default()
@@ -59,6 +61,20 @@ class Pianobot(Bot):
                     await self.load_extension(f'pianobot.{folder}.{extension}')
                 except ExtensionFailed as exc:
                     self.logger.warning('Skipped %s.%s: %s', folder, extension, exc.__cause__)
+
+        self.member_update_channel = None
+        member_update_channel = self.get_channel(int(getenv('MEMBER_CHANNEL', 0)))
+        if isinstance(member_update_channel, TextChannel):
+            self.member_update_channel = member_update_channel
+        elif getenv('MEMBER_CHANNEL') is not None:
+            self.logger.warning('Member update channel %s not found', getenv('MEMBER_CHANNEL'))
+
+        self.xp_tracking_channel = None
+        xp_tracking_channel = self.get_channel(int(getenv('XP_CHANNEL', 0)))
+        if isinstance(xp_tracking_channel, TextChannel):
+            self.xp_tracking_channel = xp_tracking_channel
+        elif getenv('XP_CHANNEL') is not None:
+            self.logger.warning('XP tracking channel %s not found', getenv('XP_CHANNEL'))
 
     async def on_ready(self) -> None:
         self.logger.info('Booted up')
