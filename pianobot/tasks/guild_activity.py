@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from asyncio import gather
+from logging import getLogger
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -18,7 +19,10 @@ async def guild_activity(bot: Pianobot) -> None:
 
 async def fetch(bot: Pianobot, name: str) -> tuple[str, int | None]:
     response = await bot.session.get(f'https://web-api.wynncraft.com/api/v3/guild/{name}')
-    if response.status != 200:
-        return name, None
     guild = await response.json()
+    if response.status != 200:
+        getLogger('tasks.guild_activity').warning(
+            'Error when fetching guild data of `%s`: %s', name, guild
+        )
+        return name, None
     return name, guild['onlineMembers']

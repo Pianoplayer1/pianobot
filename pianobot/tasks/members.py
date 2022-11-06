@@ -3,7 +3,7 @@ from __future__ import annotations
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from corkus.errors import CorkusTimeoutError
+from corkus.errors import CorkusException
 from discord import Embed
 from discord.utils import format_dt
 
@@ -18,8 +18,8 @@ RANKS = ['Recruit', 'Recruiter', 'Captain', 'Strategist', 'Chief', 'Owner']
 async def members(bot: Pianobot) -> None:
     try:
         guild_members = (await bot.corkus.guild.get('Eden')).members
-    except CorkusTimeoutError:
-        getLogger('tasks.members').warning('Error when fetching guild data of `Eden`')
+    except CorkusException as e:
+        getLogger('tasks.members').warning('Error when fetching guild data of `Eden`: %s', e)
         return
 
     database_members = await bot.database.members.get_all()
@@ -46,8 +46,10 @@ async def members(bot: Pianobot) -> None:
                     f'Playtime: {round(player.playtime.hours(4.7))} hours\n'
                     f'Total level: {player.combined_level}'
                 )
-            except CorkusTimeoutError:
-                getLogger('tasks.members').warning('Error when fetching player data')
+            except CorkusException as e:
+                getLogger('tasks.members').warning(
+                    'Error when fetching player data of `%s`: %s', corkus_member.username, e
+                )
 
             await send_embed(
                 bot,

@@ -4,7 +4,7 @@ from logging import getLogger
 from math import floor, log10
 from typing import TYPE_CHECKING
 
-from corkus.errors import CorkusTimeoutError
+from corkus.errors import CorkusException
 
 if TYPE_CHECKING:
     from pianobot import Pianobot
@@ -13,8 +13,8 @@ if TYPE_CHECKING:
 async def guild_xp(bot: Pianobot) -> None:
     try:
         guild = await bot.corkus.guild.get('Eden')
-    except CorkusTimeoutError:
-        getLogger('tasks.guild_xp').warning('Error when fetching guild data of `Eden`')
+    except CorkusException as e:
+        getLogger('tasks.guild_xp').warning('Error when fetching guild data of `Eden`: %s', e)
         return
     current_xp = {member.username: member.contributed_xp for member in guild.members}
 

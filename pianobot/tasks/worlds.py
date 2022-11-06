@@ -3,7 +3,7 @@ from __future__ import annotations
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from corkus.errors import CorkusTimeoutError
+from corkus.errors import CorkusException
 
 if TYPE_CHECKING:
     from pianobot import Pianobot
@@ -13,8 +13,8 @@ async def worlds(bot: Pianobot) -> None:
     world_names = {world.name for world in await bot.database.worlds.get_all()}
     try:
         online_players = await bot.corkus.network.online_players()
-    except CorkusTimeoutError:
-        getLogger('tasks.worlds').warning('Error when fetching list of online players')
+    except CorkusException as e:
+        getLogger('tasks.worlds').warning('Error when fetching list of online players: %s', e)
         return
 
     for server in online_players.servers:

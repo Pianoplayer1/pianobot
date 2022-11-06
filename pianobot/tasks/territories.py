@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from corkus.errors import CorkusTimeoutError
+from corkus.errors import CorkusException
 from discord import TextChannel
 
 if TYPE_CHECKING:
@@ -17,8 +17,8 @@ async def territories(bot: Pianobot) -> None:
     missing = []
     try:
         wynn_territories = await bot.corkus.territory.list_all()
-    except CorkusTimeoutError:
-        getLogger('tasks.territories').warning('Error when fetching list of territories')
+    except CorkusException as e:
+        getLogger('tasks.territories').warning('Error when fetching list of territories: %s', e)
         return
 
     for territory in wynn_territories:
@@ -52,8 +52,14 @@ async def territories(bot: Pianobot) -> None:
         f' {notify.name}!```All missing territories ({len(missing)}):\n\n{terrs_msg}```'
     )
 
-    eden = await bot.corkus.guild.get('Eden')
-    player_list = await bot.corkus.network.online_players()
+    try:
+        eden = await bot.corkus.guild.get('Eden')
+        player_list = await bot.corkus.network.online_players()
+    except CorkusException as e:
+        getLogger('tasks.territories').warning(
+            'Error when fetching guild data of `Eden` and list of online players: %s', e
+        )
+        return
     highest_rank = max(
         (int(member.rank) for member in eden.members if player_list.is_player_online(member)),
         default=-1,
