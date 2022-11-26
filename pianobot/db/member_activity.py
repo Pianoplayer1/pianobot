@@ -12,7 +12,7 @@ class MemberActivityTable:
             'SELECT column_name FROM information_schema.columns WHERE table_name ='
             ' \'member_activity\''
         )
-        return [] if len(result) <= 1 else [column[0] for column in result[1:]]
+        return [] if len(result) <= 1 else [column[0] for column in result]
 
     async def get_one(self, username: str, week: str) -> int | None:
         result = await self._con.query(
