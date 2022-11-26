@@ -5,7 +5,11 @@ from pianobot import Pianobot
 
 
 def main() -> None:
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(
+        format='[%(levelname)s] %(asctime)s - %(name)s: %(message)s',
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S',
+    )
     logging.getLogger('discord.gateway').setLevel(logging.WARNING)
 
     bot = Pianobot()
