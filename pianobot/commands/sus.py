@@ -35,9 +35,9 @@ class Sus(Cog):
             wynncraft_rank = player_data.tag.value
             wynncraft_level = 0
             wynncraft_quests = 0
-            for player_class in player_data.classes:
-                wynncraft_quests += len(player_class.quests)
-                wynncraft_level += player_class.combined_level
+            for character in player_data.characters:
+                wynncraft_quests += len(character.quests)
+                wynncraft_level += character.combined_level
 
             oldest_date = min(
                 date
