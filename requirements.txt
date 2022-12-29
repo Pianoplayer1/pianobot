@@ -1,5 +1,5 @@
-aiohttp==3.7.4.post0
-asyncpg==0.26.0
-corkus.py==2.0.0
-discord.py[voice]==2.0.1
-matplotlib==3.5.3
+aiohttp==3.8.3
+asyncpg==0.27.0
+corkus.py==3.0.1
+discord.py[voice]==2.1.0
+matplotlib==3.6.2
