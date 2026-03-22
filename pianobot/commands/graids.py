@@ -101,7 +101,8 @@ class GuildRaids(Cog):
                     if len(args) < 3:
                         await ctx.send('Please specify a user (or `all`) to reset the raids for.')
                     elif args[2] == 'all':
-                        await self.bot.database.raid_members.reset_aspects()
+                        cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+                        await self.bot.database.raid_members.reset_aspects(cutoff=cutoff)
                         await ctx.send(f'All pending aspects have been reset.')
                     else:
                         if await self.bot.database.raid_members.reset_aspects(args[2]):

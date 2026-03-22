@@ -111,7 +111,7 @@ class RaidMemberTable:
         )
         return {row[0]: row[1] for row in result}
 
-    async def reset_aspects(self, username: str | None = None) -> bool:
+    async def reset_aspects(self, username: str | None = None, cutoff: datetime = datetime.max) -> bool:
         if username is not None:
             result = await self._con.execute(
                 'UPDATE raid_members SET pending_aspects = MOD(pending_aspects, 2)'
@@ -121,6 +121,8 @@ class RaidMemberTable:
             return result.endswith('1')
         await self._con.execute(
             'UPDATE raid_members SET pending_aspects = MOD(pending_aspects, 2)'
+            ' WHERE uuid IN (SELECT uuid FROM members WHERE join_date <= $1)',
+            cutoff
         )
         return True
 

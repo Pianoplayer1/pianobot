@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from datetime import datetime, time, timedelta, timezone
 from logging import getLogger
-from math import ceil, sqrt
 from random import choices
 from typing import TYPE_CHECKING
 
@@ -101,8 +100,8 @@ async def update_for_cycle(bot: Pianobot, cycle: str, prev_cycle: str | None = N
                     await bot.database.guild_award_stats.update_xp(member.username, cycle, member.contributed_xp)
 
 
-def draw_raid_raffle_winners(entries: list[tuple[str, int]], n: int = 3) -> tuple[list[tuple[str, int]], int]:
-    entries = [(name, ceil(sqrt(amount)), amount) for name, amount in entries]
+def draw_raid_raffle_winners(entries: list[tuple[str, int]], n: int = 5) -> tuple[list[tuple[str, int]], int]:
+    entries = [(name, amount // 5, amount) for name, amount in entries if amount > 50]
     total_tickets = sum(e[1] for e in entries)
 
     winners = []
@@ -130,8 +129,8 @@ async def send_results(bot: Pianobot, cycle: str, results: list[list[tuple[str, 
     raffle_results, total_tickets = draw_raid_raffle_winners(results[0])
     header = f"Total tickets: {total_tickets}"
     code_block = f'```md\n{header}\n{"-" * len(header)}\n'
-    for i, (name, tickets, amount) in enumerate(raffle_results[:5], start=1):
-        code_block += f'{i}. {name} ({tickets} tickets, {amount} raids)\n'
+    for i, (name, tickets, amount) in enumerate(raffle_results, start=1):
+        code_block += f'{i}. {name} ({tickets} tickets for {amount} raids)\n'
     embed.add_field(name='Raid Raffle', value=code_block + '```', inline=False)
 
     if bot.member_update_channel is not None:
