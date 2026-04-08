@@ -65,12 +65,13 @@ async def send_formatted_list(bot: "Pianobot", ctx: Messageable, start_text: str
 
     data = [
         [
-            bot.get_guild(682671629213368351).get_member(discord_id).display_name.lstrip("♔♕♜♝♞♙◉ ")[:24],
+            member.display_name.lstrip("♔♕♜♝♞♙◉ ")[:24],
             str(requested),
             str(received),
             format_time_since(first_request)[1] + " ago"
         ]
         for discord_id, (requested, received, first_request) in pending_tomes.items()
+        if (member := bot.get_guild(682671629213368351).get_member(discord_id)) is not None
     ]
 
     await paginator(ctx, data, columns, separator_rows=0, start_text=start_text)
