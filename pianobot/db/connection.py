@@ -18,6 +18,7 @@ class Connection:
             host=self._host,
             password=self._password,
             user=self._user,
+            ssl='disable',
         )
         getLogger('database').debug('Connected to database %s', self._database)
 
