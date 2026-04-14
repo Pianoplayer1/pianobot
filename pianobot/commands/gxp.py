@@ -3,7 +3,6 @@ from math import floor, log10
 
 from discord.ext.commands import Bot, Cog, Context, command
 from discord.utils import format_dt
-from setuptools.extern import names
 
 from pianobot import Pianobot
 from pianobot.utils import paginator
