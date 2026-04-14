@@ -8,6 +8,7 @@ dependencies = [
     "aiohttp>=3.13.5",
     "asyncpg>=0.31.0",
     "discord-py>=2.7.1",
+    "iso8601>=2.1.0",
     "matplotlib>=3.10.8",
 ]
 
