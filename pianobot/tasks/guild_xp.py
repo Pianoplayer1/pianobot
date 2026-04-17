@@ -19,12 +19,18 @@ async def guild_xp(bot: Pianobot) -> None:
     except CorkusException as e:
         getLogger('tasks.guild_xp').warning('Error when fetching guild data of `Eden`: %s', e)
         return
-    current_xp = {member.username: member.contributed_xp for member in guild.members}
-
-    await bot.database.guild_xp.update_columns(list(current_xp.keys()))
-    await bot.database.guild_xp.add(current_xp)
 
     data = await bot.database.guild_xp.get_last(2)
+
+    current_xp = {
+        member.username: member.contributed_xp
+        for member in guild.members
+        if member in data[0]
+    }
+
+    # await bot.database.guild_xp.update_columns(list(current_xp.keys()))
+    await bot.database.guild_xp.add(current_xp)
+
     new = data[0]
     old = data[1]
     xp_diff = []
