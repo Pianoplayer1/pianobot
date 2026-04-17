@@ -25,7 +25,7 @@ async def guild_xp(bot: Pianobot) -> None:
     current_xp = {
         member.username: member.contributed_xp
         for member in guild.members
-        if member in data[0]
+        if member in data[0].data
     }
 
     # await bot.database.guild_xp.update_columns(list(current_xp.keys()))
