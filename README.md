@@ -1,32 +1,48 @@
 # Pianobot
 
-Utility bot for the Discord server of the
-Wynncraft Eden guild making use of
-the [Wynncraft API](https://docs.wynncraft.com) and developed
-with [discord.py](https://github.com/Rapptz/discord.py).
+A Discord bot for the **Eden** guild on Wynncraft.
 
-[Invite](https://discord.com/api/oauth2/authorize?client_id=808038119332904990&permissions=274878164032&scope=bot)
-this bot to your own Discord server
-or [join Eden's server](https://discord.gg/P4bss3w) to use it.
+## What it does
 
-## List of commands
+**For Eden members**
 
-For more information about a command, run `<prefix>help <command>`
-in [Eden's Discord server](https://discord.gg/P4bss3w).
+- **Promotion cycles.** Tracks raid, war, and guild-XP contributions per half-month cycle and posts ranked award embeds when each cycle closes, including a weighted raffle over raid completions.
+- **Reward bookkeeping.** Tracks pending emerald, aspect, and XP-milestone rewards owed to each member, with slash commands to view, reset, block, and set the per-raid / per-billion-XP rates.
+- **Guild tome queue.** Persistent "Join queue" button plus grant/deny commands.
+- **Live event log.** Webhooks for member joins, leaves, renames, rank changes, 4-person raid-completion groups, and Eden-relevant territory captures or losses.
+- **Live XP feed.** Periodic embeds showing each member's contributed-XP gain over the last few minutes.
 
-Every command has to be prefixed with a server-wide prefix you can view by
-mentioning the bot followed by `help`. The listed aliases can be used instead
-of a command name. [square brackets] stand for optional, <angle brackets\>
-for required arguments.
+**For everyone**
 
-| Command                                 | Description                                                                  | Aliases                    |
-|-----------------------------------------|------------------------------------------------------------------------------|----------------------------|
-| `graph <guild> -[days]`                 | Outputs the member activity of a guild as a line graph.                      |
-| `gxp ['final' / custom interval]`       | Outputs Eden's guild experience contributions in a set interval.             | `guildXP`, `xp`            |
-| `help [command]`                        | Gives you an overview or a detailed description on commands.                 | `info`                     |
-| `inactivity <guild>`                    | Outputs the member inactivity times of a specified guild.                    | `act`, `activity`, `inact` |
-| `memberActivity [calendar week] [year]` | Outputs the member activity times of Eden for a calendar week.               | `mAct`                     |
-| `playerActivity <player> [days]`        | Outputs the activity of a given player in a given interval.                  | `pAct`                     |
-| `prefix <new>`                          | Updates the bot prefix for this server.                                      | `pre`                      |
-| `soulpoints`                            | Returns a list of the next Wynncraft servers that will give you soul points. | `sp`                       |
-| `sus <player>`                          | Check the suspiciousness of a player.                                        | `alt`                      |
+- **Player profiles.** Wynncraft profile info, plus a bar chart of a player's daily online minutes and an alt-account probability check.
+- **Guild stats.** Inactivity report, weekly playtime, raid / war / XP totals over arbitrary intervals, and a line graph of any tracked guild's online member count.
+- **World status.** Live world uptime list.
+
+---
+
+## Self-hosting
+
+1. Install dependencies: `uv sync`
+2. Export the required environment variables (see below).
+3. Run the bot: `uv run client.py`
+
+### Required environment variables
+
+```
+DISCORD_TOKEN=...
+PIANOBOT_DB_URL=postgresql://user:pass@host:5432/pianobot
+EDEN_DISCORD_ID=682671629213368351
+EDEN_WYNN_UUID=221efb28-7f93-4d5d-b219-9ddf43f7418b
+```
+
+### Optional environment variables
+
+```
+WYNN_API_TOKEN=...              # bearer token; doubles the rate limit
+MEMBER_CHANNEL_WEBHOOK=...      # join/leave/promote/demote/rename logs + award embeds
+XP_CHANNEL_WEBHOOK=...          # periodic guild-XP gain embeds
+RAID_CHANNEL_WEBHOOK=...        # 4-person raid-completion embeds
+TERRITORY_CHANNEL_WEBHOOK=...   # Eden-relevant territory change embeds
+TOME_CHANNEL_ID=...             # tome-queue log channel (id, not webhook)
+TOME_MESSAGE_ID=...             # message id for the persistent "Join queue" button
+```

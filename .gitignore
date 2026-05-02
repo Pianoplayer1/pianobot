@@ -1,3 +1,8 @@
 .vscode/
 .idea/
 venv/
+.venv/
+.ruff_cache/
+__pycache__/
+*.pyc
+.env
