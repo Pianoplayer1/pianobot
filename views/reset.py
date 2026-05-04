@@ -26,7 +26,7 @@ class ConfirmResetAllView(ui.View):
         self, interaction: Interaction, _: ui.Button[ConfirmResetAllView]
     ) -> None:
         """Apply the reset across every member, then disable the button."""
-        await eden.reset_all_pending(self.bot.pool, self.kind)
+        await eden.reset_all_pending(self.bot.pool, self.kind, self.bot.eden_wynn_uuid)
         for child in self.children:
             if isinstance(child, ui.Button):
                 child.disabled = True
