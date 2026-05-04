@@ -106,6 +106,14 @@ class ManageCommands(app_commands.Group, name="manage"):
         self, interaction: Interaction, kind: RewardKind, username: str
     ) -> None:
         """Reset a member's pending balance (or all members')."""
+        member = interaction.user
+        if not isinstance(member, Member):
+            await interaction.response.send_message("Only executable in guilds.")
+            return
+        if kind == "emeralds" and not member.guild_permissions.administrator:
+            await interaction.response.send_message("Emerald commands for admins only.")
+            return
+
         if username.lower() == "all":
             await interaction.response.send_message(
                 f"Are you sure you want to reset **all** pending {kind} balances?",
@@ -128,9 +136,17 @@ class ManageCommands(app_commands.Group, name="manage"):
         self, interaction: Interaction, kind: RewardKind, amount: int
     ) -> None:
         """Set the per-raid rate for emeralds or aspects."""
+        member = interaction.user
+        if not isinstance(member, Member):
+            await interaction.response.send_message("Only executable in guilds.")
+            return
+        if kind == "emeralds" and not member.guild_permissions.administrator:
+            await interaction.response.send_message("Emerald commands for admins only.")
+            return
         if amount < 0:
             await interaction.response.send_message("Amount cannot be negative.")
             return
+
         await eden.set_rate(self.bot.pool, _RATE_KEYS[kind], amount)
         unit = eden.display_unit(kind)
         unit_name = "LE" if kind == "emeralds" else "aspects"
