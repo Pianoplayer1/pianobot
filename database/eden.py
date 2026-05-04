@@ -134,14 +134,28 @@ async def reset_pending(pool: Pool, uuid: UUID, kind: str) -> None:
     )
 
 
-async def reset_all_pending(pool: Pool, kind: str) -> None:
-    """Reset every positive pending balance for the given kind."""
+async def reset_all_pending(
+    pool: Pool, kind: str, eden_uuid: UUID | None = None
+) -> None:
+    """Reset every positive pending balance (for aspects: 7d cd) for the given kind."""
     column = "pending_emeralds" if kind == "emeralds" else "pending_aspects"
     unit = display_unit(kind)
-    await pool.execute(
-        f"UPDATE reward_balances SET {column} = MOD({column}, {unit})"  # noqa: S608
-        f" WHERE {column} > 0"
-    )
+    if kind == "aspects" and eden_uuid is not None:
+        await pool.execute(
+            f"UPDATE reward_balances r SET {column} = MOD({column}, {unit})"  # noqa: S608
+            f" WHERE {column} > 0"
+            " AND NOT EXISTS ("
+            "   SELECT 1 FROM guild_memberships gm"
+            "   WHERE gm.uuid = r.uuid AND gm.guild_uuid = $1"
+            "   AND gm.joined_at > NOW() - INTERVAL '7 days'"
+            ")",
+            eden_uuid,
+        )
+    else:
+        await pool.execute(
+            f"UPDATE reward_balances SET {column} = MOD({column}, {unit})"  # noqa: S608
+            f" WHERE {column} > 0"
+        )
 
 
 async def get_rate(pool: Pool, key: str, default: int = 0) -> int:
