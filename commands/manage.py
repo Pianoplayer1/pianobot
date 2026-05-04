@@ -118,7 +118,6 @@ class ManageCommands(app_commands.Group, name="manage"):
             await interaction.response.send_message(
                 f"Are you sure you want to reset **all** pending {kind} balances?",
                 view=ConfirmResetAllView(kind, self.bot),
-                ephemeral=True,
             )
             return
         await interaction.response.defer(thinking=True)
