@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -39,5 +40,14 @@ async def refresh_tracked_guilds(bot: Pianobot) -> None:
             merged[entry.uuid] = (entry.name, entry.prefix)
     if not merged:
         return
-    await tracked_guilds.refresh(bot.pool, merged, keep_uuids=[bot.eden_wynn_uuid])
+    keep_uuids = [bot.eden_wynn_uuid]
+
+    for attempt in range(3):
+        try:
+            await tracked_guilds.refresh(bot.pool, merged, keep_uuids=keep_uuids)
+        except Exception as exc:
+            if attempt == 2:
+                raise
+            log.warning("Refreshing tracked guilds raised %s", exc)
+            await asyncio.sleep(0.2 * (attempt + 1))
     log.info("Refreshed tracked guilds: %d entries", len(merged))

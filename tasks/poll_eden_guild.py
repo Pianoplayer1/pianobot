@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import logging
-from collections import defaultdict
-from itertools import batched
+from collections import defaultdict, deque
+from heapq import heapify, heappop, heappush
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from api import NotFoundError, WynncraftError
 from database import eden, guild_membership, guild_metrics
@@ -73,8 +74,22 @@ async def _dispatch_raid_groups(
         by_raid[raid.raid_name].append(raid)
 
     for raid_name in sorted(by_raid.keys()):
-        raids_in_name = sorted(by_raid[raid_name], key=lambda r: r.username.lower())
-        for group in batched(raids_in_name, 4):
+        by_uuid: dict[UUID, deque[NewRaid]] = defaultdict(deque)
+        for raid in by_raid[raid_name]:
+            by_uuid[raid.uuid].append(raid)
+        heap = [(-len(q), q[0].username.lower(), uuid) for uuid, q in by_uuid.items()]
+        heapify(heap)
+
+        while heap:
+            group: list[NewRaid] = []
+            leftover = []
+            while len(group) < 4 and heap:
+                neg_rem, name, uuid = heappop(heap)
+                group.append(by_uuid[uuid].popleft())
+                if -neg_rem > 1:
+                    leftover.append((neg_rem + 1, name, uuid))
+            for item in leftover:
+                heappush(heap, item)
             if len(group) == 4:
                 usernames = [r.username for r in group]
                 await webhooks.send_eden_raid_completed(

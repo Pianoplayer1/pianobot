@@ -78,7 +78,7 @@ async def post_queue(bot: Pianobot, header: str) -> None:
     if not isinstance(channel := bot.get_channel(int(tome_channel_id)), TextChannel):
         return
 
-    guild = bot.get_guild(int(os.environ["EDEN_GUILD_ID"]))
+    guild = bot.get_guild(int(os.environ["EDEN_DISCORD_ID"]))
     if guild is None:
         return
 

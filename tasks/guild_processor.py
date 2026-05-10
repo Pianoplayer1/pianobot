@@ -148,7 +148,11 @@ async def process_guild(
 
     for member in guild.members:
         if member.raid_counts:
-            state.raid_counts[member.uuid] = member.raid_counts
+            prev_counts = state.raid_counts.get(member.uuid, {})
+            state.raid_counts[member.uuid] = {
+                raid_name: max(count, prev_counts.get(raid_name, 0))
+                for raid_name, count in member.raid_counts.items()
+            }
         else:
             state.raid_counts.pop(member.uuid, None)
         if member.total_level is not None:
@@ -312,6 +316,8 @@ async def _reconcile_guild_raids(
         if prev_raids is None:
             continue
         for raid_name, new_count in member.raid_counts.items():
+            if raid_name not in prev_raids:
+                continue
             for _ in range(max(0, new_count - prev_raids.get(raid_name, 0))):
                 visible.append((member.uuid, member.username, raid_name))
 
